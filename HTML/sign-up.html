@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="../CSS/sign-up.css"/>
+    <link rel="stylesheet" href="../CSS/color.css"/>
+    <link rel="stylesheet" href="../CSS/typography.css"/>
+  </head>
+  <body>
+    <main class="login-container">
+      <section class="left-column">
+        <div class="logo-section">
+          <h1>StockMaster</h1>
+        </div>
+        <div class="welcome-section">
+          <h2>Velkommen tilbage</h2>
+          <p>Hvis du allerede har en konto, kan du logge ind her.</p>
+          <button class="login-button">Login</button>
+        </div>
+      </section>
+
+      <section class="right-column">
+        <div class="registration-form">
+          <h2>Opret konto</h2>
+          <form id="registerForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="fornavn">Fornavn</label>
+                <input type="text" id="fornavn" name="fornavn" placeholder="Fornavn" required />
+              </div>
+              <div class="form-group">
+                <label for="efternavn">Efternavn</label>
+                <input type="text" id="efternavn" name="efternavn" placeholder="Efternavn" required />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" placeholder="Email" required />
+            </div>
+
+            <div class="form-group">
+              <label for="telefon">Telefonnummer</label>
+              <input type="tel" id="telefon" name="telefon" placeholder="Telefonnummer" />
+            </div>
+
+            <div class="form-group">
+              <label for="password">Adgangskode</label>
+              <input type="password" id="password" name="password" placeholder="Adgangskode" required />
+            </div>
+
+            <div class="form-buttons">
+              <button type="button" class="cancel-button">Anuller</button>
+              <button type="submit" class="save-button">Gem</button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
