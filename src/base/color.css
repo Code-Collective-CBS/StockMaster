@@ -1,0 +1,17 @@
+:root {
+    --primary-color: #151F32;
+    --secondary-color: #172540;
+    --highlight: #00DA91;
+    --primary-text: #FFFFFF;
+    --secondary-text: #EBF2F1;
+    --grey: #454545;
+}
+
+.light-theme {
+    --primary-color: white;
+    --secondary-color: #EBF2F1;
+    --highlight: #00DA91;
+    --primary-text: #172540;
+    --secondary-text: #EBF2F1;
+    --grey: #454545;
+}
