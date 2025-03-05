@@ -6,35 +6,32 @@
     <title>StockMaster - Login</title>
     <link rel="stylesheet" href="/src/base/color.css"/>
     <link rel="stylesheet" href="/src/base/typography.css"/>
-    <link rel="stylesheet" href="/src/layouts/sign-up.css"/>
+    <link rel="stylesheet" href="/src/layouts/login.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   </head>
-  <body>
-    <main class="login-container">
-      <div class="login-form">
-        <div class="logo-section">
-          <h1>StockMaster</h1>
+   <body>
+    <div class="container">
+      <h1>StockMaster</h1>
+
+      <h2>Login på din konto</h2>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="brugernavn">Brugernavn:</label>
+          <input type="text" id="brugernavn" name="brugernavn" placeholder="Brugernavn" required />
         </div>
 
-        <h2>Login på din konto</h2>
+        <div class="form-group">
+          <label for="adgangskode">Adgangskode:</label>
+          <input type="password" id="adgangskode" name="adgangskode" placeholder="Adgangskode" required />
+        </div>
 
-        <form id="loginForm">
-          <div class="form-group">
-            <label for="brugernavn">Brugernavn:</label>
-            <input type="text" id="brugernavn" name="brugernavn" required />
-          </div>
+        <button type="submit">Login</button>
+      </form>
 
-          <div class="form-group">
-            <label for="adgangskode">Adgangskode:</label>
-            <input type="password" id="adgangskode" name="adgangskode" required />
-          </div>
-
-          <button type="submit" class="login-button">Login</button>
-        </form>
-
-        <div class="register-link">
-            <a href="/src/pages/sign-up.html">Har du ikke en konto? Registrer</a>
-          </div>
+      <div class="register-link">
+        <a href="/src/pages/sign-up.html">Har du ikke en konto? Registrer her</a>
       </div>
-    </main>
+    </div>
   </body>
 </html>
