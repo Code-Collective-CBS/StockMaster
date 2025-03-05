@@ -32,6 +32,7 @@ html, body {
 .logo-section {
     padding-top: 1rem;
     padding-bottom: 4rem;
+    text-align: center;
 }
 
 .logo-section h1 {
@@ -152,8 +153,8 @@ html, body {
 /* Form Buttons */
 .form-buttons {
     display: flex;
-    justify-content: center;
-    gap: 1rem;
+    justify-content: flex-start;
+    gap: 2rem;
     margin-top: 3rem;
 }
 
@@ -163,7 +164,7 @@ html, body {
     border: none;
     border-radius: 20px;
     cursor: pointer;
-    min-width: 120px;
+    min-width: 200px;
     font-size: var(--text-size);
     transition: opacity 0.2s;
 }
