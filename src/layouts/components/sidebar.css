@@ -1,0 +1,126 @@
+/* sidebar styles for all pages */
+
+/* Base sidebar container */
+.sideBar {
+    width: 250px;
+    background-color: var(--secondary-color);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0; /* top and bottom */
+    position: fixed;
+    height: 100vh;
+    box-sizing: border-box;
+    z-index: 100;
+}
+
+/* Brand name styling */
+.brandName {
+    font-size: var(--h4-size);
+    font-weight: var(--h1-weight);
+    color: var(--primary-text);
+    padding: 20px 25px; /* top and bottom and left and right */
+    margin-bottom: 20px;
+}
+
+/* Navigation container */
+.sideBarNav {
+    flex-grow: 1; /* Take up remaining space */
+}
+
+/* Common styles for all nav items */
+.nav-item, .setting-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 25px;
+    color: var(--primary-text);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.nav-item:hover, .setting-item:hover {
+    background-color: var(--sidebar-hover);
+}
+
+/* Active state for selected nav item */
+.nav-item.active {
+    background-color: var(--active-nav);
+    border-left: 4px solid var(--highlight);
+    padding-left: 21px; /* 25px - 4px border (align with the rest) */
+}
+
+.nav-item.active a, .nav-item.active .icon {
+    color: var(--highlight);
+}
+
+/* Icon styling */
+.icon {
+    margin-right: 15px;
+    color: var(--primary-text);
+}
+
+/* Link styling */
+.nav-item a, .setting-item a {
+    text-decoration: none;
+    color: inherit;
+    font-size: var(--text-size);
+}
+
+/* Settings area at bottom of sidebar */
+.sideBarSetting {
+    margin-top: auto;
+    border-top: 1px solid var(--sidebar-hover);
+    padding-top: 10px;
+}
+
+/* Special styling for logout button */
+#signOut-item {
+    color: var(--red); /* Red shade for logout */
+}
+
+#signOut-item .icon {
+    color: var(--red);
+}
+
+/* Responsive styles for smaller screens */
+@media (max-width: 768px) {
+    .sideBar {
+        width: 70px;
+        padding: 10px 0;
+    }
+
+    .brandName {
+        font-size: 0;
+        padding: 20px 0;
+        text-align: center;
+    }
+
+    .brandName::first-letter {
+        font-size: 24px;
+    }
+
+    .nav-item, .setting-item {
+        padding: 15px 0;
+        justify-content: center;
+    }
+
+    .nav-item a, .setting-item a {
+        display: none;
+    }
+
+    .icon {
+        margin-right: 0;
+    }
+
+    .nav-item.active {
+        border-left: none;
+        border-left-width: 0;
+        padding-left: 0;
+        border-right: 4px solid var(--highlight);
+    }
+}
+
+/* For very small screens */
+@media (max-width: 576px) {
+    .sideBar {
+        width: 60px;
+    }
+}

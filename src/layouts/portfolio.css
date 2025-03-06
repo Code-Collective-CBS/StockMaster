@@ -1,0 +1,384 @@
+/* Main layout */
+body {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-primary);
+    background-color: var(--primary-color);
+    color: var(--primary-text);
+    min-height: 100vh;
+}
+
+/* Main content area */
+.main-content {
+    flex: 1;
+    margin-left: 250px; /*same as sidebar width*/
+    padding: 30px;
+    box-sizing: border-box;
+}
+
+/* Header */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.page-header h1 {
+    font-size: var(--h1-size);
+    font-weight: var(--h1-weight);
+    margin: 0;
+}
+
+.header-actions {
+    display: flex;
+    gap: 15px;
+}
+
+/* Buttons */
+.btn {
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: var(--text-size);
+    font-weight: var(--text-size);
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn:hover {
+    transform: translateY(-2px); /* lift the button slightly on hover*/
+}
+
+.btn-primary {
+    background-color: var(--highlight);
+    color: var(--secondary-color);
+}
+
+.btn-primary:hover {
+    background-color: #00c080; /* Darker shade of highlight */
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    color: var(--primary-text);
+    border: 1px solid var(--grey);
+}
+
+.btn-secondary:hover {
+    background-color: var(--grey);
+}
+
+/* Dashboard layout */
+.dashboard-top {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two equal columns 1fr stands for one fraction and 1fr 1fr stands for two equal columns */
+    gap: 20px; /* Gap between the two columns */
+    margin-bottom: 30px;
+}
+
+.total-value-card {
+    grid-column: 1; /* Card will take the first column */
+    grid-row: 1; /* Card will take the first row */
+}
+
+.portfolio-list-card {
+    grid-column: 2; /* Card will take the second column */
+
+    grid-row: 1 / span 2; /* It is placed in column 2, starting at row 1.
+    grid-row: 1 / span 2; → This means it spans across two rows (from row 1 through row 2).So this element will be taller than the others. */
+}
+
+.pie-chart-card {
+    grid-column: 1;
+    grid-row: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Card design */
+.card {
+    background-color: var(--secondary-color);
+    border-radius: 10px;
+    padding: 25px;
+}
+
+.card-label {
+    color: var(--primary-text);
+    font-size: var(--text-size);
+    margin: 0 0 10px 0; /* Clockwise order (top, right, bottom, left*/
+}
+
+.card-title {
+    font-size: var(--h4-size);
+    font-weight: var(--h4-weight);
+    margin: 0 0 20px 0; /* Clockwise order (top, right, bottom, left*/
+}
+
+.total-value-number {
+    font-size: var(--h2-size);
+    font-weight: var(--h2-weight);
+    margin: 20px 0 20px 0; /* top and bottom */
+    color: var(--highlight);
+}
+
+/* Performance indicators */
+.performance-indicators {
+    display: flex;
+    gap: 40px;
+    margin-top: 20px;
+}
+
+.indicator {
+    display: flex;
+    flex-direction: column;
+}
+
+.period {
+    font-size: var(--text-size);
+    color: var(--primary-text);
+    margin-bottom: 2.5px;
+}
+
+.value {
+    font-size: var(--h5-size);
+    font-weight: var(--h5-weight);
+    display: flex;
+    align-items: center;
+}
+
+.positive {
+    color: var(--highlight);
+}
+
+.negative {
+    color: var(--red); /* Red for negative values */
+}
+
+.arrow {
+    margin-left: 5px;
+}
+
+/* Portfolio list */
+.portfolio-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.portfolio-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 2fr 1fr; /* Four columns with different widths (fractions) */
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--grey);
+}
+
+.portfolio-row:last-child {
+    border-bottom: none;
+}
+
+.portfolio-name {
+    font-weight: var(--h2-weight);
+}
+
+.portfolio-change {
+    text-align: right;
+}
+
+.portfolio-value {
+    text-align: right;
+}
+
+.portfolio-link a {
+    color: var(--highlight);
+    text-decoration: none;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.portfolio-link a:hover {
+    text-decoration: underline;
+}
+
+/* Chart containers */
+.chart-container {
+    width: 100%;
+    height: 100%;
+    min-height: 250px;
+}
+
+.dashboard-bottom .chart-container {
+    min-height: 350px;
+}
+
+/* Full width card */
+.full-width {
+    width: 100%;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.timeframe-select {
+    background-color: var(--secondary-color);
+    border: 1px solid var(--grey);
+    border-radius: 10px;
+    color: var(--primary-text);
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: var(--secondary-color);
+    border-radius: 12px;
+    width: 500px;
+    max-width: 90%;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: var(--h3-size);
+    font-weight: var(--h3-weight);
+}
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: var(--primary-text);
+    cursor: pointer;
+}
+
+.modal-body {
+    padding: 25px;
+}
+
+/* Form styles */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--primary-text);
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.form-group input:focus, .form-group select:focus {
+    outline: none;
+    border-color: var(--highlight);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .dashboard-top {
+        grid-template-columns: 1fr;
+    }
+
+    .total-value-card, .portfolio-list-card, .pie-chart-card {
+        grid-column: 1;
+    }
+
+    .total-value-card {
+        grid-row: 1;
+    }
+
+    .portfolio-list-card {
+        grid-row: 2;
+    }
+
+    .pie-chart-card {
+        grid-row: 3;
+    }
+}
+
+@media (max-width: 768px) {
+    .sideBar {
+        width: 70px;
+        padding: 10px 0;
+    }
+
+    .brandName {
+        font-size: 0;
+        padding: 20px 0;
+        text-align: center;
+    }
+
+    .brandName::first-letter {
+        font-size: 24px;
+    }
+
+    .nav-item, .setting-item {
+        padding: 15px 0;
+        justify-content: center;
+    }
+
+    .nav-item a, .setting-item a {
+        display: none;
+    }
+
+    .icon {
+        margin-right: 0;
+    }
+
+    .main-content {
+        margin-left: 70px;
+        padding: 20px;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .header-actions {
+        width: 100%;
+    }
+
+    .btn {
+        flex: 1;
+    }
+}

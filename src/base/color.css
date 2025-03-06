@@ -4,7 +4,10 @@
     --highlight: #00DA91;
     --primary-text: #FFFFFF;
     --secondary-text: #EBF2F1;
-    --grey: #454545;
+    --grey: rgba(255, 255, 255, 0.2);
+    --sidebar-hover: rgba(255, 255, 255, 0.1);
+    --active-nav: rgba(0, 218, 145, 0.2);
+    --red: #EB5050;
 }
 
 .light-theme {
@@ -13,5 +16,6 @@
     --highlight: #00DA91;
     --primary-text: #172540;
     --secondary-text: #EBF2F1;
-    --grey: #454545;
+    --grey: rgba(255, 255, 255, 0.2);
+    --red: #EB5050;
 }
