@@ -1,0 +1,63 @@
+/* TRANSACTION LAYOUT */
+main.transaction-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    max-width: 1400px;
+    width: 100%;
+}
+
+/* GRID LAYOUT */
+section.transaction-grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(3, 1fr);
+    width: 100%;
+    max-width: 100%;
+    background-color: transparent;
+}
+
+section.transactions{
+    grid-column: span 3;
+}
+section.balance{
+    grid-column: span 2;
+}
+section.top-trades{
+    grid-column: span 1;
+}
+
+/* TRANSACTION CONTENT STYLING*/
+section {
+    background-color: var(--secondary-color);
+    border-radius: 5px;
+    padding: 20px;
+}
+
+/*TABLE STYLING*/
+table{
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+}
+thead tr{
+    font-weight: var(--text-weight-bold);
+    border-bottom: solid 3px var(--third-blue);
+}
+tbody tr{
+    border-bottom: solid 2px var(--grey);
+    transition:  0.3s ease-in-out;
+}
+
+tbody tr:hover{
+    color: var(--secondary-color);
+    background-color: var(--secondary-highligth);
+}
+
+th, td{
+    padding: 10px;
+}
+
+td{
+    height: 35px;
+}

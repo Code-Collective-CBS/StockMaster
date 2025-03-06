@@ -1,15 +1,92 @@
-body{
+/* DASHBOARD LAYOUT */
+main.dashboard-content {
     display: flex;
-    height: 100vh;
-    background-color: var(--primary-color);
-    font-size: var(--text-size);
-    font-family: var(--font-primary);
-    color: var(--primary-text);
+    flex-direction: column;
+    flex-grow: 1;
+    max-width: 1400px;
+    width: 100%;
 }
 
-.dashboard-content{
-    flex: 1;
-    margin-left: 250px; /*same as sidebar width*/
-    padding: 30px;
-    box-sizing: border-box;
+/* GRID LAYOUT */
+section.dashboard-grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(3, 1fr);
+    width: 100%;
+    max-width: 100%;
+    background-color: transparent;
+}
+
+/* GRID LAYOUT: Define Spans */
+section.overview,
+section.portfolios,
+section.benchmark,
+section.top-stocks {
+    grid-column: span 1;
+}
+
+section.portfolio-graph {
+    grid-column: span 3;
+}
+
+section.news {
+    grid-column: span 2;
+}
+
+/* DASHBOARD CONTENT STYLING */
+section {
+    background-color: var(--secondary-color);
+    border-radius: 5px;
+    padding: 20px;
+}
+
+/* SELECT ELEMENTS */
+#overview-interval,
+#benchmark-interval,
+#portfolio-graph-interval {
+    color: var(--highlight);
+    background-color: transparent;
+    border: none;
+    outline: none;
+    font-weight: var(--text-weight-bold);
+}
+
+/* OVERVIEW */
+.overview-value {
+    font-size: var(--h5-size);
+}
+
+/* PORTFOLIOS */
+a.portfolio {
+    color: #BADFEE;
+    text-decoration: none;
+}
+
+/* BENCHMARK */
+.benchmark-index {
+    font-size: var(--h5-size);
+}
+
+/* PORTFOLIO GRAPH SECTION */
+section.portfolio-graph {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.portfolio-graph h2 {
+    align-self: flex-start;
+    margin-bottom: 10px;
+}
+
+.portfolio-graph canvas {
+    flex-grow: 1;
+    max-width: 100%;
+}
+
+.portfolio-graph select {
+    align-self: flex-end;
+    margin-top: 10px;
 }

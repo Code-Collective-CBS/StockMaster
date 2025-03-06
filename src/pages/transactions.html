@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Overblik</title>
-    <link rel="stylesheet" href="../styles/layouts/dashboard.css">
+    <title>Transaktioner</title>
+    <link rel="stylesheet" href="../styles/layouts/transactions.css">
     <link rel="stylesheet" href="../styles/base/color.css">
     <link rel="stylesheet" href="../styles/base/typography.css">
     <link rel="stylesheet" href="../styles/base/global-sidebar.css">
@@ -48,7 +48,7 @@
                 </svg>
                 <a href="#">Aktier</a>
             </div>
-            
+
             <div class="nav-item">
                 <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
@@ -96,68 +96,85 @@
             </nav>
         </div>
     </aside>
-    <main class="dashboard-content">
+    <main class="transaction-content">
         <header class="top-bar">
-            <h1>Overblik</h1>
+            <h1>Transaktioner</h1>
         </header>
-        <section class="dashboard-grid">
-            <section class="overview">
-                <h2>Egenkapital</h2>
-                <p class="overview-value">999999 <span class="currency">[Valuta]</span></p>
-                <p class="overview-change">15%</p>
-                <select name="overview-interval" id="overview-interval">
-                    <option value="day">Dag</option>
-                    <option value="month">måned</option>
-                    <option value="current-year">i år</option>
-                    <option value="year">år</option>
-                </select>
+        <section class="transaction-grid">
+            <section class="transactions">
+                <h2>Alle transaktioner</h2>
+                <table id="transaction-table">
+                    <thead>
+                        <tr class="tr-thead">
+                            <th class="th-date">Dato</th>
+                            <th class="th-account">Konto</th>
+                            <th class="th-portofolio">Portefølje</th>
+                            <th class="th-type">Type</th>
+                            <th class="th-ammount">Beløb</th>
+                            <th class="th-market-price">Kurs</th>
+                            <th class="th-cost">Omkostninger</th>
+                            <th class="th-money-ammount">Beløb</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="tr-body-1">
+                            <td class="td-date">01/01/2025</td>
+                            <td class="td-account">Konto 1</td>
+                            <td class="td-portofolio">Portefølje 1</td>
+                            <td class="td-type">Inbetaling</td>
+                            <td class="td-ammount">-</td>
+                            <td class="td-market-price">-</td>
+                            <td class="td-cost">-</td>
+                            <td class="td-money-ammount">9999 <span class="currency">DKK</span></td>
+                        </tr>
+                        <tr class="tr-body-2">
+                            <td class="td-date">02/02/2025</td>
+                            <td class="td-account">Konto 2</td>
+                            <td class="td-portofolio">Portefølje 2</td>
+                            <td class="td-type">Inbetaling</td>
+                            <td class="td-ammount">-</td>
+                            <td class="td-market-price">-</td>
+                            <td class="td-cost">-</td>
+                            <td class="td-money-ammount">9999 <span class="currency">DKK</span></td>
+                        </tr>
+                    </tbody>
+                </table>
             </section>
 
-            <section class="portfolios">
-                <h2>Porteføljer</h2>
-                <p><a class="portfolio" href="#">Portefølje 1</a></p>
-                <p><a class="portfolio" href="#">Portefølje 2</a></p>
-                <p><a class="portfolio" href="#">Portefølje 3</a></p>
+            <section class="balance">
+                <h2>Saldooversigt</h2>
+                <table id="balance-table">
+                    <thead>
+                        <tr class="tr-head">
+                            <th class="th-currency">Valuta</th>
+                            <th class="th-added-account">Tilføjet konto</th>
+                            <th class="th-subtracted-account">Fratrukket konto</th>
+                            <th class="th-total">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="tr-body-1">
+                            <td class="td-currency">DKK</td>
+                            <td class="td-added-account">999</td>
+                            <td class="td-subtracted-account">100</td>
+                            <td class="td-total">899</td>
+                        </tr>
+                    <tbody>
+                        <tr class="tr-body-2">
+                            <td class="td-currency">SEK</td>
+                            <td class="td-added-account">200</td>
+                            <td class="td-subtracted-account">100</td>
+                            <td class="td-total">100</td>
+                        </tr>
+                    </tbody>
+                </table>
             </section>
 
-            <section class="benchmark">
-                <h2>Benchmark</h2>
-                <p class="benchmark-index">OMXC25</p>
-                <p class="benchmark-change">15%</p>
-                <select name="benchmark" id="benchmark-interval">
-                    <option value="day">Dag</option>
-                    <option value="month">Måned</option>
-                    <option value="current-year">I år</option>
-                    <option value="year">år</option>
-                </select>
-            </section>
-
-            <section class="portfolio-graph">
-                <h2>Alle porteføljer</h2>
-                <canvas id="portfolioChart"></canvas>
-                <select name="portfolio-graph-interval" id="portfolio-graph-interval">
-                    <option value="day">Dag</option>
-                    <option value="month">Måned</option>
-                    <option value="current-year">I år</option>
-                    <option value="year">år</option>
-                </select>
-            </section>
-
-            <section class="news">
-                <h2>Nyheder</h2>
-                <p>Her står en meget meget meget meget meget meget meget meget meget meget meget meget meget meget meget
-                    meget
-                    meget meget meget meget meget meget meget meget meget meget meget meget meget meget meget meget
-                    meget meget meget meget meget meget meget meget spændende nyhed...</p>
-            </section>
-
-            <section class="top-stocks">
-                <h2>Top 5 aktier</h2>
-                <p>OMXC25 - 999 [valuta]</p>
-                <p>S&P 500 - 999 [valuta]</p>
-                <p>OMXC25 - 999 [valuta]</p>
-                <p>S&P 500 - 999 [valuta]</p>
-                <p>OMXC25 - 999 [valuta]</p>
+            <section class="top-trades">
+                <h2>Mest handlede</h2>
+                <p class="most-traded-1">Novo nordisk A/S</p>
+                <p class="most-traded-2">Apple Inc</p>
+                <p class="most-traded-2">Microsoft corp.</p>
             </section>
         </section>
     </main>

@@ -1,0 +1,73 @@
+/* Ensure main content takes full space */
+main.securities-news-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    max-width: 1400px;
+    width: 100%;
+    padding: 20px;
+}
+
+/* PARENT GRID: 2 COLUMNS (Left: Search + News, Right: Top Picks) */
+section.securities-news-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* Left column (search/news) takes more space */
+    gap: 20px; /* Adds spacing between sections */
+    width: 100%;
+}
+
+/* LEFT COLUMN: Nested Grid (Search + News) */
+.left-column {
+    display: grid;
+    grid-template-rows: auto auto; /* 2 rows (search + news) */
+    gap: 20px;
+}
+
+/* RIGHT COLUMN: Top Picks */
+section.top-picks, section.search-stocks,  section.news{
+    background-color: var(--secondary-color);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+/* General Section Styling */
+section {
+    border-radius: 8px;
+    padding: 20px;
+}
+
+/* SEARCH BAR STYLING */
+.search-container {
+    display: flex;
+    align-items: center;
+    background-color: var(--secondary-text);
+    padding: 5px;
+    border-radius: 8px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.search-container input {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    color: var(--primary-text);
+}
+
+.search-container button {
+    background-color: var(--highlight);
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    color: white;
+    border-radius: 0 8px 8px 0;
+    transition: background 0.3s;
+    height: 100%;
+}
+
+.search-container button:hover {
+    background-color: var(--primary-text);
+    color: var(--secondary-color);
+}

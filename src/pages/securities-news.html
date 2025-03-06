@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Overblik</title>
-    <link rel="stylesheet" href="../styles/layouts/dashboard.css">
+    <title>Værdipapirer og nyheder</title>
+    <link rel="stylesheet" href="../styles/layouts/securities-news.css">
     <link rel="stylesheet" href="../styles/base/color.css">
     <link rel="stylesheet" href="../styles/base/typography.css">
     <link rel="stylesheet" href="../styles/base/global-sidebar.css">
@@ -48,7 +48,7 @@
                 </svg>
                 <a href="#">Aktier</a>
             </div>
-            
+
             <div class="nav-item">
                 <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
@@ -96,68 +96,37 @@
             </nav>
         </div>
     </aside>
-    <main class="dashboard-content">
+    <main class="securities-news-content">
         <header class="top-bar">
-            <h1>Overblik</h1>
+            <h1>Værdipapirer og nyheder</h1>
         </header>
-        <section class="dashboard-grid">
-            <section class="overview">
-                <h2>Egenkapital</h2>
-                <p class="overview-value">999999 <span class="currency">[Valuta]</span></p>
-                <p class="overview-change">15%</p>
-                <select name="overview-interval" id="overview-interval">
-                    <option value="day">Dag</option>
-                    <option value="month">måned</option>
-                    <option value="current-year">i år</option>
-                    <option value="year">år</option>
-                </select>
+
+        <section class="securities-news-grid">
+            <!-- LEFT COLUMN (Search + News) -->
+            <section class="left-column">
+                <section class="search-stocks">
+                    <h2>Søg værdipapirer</h2>
+                    <div class="search-container">
+                        <input type="text" placeholder="Søg efter værdipapir">
+                        <button class="seach-button" type="button">🔍</button>
+                    </div>
+                </section>
+
+                <section class="news">
+                    <h2>Nyheder</h2>
+                    <p><strong>Chris Friedkly</strong></p>
+                    <p>Supermarket VillanovaSupermarket VillanovaSupermarket...</p>
+                </section>
             </section>
 
-            <section class="portfolios">
-                <h2>Porteføljer</h2>
-                <p><a class="portfolio" href="#">Portefølje 1</a></p>
-                <p><a class="portfolio" href="#">Portefølje 2</a></p>
-                <p><a class="portfolio" href="#">Portefølje 3</a></p>
-            </section>
-
-            <section class="benchmark">
-                <h2>Benchmark</h2>
-                <p class="benchmark-index">OMXC25</p>
-                <p class="benchmark-change">15%</p>
-                <select name="benchmark" id="benchmark-interval">
-                    <option value="day">Dag</option>
-                    <option value="month">Måned</option>
-                    <option value="current-year">I år</option>
-                    <option value="year">år</option>
-                </select>
-            </section>
-
-            <section class="portfolio-graph">
-                <h2>Alle porteføljer</h2>
-                <canvas id="portfolioChart"></canvas>
-                <select name="portfolio-graph-interval" id="portfolio-graph-interval">
-                    <option value="day">Dag</option>
-                    <option value="month">Måned</option>
-                    <option value="current-year">I år</option>
-                    <option value="year">år</option>
-                </select>
-            </section>
-
-            <section class="news">
-                <h2>Nyheder</h2>
-                <p>Her står en meget meget meget meget meget meget meget meget meget meget meget meget meget meget meget
-                    meget
-                    meget meget meget meget meget meget meget meget meget meget meget meget meget meget meget meget
-                    meget meget meget meget meget meget meget meget spændende nyhed...</p>
-            </section>
-
-            <section class="top-stocks">
-                <h2>Top 5 aktier</h2>
+            <!-- RIGHT COLUMN (Top Picks) -->
+            <section class="top-picks">
+                <h2>Top valg</h2>
                 <p>OMXC25 - 999 [valuta]</p>
                 <p>S&P 500 - 999 [valuta]</p>
-                <p>OMXC25 - 999 [valuta]</p>
-                <p>S&P 500 - 999 [valuta]</p>
-                <p>OMXC25 - 999 [valuta]</p>
+                <p>RUSSEL 300 - 999 [valuta]</p>
+                <p>MCSI WORLD - 999 [valuta]</p>
+                <p>BITCOIN - 999 [valuta]</p>
             </section>
         </section>
     </main>
