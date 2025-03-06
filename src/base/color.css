@@ -2,6 +2,7 @@
     --primary-color: #151F32;
     --secondary-color: #172540;
     --highlight: #00DA91;
+    --secondary-highligth: #BADFEE;
     --primary-text: #FFFFFF;
     --secondary-text: #EBF2F1;
     --grey: rgba(255, 255, 255, 0.2);
@@ -14,6 +15,8 @@
     --primary-color: white;
     --secondary-color: #EBF2F1;
     --highlight: #00DA91;
+    --secondary-highligth: #BADFEE;
+    --third-blue: #1E6399;
     --primary-text: #172540;
     --secondary-text: #EBF2F1;
     --grey: rgba(255, 255, 255, 0.2);
