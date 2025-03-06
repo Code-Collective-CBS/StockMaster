@@ -21,7 +21,7 @@
   }
 
   h1 {
-    text-align: left;
+    text-align: center;
     margin-bottom: 4rem;
     font-size: var(--h1-size);
     font-weight: var(--h1-weight);

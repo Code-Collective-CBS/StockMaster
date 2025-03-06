@@ -215,9 +215,7 @@ body {
 }
 
 /* Full width card */
-.full-width {
-    width: 100%;
-}
+
 
 .card-header {
     display: flex;
