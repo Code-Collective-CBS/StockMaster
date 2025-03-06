@@ -1,0 +1,27 @@
+{
+  "name": "stockmaster",
+  "version": "1.0.0",
+  "description": "Investment platform",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Code-Collective-CBS/StockMaster.git"
+  },
+  "keywords": [
+    "investment",
+    "platform",
+    "charts",
+    "invest",
+    "stock",
+    "groupProject"
+  ],
+  "author": "Code-Collective-CBS",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Code-Collective-CBS/StockMaster/issues"
+  },
+  "homepage": "https://github.com/Code-Collective-CBS/StockMaster#readme"
+}
