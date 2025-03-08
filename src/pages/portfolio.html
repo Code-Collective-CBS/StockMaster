@@ -1,248 +1,215 @@
 <!DOCTYPE html>
 <html lang="da">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Porteføljer - StockMaster</title>
-    <link rel="stylesheet" href="../layouts/portfolio.css">
-    <link rel="stylesheet" href="../layouts/components/sidebar.css">
-    <link rel="stylesheet" href="../base/color.css" />
-    <link rel="stylesheet" href="../base/typography.css" />
-    <!--GOOGLE FONTS-->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap"
-      rel="stylesheet"
-    />
-  </head>
 
-  <body>
-    <!--Sidebar-->
-    <aside class="sideBar">
-      <span class="brandName">StockMaster</span>
-      <nav class="sideBarNav">
-        <div class="nav-item">
-          <svg
-            class="icon"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Porteføljer - StockMaster</title>
+  <link rel="stylesheet" href="../layouts/portfolio.css">
+  <link rel="stylesheet" href="../layouts/components/sidebar.css">
+  <link rel="stylesheet" href="../base/color.css" />
+  <link rel="stylesheet" href="../base/typography.css" />
+  <!--GOOGLE FONTS-->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+  <!--Sidebar-->
+  <aside class="sideBar">
+    <span class="brandName">StockMaster</span>
+    <nav class="sideBarNav">
+      <div class="nav-item">
+        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M4 13h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1zm-1 7a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v4zm10 0a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-7a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v7zm1-10h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1z"
+            fill="currentColor" />
+        </svg>
+        <a href="../pages/dashboard.html">Overblik</a>
+      </div>
+
+      <div class="nav-item">
+        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M21,5H5A1,1,0,0,1,5,3h6A2.006,2.006,0,0,0,9,1H3A2.006,2.006,0,0,0,1,3V19a4,4,0,0,0,4,4H19a4,4,0,0,0,4-4V7A2.006,2.006,0,0,0,21,5ZM5,14H9a1,1,0,0,1,0,2H5a1,1,0,0,1,0-2Zm9,6H5a1,1,0,0,1,0-2h9a1,1,0,0,1,0,2Z"
+            fill="currentColor" />
+        </svg>
+        <a href="../pages/portfolio.html">Portefølje</a>
+      </div>
+
+      <div class="nav-item">
+        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M23,22H21V11a2,2,0,0,0-2-2H17a2,2,0,0,0-2,2V22H11V3A2,2,0,0,0,9,1H7A2,2,0,0,0,5,3V22H4a2,2,0,0,1-2-2V1A1,1,0,0,0,0,1V20a4,4,0,0,0,4,4H23a1,1,0,0,0,0-2Z"
+            fill="currentColor" />
+        </svg>
+        <a href="../pages/securities-news.html">Værdipapirer</a>
+      </div>
+      <div class="nav-item">
+        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14,6V2.01c.06.05.12.11.17.16l5.66,5.66c.05.05.11.11.16.17H16A2.006,2.006,0,0,1,14,6Z"
+            fill="currentColor" />
+          <path
+            d="M20.94,10H16a4,4,0,0,1-4-4V1.06A3.683,3.683,0,0,0,11.34,1H6A3,3,0,0,0,3,4V20a3,3,0,0,0,3,3H18a3,3,0,0,0,3-3V10.66A3.683,3.683,0,0,0,20.94,10ZM13,17H11v2a1,1,0,0,1-2,0V17H7a1,1,0,0,1,0-2H9V13a1,1,0,0,1,2,0v2h2a1,1,0,0,1,0,2Z"
+            fill="currentColor" />
+        </svg>
+        <a href="../pages/transactions.html">Transaktioner</a>
+      </div>
+    </nav>
+
+    <!-- This section is pushed to the bottom -->
+    <div class="sideBarSetting">
+      <nav class="settingNav">
+        <div class="setting-item">
+          <svg class="icon" width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
-              d="M4 13h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1zm-1 7a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v4zm10 0a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-7a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v7zm1-10h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1z"
-              fill="currentColor"
-            />
+              d="M27.526,18.036L27,17.732c-0.626-0.361-1-1.009-1-1.732s0.374-1.371,1-1.732l0.526-0.304c1.436-0.83,1.927-2.662,1.098-4.098l-1-1.732c-0.827-1.433-2.666-1.925-4.098-1.098L23,7.339c-0.626,0.362-1.375,0.362-2,0c-0.626-0.362-1-1.009-1-1.732V5c0-1.654-1.346-3-3-3h-2c-1.654,0-3,1.346-3,3v0.608c0,0.723-0.374,1.37-1,1.732c-0.626,0.361-1.374,0.362-2,0L8.474,7.036C7.042,6.209,5.203,6.701,4.375,8.134l-1,1.732c-0.829,1.436-0.338,3.269,1.098,4.098L5,14.268C5.626,14.629,6,15.277,6,16s-0.374,1.371-1,1.732l-0.526,0.304c-1.436,0.829-1.927,2.662-1.098,4.098l1,1.732c0.828,1.433,2.667,1.925,4.098,1.098L9,24.661c0.626-0.363,1.374-0.361,2,0c0.626,0.362,1,1.009,1,1.732V27c0,1.654,1.346,3,3,3h2c1.654,0,3-1.346,3-3v-0.608c0-0.723,0.374-1.37,1-1.732c0.625-0.361,1.374-0.362,2,0l0.526,0.304c1.432,0.826,3.271,0.334,4.098-1.098l1-1.732C29.453,20.698,28.962,18.865,27.526,18.036z M16,21c-2.757,0-5-2.243-5-5s2.243-5,5-5s5,2.243,5,5S18.757,21,16,21z"
+              fill="currentColor" />
           </svg>
-          <a href="/src/pages/dashboard.html">Overblik</a>
+          <a href="#">Indstillinger</a>
         </div>
-
-        <div class="nav-item active">
-          <svg
-            class="icon"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
+        <div id="signOut-item" class="setting-item">
+          <svg class="icon" width="24" height="24" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
-              d="M21,5H5A1,1,0,0,1,5,3h6A2.006,2.006,0,0,0,9,1H3A2.006,2.006,0,0,0,1,3V19a4,4,0,0,0,4,4H19a4,4,0,0,0,4-4V7A2.006,2.006,0,0,0,21,5ZM5,14H9a1,1,0,0,1,0,2H5a1,1,0,0,1,0-2Zm9,6H5a1,1,0,0,1,0-2h9a1,1,0,0,1,0,2Z"
-              fill="currentColor"
-            />
+              d="M43.7578,61.7578a5.9994,5.9994,0,1,0,8.4844,8.4844l18-18a5.9979,5.9979,0,0,0,0-8.4844l-18-18a5.9994,5.9994,0,0,0-8.4844,8.4844L51.5156,42H6A6,6,0,0,0,6,54H51.5156Z"
+              fill="currentColor" />
           </svg>
-          <a href="/src/pages/portfolio.html">Portefølje</a>
-        </div>
-
-        <div class="nav-item">
-          <svg
-            class="icon"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M23,22H21V11a2,2,0,0,0-2-2H17a2,2,0,0,0-2,2V22H11V3A2,2,0,0,0,9,1H7A2,2,0,0,0,5,3V22H4a2,2,0,0,1-2-2V1A1,1,0,0,0,0,1V20a4,4,0,0,0,4,4H23a1,1,0,0,0,0-2Z"
-              fill="currentColor"
-            />
-          </svg>
-          <a href="/src/pages/stocks.html">Aktier</a>
+          <a class="signOut" href="#">Log ud</a>
         </div>
       </nav>
-
-      <!-- This section is pushed to the bottom -->
-      <div class="sideBarSetting">
-        <nav class="settingNav">
-          <div class="setting-item">
-            <svg
-              class="icon"
-              width="24"
-              height="24"
-              viewBox="0 0 32 32"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M27.526,18.036L27,17.732c-0.626-0.361-1-1.009-1-1.732s0.374-1.371,1-1.732l0.526-0.304c1.436-0.83,1.927-2.662,1.098-4.098l-1-1.732c-0.827-1.433-2.666-1.925-4.098-1.098L23,7.339c-0.626,0.362-1.375,0.362-2,0c-0.626-0.362-1-1.009-1-1.732V5c0-1.654-1.346-3-3-3h-2c-1.654,0-3,1.346-3,3v0.608c0,0.723-0.374,1.37-1,1.732c-0.626,0.361-1.374,0.362-2,0L8.474,7.036C7.042,6.209,5.203,6.701,4.375,8.134l-1,1.732c-0.829,1.436-0.338,3.269,1.098,4.098L5,14.268C5.626,14.629,6,15.277,6,16s-0.374,1.371-1,1.732l-0.526,0.304c-1.436,0.829-1.927,2.662-1.098,4.098l1,1.732c0.828,1.433,2.667,1.925,4.098,1.098L9,24.661c0.626-0.363,1.374-0.361,2,0c0.626,0.362,1,1.009,1,1.732V27c0,1.654,1.346,3,3,3h2c1.654,0,3-1.346,3-3v-0.608c0-0.723,0.374-1.37,1-1.732c0.625-0.361,1.374-0.362,2,0l0.526,0.304c1.432,0.826,3.271,0.334,4.098-1.098l1-1.732C29.453,20.698,28.962,18.865,27.526,18.036z M16,21c-2.757,0-5-2.243-5-5s2.243-5,5-5s5,2.243,5,5S18.757,21,16,21z"
-                fill="currentColor"
-              />
-            </svg>
-            <a href="/src/pages/settings.html">Indstillinger</a>
-          </div>
-          <div id="signOut-item" class="setting-item">
-            <svg
-              class="icon"
-              width="24"
-              height="24"
-              viewBox="0 0 96 96"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M43.7578,61.7578a5.9994,5.9994,0,1,0,8.4844,8.4844l18-18a5.9979,5.9979,0,0,0,0-8.4844l-18-18a5.9994,5.9994,0,0,0-8.4844,8.4844L51.5156,42H6A6,6,0,0,0,6,54H51.5156Z"
-                fill="currentColor"
-              />
-            </svg>
-            <a class="signOut" href="#" id="logoutButton">Log ud</a>
-          </div>
-        </nav>
+    </div>
+  </aside>
+  <!--Main Content-->
+  <main class="main-content">
+    <!-- Header section -->
+    <header class="page-header">
+      <h1>Portefølje oversigt</h1>
+      <div class="header-actions">
+        <button class="btn btn-secondary" id="addPortfolioButton">Tilføj portefølje</button>
+        <button class="btn btn-primary" id="depositButton">Indbetal</button>
       </div>
-    </aside>
-    <!--End of Sidebar-->
+    </header>
 
-    <!--Main Content-->
-    <main class="main-content">
-      <!-- Header section -->
-      <header class="page-header">
-        <h1>Portefølje oversigt</h1>
-        <div class="header-actions">
-          <button class="btn btn-secondary" id="addPortfolioButton">Tilføj portefølje</button>
-          <button class="btn btn-primary" id="depositButton">Indbetal</button>
-        </div>
-      </header>
+    <!-- Top section with cards -->
+    <section class="dashboard-top">
+      <!-- Left card - Total value -->
+      <div class="card total-value-card">
+        <p class="card-label">Total værdi i DKK</p>
+        <h2 class="total-value-number" id="totalValueDisplay">224.542 DKK</h2>
 
-      <!-- Top section with cards -->
-      <section class="dashboard-top">
-        <!-- Left card - Total value -->
-        <div class="card total-value-card">
-          <p class="card-label">Total værdi i DKK</p>
-          <h2 class="total-value-number" id="totalValueDisplay">224.542 DKK</h2>
-
-          <!-- Performance indicators (7D, 1M, 6M) -->
-          <div class="performance-indicators">
-            <div class="indicator">
-              <span class="period">7D</span>
-              <div class="value positive" id="performance7d">
-                18.78% <span class="arrow">↗</span>
-              </div>
-            </div>
-            <div class="indicator">
-              <span class="period">1M</span>
-              <div class="value negative" id="performance1m">-15.07% <span class="arrow">↗</span></div>
-            </div>
-            <div class="indicator">
-              <span class="period">6M</span>
-              <div class="value negative" id="performance6m">-3.15% <span class="arrow">↗</span></div>
+        <!-- Performance indicators (7D, 1M, 6M) -->
+        <div class="performance-indicators">
+          <div class="indicator">
+            <span class="period">7D</span>
+            <div class="value positive" id="performance7d">
+              18.78% <span class="arrow">↗</span>
             </div>
           </div>
-        </div>
-
-        <!-- Right side - Portfolio distribution -->
-        <div class="card portfolio-list-card">
-          <h2 class="card-title">Fordeling af værdi i porteføljer</h2>
-          <div class="portfolio-list" id="portfolioList">
-            <!-- Portfolio rows will be inserted here by JavaScript -->
+          <div class="indicator">
+            <span class="period">1M</span>
+            <div class="value negative" id="performance1m">-15.07% <span class="arrow">↗</span></div>
+          </div>
+          <div class="indicator">
+            <span class="period">6M</span>
+            <div class="value negative" id="performance6m">-3.15% <span class="arrow">↗</span></div>
           </div>
         </div>
+      </div>
 
-        <!-- Pie chart card -->
-        <div class="card pie-chart-card">
-          <div id="portfolioDistributionChart" class="chart-container">
-            <!-- Pie chart will be inserted here by JavaScript -->
+      <!-- Right side - Portfolio distribution -->
+      <div class="card portfolio-list-card">
+        <h2 class="card-title">Fordeling af værdi i porteføljer</h2>
+        <div class="portfolio-list" id="portfolioList">
+          <!-- Portfolio rows will be inserted here by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Pie chart card -->
+      <div class="card pie-chart-card">
+        <div id="portfolioDistributionChart" class="chart-container">
+          <!-- Pie chart will be inserted here by JavaScript -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom section with portfolio graph -->
+    <section class="dashboard-bottom">
+      <div class="card full-width">
+        <div class="card-header">
+          <h2 class="card-title">Alle porteføljer</h2>
+          <div class="time-selector">
+            <select id="timeframeSelector" class="timeframe-select">
+              <option value="7d">7 dage</option>
+              <option value="1m">1 måned</option>
+              <option value="3m">3 måneder</option>
+              <option value="6m">6 måneder</option>
+              <option value="1y" selected>1 år</option>
+              <option value="all">Alle</option>
+            </select>
           </div>
         </div>
-      </section>
+        <div id="portfolioGrowthChart" class="chart-container">
+          <!-- Line graph will be inserted here by JavaScript -->
+        </div>
+      </div>
+    </section>
+  </main>
 
-      <!-- Bottom section with portfolio graph -->
-      <section class="dashboard-bottom">
-        <div class="card full-width">
-          <div class="card-header">
-            <h2 class="card-title">Alle porteføljer</h2>
-            <div class="time-selector">
-              <select id="timeframeSelector" class="timeframe-select">
-                <option value="7d">7 dage</option>
-                <option value="1m">1 måned</option>
-                <option value="3m">3 måneder</option>
-                <option value="6m">6 måneder</option>
-                <option value="1y" selected>1 år</option>
-                <option value="all">Alle</option>
-              </select>
-            </div>
+  <!-- Modal for adding new portfolio (hidden by default) -->
+  <div class="modal" id="addPortfolioModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Tilføj ny portefølje</h2>
+        <button class="close-button" id="closeModalButton">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="addPortfolioForm">
+          <div class="form-group">
+            <label for="portfolioName">Portefølje navn</label>
+            <input type="text" id="portfolioName" required>
           </div>
-          <div id="portfolioGrowthChart" class="chart-container">
-            <!-- Line graph will be inserted here by JavaScript -->
+          <div class="form-group">
+            <label for="accountSelect">Vælg konto</label>
+            <select id="accountSelect" required>
+              <!-- Account options will be filled by JavaScript -->
+            </select>
           </div>
-        </div>
-      </section>
-    </main>
-
-    <!-- Modal for adding new portfolio (hidden by default) -->
-    <div class="modal" id="addPortfolioModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Tilføj ny portefølje</h2>
-          <button class="close-button" id="closeModalButton">&times;</button>
-        </div>
-        <div class="modal-body">
-          <form id="addPortfolioForm">
-            <div class="form-group">
-              <label for="portfolioName">Portefølje navn</label>
-              <input type="text" id="portfolioName" required>
-            </div>
-            <div class="form-group">
-              <label for="accountSelect">Vælg konto</label>
-              <select id="accountSelect" required>
-                <!-- Account options will be filled by JavaScript -->
-              </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Opret portefølje</button>
-          </form>
-        </div>
+          <button type="submit" class="btn btn-primary">Opret portefølje</button>
+        </form>
       </div>
     </div>
+  </div>
 
-    <!-- Modal for deposits (hidden by default) -->
-    <div class="modal" id="depositModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Indbetal til konto</h2>
-          <button class="close-button" id="closeDepositModalButton">&times;</button>
-        </div>
-        <div class="modal-body">
-          <form id="depositForm">
-            <div class="form-group">
-              <label for="accountSelectDeposit">Vælg konto</label>
-              <select id="accountSelectDeposit" required>
-                <!-- Account options will be filled by JavaScript -->
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="depositAmount">Beløb (DKK)</label>
-              <input type="number" id="depositAmount" min="1" step="1" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Indbetal</button>
-          </form>
-        </div>
+  <!-- Modal for deposits (hidden by default) -->
+  <div class="modal" id="depositModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Indbetal til konto</h2>
+        <button class="close-button" id="closeDepositModalButton">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="depositForm">
+          <div class="form-group">
+            <label for="accountSelectDeposit">Vælg konto</label>
+            <select id="accountSelectDeposit" required>
+              <!-- Account options will be filled by JavaScript -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="depositAmount">Beløb (DKK)</label>
+            <input type="number" id="depositAmount" min="1" step="1" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Indbetal</button>
+        </form>
       </div>
     </div>
+  </div>
 
-    <!-- Load JavaScript files -->
-    <script src="/src/scripts/mockData.js"></script>
-    <script src="/src/scripts/portfolio.js"></script>
-    <script src="/src/scripts/sidebar.js"></script>
-  </body>
+  <!-- Load JavaScript files -->
+  <script src="/src/scripts/mockData.js"></script>
+  <script src="/src/scripts/portfolio.js"></script>
+  <script src="/src/scripts/sidebar.js"></script>
+</body>
+
 </html>

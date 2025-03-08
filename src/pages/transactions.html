@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="../layouts/transactions.css">
     <link rel="stylesheet" href="../base/color.css">
     <link rel="stylesheet" href="../base/typography.css">
-    <link rel="stylesheet" href="../layouts/components/global-sidebar-eg.css">
+    <link rel="stylesheet" href="../layouts/components/sidebar.css">
     <!--GOOGLE FONTS-->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,9 +46,8 @@
                         d="M23,22H21V11a2,2,0,0,0-2-2H17a2,2,0,0,0-2,2V22H11V3A2,2,0,0,0,9,1H7A2,2,0,0,0,5,3V22H4a2,2,0,0,1-2-2V1A1,1,0,0,0,0,1V20a4,4,0,0,0,4,4H23a1,1,0,0,0,0-2Z"
                         fill="currentColor" />
                 </svg>
-                <a href="../pages/securities-news.html">Aktier</a>
+                <a href="../pages/securities-news.html">Værdipapirer</a>
             </div>
-
             <div class="nav-item">
                 <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
@@ -64,16 +63,6 @@
 
         <!-- This section is pushed to the bottom -->
         <div class="sideBarSetting">
-            <div class="profile-info">
-                <img src="/media/nyheder.svg" alt="profile picture">
-                <div class="profile-name-account">
-                    <p class="profile-name">Mit navn</p>
-                    <select name="account" id="account-select">
-                        <option value="account_1">Konto 1</option>
-                        <option value="account_2">Konto 2</option>
-                    </select>
-                </div>
-            </div>
             <nav class="settingNav">
                 <div class="setting-item">
                     <svg class="icon" width="24" height="24" viewBox="0 0 32 32" fill="none"
@@ -97,8 +86,12 @@
         </div>
     </aside>
     <main class="transaction-content">
-        <header class="top-bar">
+        <header class="page-header">
             <h1>Transaktioner</h1>
+            <div class="header-actions">
+                <button class="btn btn-secondary" id="addPortfolioButton">Tilføj portefølje</button>
+                <button class="btn btn-primary" id="depositButton">Indbetal</button>
+              </div>
         </header>
         <section class="transaction-grid">
             <section class="transactions">
