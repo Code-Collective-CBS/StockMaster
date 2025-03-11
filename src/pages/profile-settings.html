@@ -1,23 +1,25 @@
 <!DOCTYPE html>
 <html lang="da">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile Settings - StockMaster</title>
+    <link rel="stylesheet" href="/src/layouts/profile-settings.css" />
+    <link rel="stylesheet" href="/src/layouts/components/sidebar.css" />
+    <link rel="stylesheet" href="/src/base/color.css" />
+    <link rel="stylesheet" href="/src/base/typography.css" />
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Overblik</title>
-    <link rel="stylesheet" href="../layouts/dashboard.css">
-    <link rel="stylesheet" href="../base/color.css">
-    <link rel="stylesheet" href="../base/typography.css">
-    <link rel="stylesheet" href="../layouts/components/sidebar.css">
     <!--GOOGLE FONTS-->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
-</head>
-
-<body>
-     <!--Sidebar Start-->
-     <aside class="sideBar">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!--Sidebar Start-->
+    <aside class="sideBar">
       <span class="brandName">StockMaster</span>
       <nav class="sideBarNav">
         <div class="nav-item">
@@ -143,76 +145,64 @@
     </aside>
     <!--Sidebar finish-->
 
-
-    <main class="dashboard-content">
-        <header class="page-header">
-            <h1>Overblik</h1>
-            <div class="header-actions">
-              <button class="btn btn-secondary" id="addPortfolioButton">Tilføj portefølje</button>
-              <button class="btn btn-primary" id="depositButton">Indbetal</button>
+    <!--Main content-->
+    <main class="main-content">
+      <div class="profile-settings-container">
+        <div class="profile-header">
+          <h1>Profilindstillinger</h1>
+          <div class="profile-picture-section">
+            <div class="profile-picture">
+              <img src="/src/assets/storm-profile.jpeg" alt="Profile picture" />
             </div>
-        </header>
-        <section class="dashboard-grid">
-            <section class="overview">
-                <h2>Egenkapital</h2>
-                <p class="overview-value">999999 <span class="currency">[Valuta]</span></p>
-                <p class="overview-change">15%</p>
-                <select name="overview-interval" id="overview-interval">
-                    <option value="day">Dag</option>
-                    <option value="month">måned</option>
-                    <option value="current-year">i år</option>
-                    <option value="year">år</option>
-                </select>
-            </section>
+            <p class="skift-profil-billede"><a href="#">Skift profil billede</a></p>
+          </div>
+        </div>
 
-            <section class="portfolios">
-                <h2>Porteføljer</h2>
-                <p><a class="portfolio" href="#">Portefølje 1</a></p>
-                <p><a class="portfolio" href="#">Portefølje 2</a></p>
-                <p><a class="portfolio" href="#">Portefølje 3</a></p>
-            </section>
+        <div class="profile-form">
+          <div class="name-row">
+            <div class="form-group">
+              <label for="firstname">Fornavn</label>
+              <input type="text" id="firstname" value="Storm" />
+            </div>
 
-            <section class="benchmark">
-                <h2>Benchmark</h2>
-                <p class="benchmark-index">OMXC25</p>
-                <p class="benchmark-change">15%</p>
-                <select name="benchmark" id="benchmark-interval">
-                    <option value="day">Dag</option>
-                    <option value="month">Måned</option>
-                    <option value="current-year">I år</option>
-                    <option value="year">år</option>
-                </select>
-            </section>
+            <div class="form-group">
+              <label for="lastname">Efternavn</label>
+              <input type="text" id="lastname" value="Volf" />
+            </div>
+          </div>
 
-            <section class="portfolio-graph">
-                <h2>Alle porteføljer</h2>
-                <canvas id="portfolioChart"></canvas>
-                <select name="portfolio-graph-interval" id="portfolio-graph-interval">
-                    <option value="day">Dag</option>
-                    <option value="month">Måned</option>
-                    <option value="current-year">I år</option>
-                    <option value="year">år</option>
-                </select>
-            </section>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" value="stormsirius@gmail.com" />
+          </div>
 
-            <section class="news">
-                <h2>Nyheder</h2>
-                <p>Her står en meget meget meget meget meget meget meget meget meget meget meget meget meget meget meget
-                    meget
-                    meget meget meget meget meget meget meget meget meget meget meget meget meget meget meget meget
-                    meget meget meget meget meget meget meget meget spændende nyhed...</p>
-            </section>
+          <div class="form-group">
+            <label for="phone">Telefonnummer</label>
+            <input type="tel" id="phone" value="+45 27208075" />
+          </div>
 
-            <section class="top-stocks">
-                <h2>Top 5 aktier</h2>
-                <p>OMXC25 - 999 [valuta]</p>
-                <p>S&P 500 - 999 [valuta]</p>
-                <p>OMXC25 - 999 [valuta]</p>
-                <p>S&P 500 - 999 [valuta]</p>
-                <p>OMXC25 - 999 [valuta]</p>
-            </section>
-        </section>
+          <div class="form-group">
+            <label for="current-password">Adgangskode</label>
+            <input type="password" id="current-password" value="••••••••••" />
+          </div>
+
+          <div class="form-group btn">
+            <label for="new-password">Nulstil adgangskode</label>
+            <input
+              type="password"
+              id="new-password"
+              placeholder="Write a new password here..."
+            />
+          </div>
+
+          <div class="form-actions">
+            <button class="cancel-btn">Anuller</button>
+            <button class="save-btn">Gem</button>
+          </div>
+        </div>
+      </div>
     </main>
-</body>
 
+    <script src="/src/scripts/sidebar.js"></script>
+  </body>
 </html>

@@ -42,13 +42,14 @@
 
 /* Active state for selected nav item */
 .nav-item.active {
-    background-color: var(--active-nav);
-    border-left: 4px solid var(--highlight);
+    /* background-color: var(--active-nav);
+    border-left: 4px solid var(--highlight); */
+    background-color: var(--secondary-highligth);
     padding-left: 21px; /* 25px - 4px border (align with the rest) */
 }
 
 .nav-item.active a, .nav-item.active .icon {
-    color: var(--highlight);
+    color: var(--primary-color);
 }
 
 /* Icon styling */
@@ -71,6 +72,45 @@
     padding-top: 10px;
 }
 
+/* PROFILE SECTION */
+.profile-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 6px;
+    margin-left: 10px;
+}
+
+.profile-info img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.profile-name-account {
+    display: flex;
+    flex-direction: column;
+}
+
+/* DROPDOWN FOR ACCOUNT SELECTION */
+#account-select {
+    padding: 5px;
+    border: none;
+    outline: none;
+    border-radius: 10px;
+    background-color: var(--secondary-highligth);
+    color: var(--primary-color);
+    cursor: pointer;
+}
+
+#account-select:hover {
+    background-color: var(--highlight);
+    color: var(--primary-text);
+}
+
+
 /* Special styling for logout button */
 #signOut-item {
     color: var(--red); /* Red shade for logout */
@@ -78,6 +118,14 @@
 
 #signOut-item .icon {
     color: var(--red);
+}
+
+#signOut-item:hover {
+    background-color: var(--red); /* Red shade for logout */
+    color: var(--primary-text);
+    .icon {
+        color: var(--primary-text);
+    }
 }
 
 /* Responsive styles for smaller screens */

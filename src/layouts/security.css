@@ -8,6 +8,13 @@ body {
     min-height: 100vh;
 }
 
+.security-content {
+    flex: 1;
+    margin-left: 250px; /*same as sidebar width*/
+    padding: 30px;
+    box-sizing: border-box;
+}
+
 header{
     padding: 20px;
 }

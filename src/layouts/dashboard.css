@@ -12,6 +12,13 @@ header{
     padding: 20px;
 }
 
+.dashboard-content {
+    flex: 1;
+    margin-left: 250px; /*same as sidebar width*/
+    padding: 30px;
+    box-sizing: border-box;
+}
+
 /* Header */
 .page-header {
     display: flex;

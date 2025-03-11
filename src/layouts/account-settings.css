@@ -1,0 +1,207 @@
+/* Account Settings Page CSS */
+
+body {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-primary);
+    background-color: var(--primary-color);
+    color: var(--primary-text);
+    min-height: 100vh;
+}
+/* Main content area */
+.main-content {
+    flex: 1;
+    margin-left: 250px; /*same as sidebar width*/
+    padding: 30px;
+    box-sizing: border-box;
+}
+
+
+  .account-settings-container {
+    background-color: var(--secondary-color);
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .account-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+
+  /* Page Title */
+  h1 {
+    margin: 0;
+  }
+
+  /* Profile Picture Section */
+  .account-btn-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .btn-div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 400px;
+    height: 50px;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: transparent;
+    gap: 20px;
+  }
+
+
+  .account-btn {
+    width: 150px;
+    height: 30px;
+    border-radius: 10px;
+    border: none;
+    transition: all 0.3s ease;
+  }
+
+  .primary-btn {
+    background-color: var(--highlight);
+    color: var(--primary-text);
+  }
+
+  .account-btn:hover{
+    transform: translateY(-2px);
+  }
+
+  /* Form Styling */
+  .profile-form {
+    width: 100%;
+  }
+
+  .name-row {
+    display: flex;
+    gap: 40px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+    flex: 1;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--primary-text);
+    font-weight: var(--text-weight-medium);
+  }
+
+  input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    background-color: var(--primary-text);
+    border: 1px solid var(--sidebar-hover);
+    color: var(--primary-color);
+    font-size: var(--text-size);
+    transition: border-color 0.3s;
+    box-sizing: border-box;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: var(--highlight);
+  }
+
+  input::placeholder {
+    color: var(--primary-color);
+  }
+
+  /* Action Buttons */
+  .form-actions {
+    display: flex;
+    justify-content: flex-start;
+    gap: 15px;
+    margin-top: 30px;
+  }
+
+  .cancel-btn, .save-btn {
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: var(--text-size);
+    font-weight: var(--text-weight-medium);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .cancel-btn {
+    background-color: transparent;
+    color: var(--primary-text);
+    border: 1px solid var(--sidebar-hover);
+  }
+
+  .cancel-btn:hover {
+    background-color: var(--sidebar-hover);
+  }
+
+  .save-btn {
+    background-color: var(--highlight);
+    color: white;
+    border: none;
+  }
+
+  .save-btn:hover {
+    background-color: var(--highlight-dark, #32a852);
+    transform: translateY(-2px);
+  }
+
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .main-content {
+      margin-left: 70px;
+      padding: 20px;
+    }
+
+    .profile-settings-container {
+      padding: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .profile-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 20px;
+        }
+
+        .profile-picture-section {
+          align-self: center;
+        }
+      }
+
+    .form-row {
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .form-actions {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .cancel-btn, .save-btn {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .main-content {
+      margin-left: 60px;
+      padding: 15px;
+    }
+
+    h1 {
+      font-size: var(--h4-size);
+    }
+  }

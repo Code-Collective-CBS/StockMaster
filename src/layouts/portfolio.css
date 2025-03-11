@@ -121,7 +121,7 @@ body {
     font-size: var(--h2-size);
     font-weight: var(--h2-weight);
     margin: 20px 0 20px 0; /* top and bottom */
-    color: var(--highlight);
+    color: var(--primary-text);
 }
 
 /* Performance indicators */
@@ -297,8 +297,8 @@ body {
     width: 100%;
     padding: 12px;
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--grey);
+    background-color: var(--sidebar-hover);
     color: var(--primary-text);
     font-size: 16px;
     box-sizing: border-box;
