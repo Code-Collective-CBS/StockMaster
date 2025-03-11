@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Getting the references of the elements
     const profilePictureLink = document.querySelector(".skift-profil-billede a");
     const profilePictureImg = document.querySelector(".profile-picture img");
+    const profilePictureContainer = document.querySelector('.profile-picture');
 
     // Create a hidden file input element
   const fileInput = document.createElement('input');
@@ -59,7 +60,5 @@ document.addEventListener("DOMContentLoaded", function() {
       alert('Profilbillede opdateret!');
     }, 500);
   }
-  
-  const profilePictureContainer = document.querySelector('.profile-picture');
 
 })
