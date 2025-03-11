@@ -1,101 +1,135 @@
-// Reusable sidebar functionality
-
 document.addEventListener("DOMContentLoaded", function () {
-  // Function to set active sidebar navigation item based on current page
-  function setActiveSidebarItem() {
-    // current page path
-    const currentPath = window.location.pathname;
+  // Configuration
+  const CONFIG = {
+    paths: {
+      dashboard: ["dashboard", "index.html"],
+      portfolio: ["portfolio"],
+      securities: ["security", "securities-news"],
+      transactions: ["transactions"],
+      settings: ["profile-settings", "profile", "account-settings"]
+    },
+    selectors: {
+      navItems: ".sideBarNav .nav-item",
+      settingItems: ".setting-item",
+      sidebarLinks: ".sideBar a",
+      signOutButton: ".signOut"
+    }
+  };
 
-    // all navigation items
-    const navItems = document.querySelectorAll(".sideBarNav .nav-item");
+  // Initialize sidebar functionality
+  initializeSidebar();
 
-    // Remove active class from all items first
-    navItems.forEach((item) => {
-      item.classList.remove("active");
-    });
-
-    // Determine which nav item should be active based on the current path
-
-    // Dashboard page (home page)
-    if (
-      currentPath.includes("dashboard") ||
-      currentPath === "/" ||
-      currentPath.endsWith("index.html")
-    ) {
-      document.querySelector(".nav-item:nth-child(1)").classList.add("active");
-
-      // portfolio page
-    } else if (currentPath.includes("portfolio")) {
-      document.querySelector(".nav-item:nth-child(2)").classList.add("active");
-
-
-      // security page
-    } else if (
-      currentPath.includes("security") ||
-      currentPath.includes("aktier")
-    ) {
-      document.querySelector(".nav-item:nth-child(3)").classList.add("active");
-
-
-
-      // also security page
-    } else if (
-      currentPath.includes("securities-news") ||
-      currentPath.includes("værdipapirer-nyheder")
-    ) {
-      document.querySelector(".nav-item:nth-child(3)").classList.add("active");
-
-
-      // transactions page
-    } else if (
-      currentPath.includes("transactions") ||
-      currentPath.includes("transaktioner")
-    ) {
-      document.querySelector(".nav-item:nth-child(4)").classList.add("active");
-
-
-      // settings page (bottom)
-    } else if (
-      currentPath.includes("settings") ||
-      currentPath.includes("indstillinger")
-    ) {
-      document
-        .querySelector(".setting-item:nth-child(1)")
-        .classList.add("active");
+  function initializeSidebar() {
+    try {
+      handleNavigation();
+      setActiveSidebarItem();
+      setupSignOut();
+    } catch (error) {
+      console.error("Error initializing sidebar:", error);
     }
   }
 
-  // Set active item when page loads
-  setActiveSidebarItem();
+  function setActiveSidebarItem() {
+    const currentPath = window.location.pathname.toLowerCase();
 
-  // Setup logout button functionality
-  const logoutButton =
-    document.getElementById("logoutButton") ||
-    document.querySelector(".signOut");
-  if (logoutButton) {
-    logoutButton.addEventListener("click", function (event) {
-      event.preventDefault();
+    // Remove all active classes first
+    removeAllActiveClasses();
 
-      // This would be replaced with actual logout logic when implemented
-      console.log("Logging out...");
+    // Set active class based on current path
+    if (isPathMatch(currentPath, CONFIG.paths.dashboard)) {
+      setActiveNavItem(1);
+    } else if (isPathMatch(currentPath, CONFIG.paths.portfolio)) {
+      setActiveNavItem(2);
+    } else if (isPathMatch(currentPath, CONFIG.paths.securities)) {
+      setActiveNavItem(3);
+    } else if (isPathMatch(currentPath, CONFIG.paths.transactions)) {
+      setActiveNavItem(4);
+    } else if (isPathMatch(currentPath, CONFIG.paths.settings)) {
+      setActiveSettingItem(1);
+    }
+  }
 
-      // For now, redirect to login page after "logout"
-      // In the real implementation, you'd make an API call to logout first
-      window.location.href = "/src/pages/login.html";
+  function handleNavigation() {
+    const sidebarLinks = document.querySelectorAll(CONFIG.selectors.sidebarLinks);
+
+    sidebarLinks.forEach((link) => {
+      link.addEventListener("click", function (event) {
+        // Skip if it's the logout button
+        if (link.classList.contains("signOut")) {
+          return;
+        }
+
+        event.preventDefault();
+        const href = link.getAttribute("href");
+
+        if (href) {
+          updateActiveState(link);
+          navigateToPage(href);
+        }
+      });
     });
   }
 
-  // Make sure all sidebar links work properly
-  const sidebarLinks = document.querySelectorAll(".sideBar a");
-  sidebarLinks.forEach((link) => {
-    link.addEventListener("click", function (event) {
-      // Don't apply this to the logout button which has its own handler
-      if (link.classList.contains("signOut")) {
-        return; // Skip this link as it's handled above
-      }
+  function setupSignOut() {
+    const signOutButton = document.querySelector(CONFIG.selectors.signOutButton);
+    if (signOutButton) {
+      signOutButton.addEventListener("click", function (event) {
+        event.preventDefault();
+        handleSignOut();
+      });
+    }
+  }
 
-      // Let the browser handle navigation normally
-      // This function can be expanded later when needed
-    });
-  });
+  // Helper functions
+  function removeAllActiveClasses() {
+    const elements = document.querySelectorAll(`${CONFIG.selectors.navItems}, ${CONFIG.selectors.settingItems}`);
+    elements.forEach(item => item.classList.remove("active"));
+  }
+
+  function setActiveNavItem(index) {
+    const navItem = document.querySelector(`${CONFIG.selectors.navItems}:nth-child(${index})`);
+    if (navItem) {
+      navItem.classList.add("active");
+    }
+  }
+
+  function setActiveSettingItem(index) {
+    const settingItem = document.querySelector(`${CONFIG.selectors.settingItems}:nth-child(${index})`);
+    if (settingItem) {
+      settingItem.classList.add("active");
+    }
+  }
+
+  function isPathMatch(currentPath, pathArray) {
+    return pathArray.some(path => currentPath.includes(path.toLowerCase()));
+  }
+
+  function updateActiveState(clickedLink) {
+    removeAllActiveClasses();
+    const parentItem = clickedLink.closest(".nav-item, .setting-item");
+    if (parentItem) {
+      parentItem.classList.add("active");
+    }
+  }
+
+  function navigateToPage(href) {
+    try {
+      window.location.href = href;
+    } catch (error) {
+      console.error("Navigation failed:", error);
+    }
+  }
+
+  function handleSignOut() {
+    try {
+      // Clear any stored user data
+      localStorage.removeItem("userSession");
+      sessionStorage.clear();
+
+      // Redirect to login page
+      window.location.href = "/src/pages/login.html";
+    } catch (error) {
+      console.error("Sign out failed:", error);
+    }
+  }
 });
