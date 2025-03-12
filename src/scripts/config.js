@@ -1,9 +1,16 @@
-//////////////////////////// ALPHA VANTAGE ////////////////////////////
-var request = require('request');
+//////// ALPHA VANTAGE API KEY ////////
 'use strict';
+require('dotenv').config({ path: '../../.env' });
 
-const url = 'https://www.alphavantage.co';
-const query = '';
+const apiKey = process.env.APIKEY_ALPHA_VANTAGE;
+console.log(apiKey);
+
+//////// ALPHA VANTAGE ////////
+
+var request = require('request');
+
+const url = 'https://www.alphavantage.co/query';
+const query = '/query?';
 
 request.get({
     url: url,
@@ -18,3 +25,7 @@ request.get({
       console.log(data);
     }
 });
+
+//////// FUNCTIONS API ////////
+
+const overview = '/function=OVERVIEW';
