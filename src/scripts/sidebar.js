@@ -2,17 +2,17 @@
 document.addEventListener("DOMContentLoaded", function () {
   // Configuration (making it easier to find the html elements)
   const CONFIG = {
-    // pages
+    // paths (html pages)
     paths: {
       dashboard: ["dashboard", "index.html"],
       portfolio: ["portfolio"],
       securities: ["security", "securities-news"],
       transactions: ["transactions"],
-      settings: ["profile-settings", "profile", "account-settings", "settings"]
+      settings: ["profile-settings", "account-settings"]
     },
-    // elements
+    // html classes
     selectors: {
-      navItems: ".sideBarNav .nav-item",
+      navItems: ".nav-item",
       settingItem: ".setting-item",
       sidebarLinks: ".sideBar a",
       signOutButton: ".signOut"
@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function isPathMatch(currentPath, pathArray) {
     return pathArray.some(path => currentPath.includes(path.toLowerCase()));
   }
-  
+
 
   function updateActiveState(clickedLink) {
     removeAllActiveClasses();
