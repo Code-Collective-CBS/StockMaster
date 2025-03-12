@@ -56,6 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  // Function to set current nav item active
   function handleNavigation() {
     const sidebarLinks = document.querySelectorAll(CONFIG.selectors.sidebarLinks);
 
@@ -76,6 +77,7 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
   }
+
 
   function setupSignOut() {
     const signOutButton = document.querySelector(CONFIG.selectors.signOutButton);
@@ -110,6 +112,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function isPathMatch(currentPath, pathArray) {
     return pathArray.some(path => currentPath.includes(path.toLowerCase()));
   }
+  
 
   function updateActiveState(clickedLink) {
     removeAllActiveClasses();
@@ -127,6 +130,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  // Redirects to login page
   function handleSignOut() {
     try {
       // Redirect to login page
