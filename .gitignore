@@ -3,6 +3,7 @@
 
 # Node modules
 node_modules/
+.env
 
 # Log file
 *.log
