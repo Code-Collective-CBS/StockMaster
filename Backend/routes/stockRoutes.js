@@ -1,12 +1,32 @@
 // This file is a specific route for stocks from Alpha Vantage
 const express = require('express');
 const router = express.Router();
+const stockController = require('../controllers/stockController');
 
 
-// Defining routes for stock-related operations
-// For now I am just making a test route
-router.get('/', (req, res) => {
+// This is just a test route (good for testing)
+router.get('/test', (req, res) => {
     res.json({ message: 'Stock API is working!' });
+});
+
+
+// Stock quote endpoint
+router.get('/quote/:symbol', stockController.getQuote)
+
+// Stock search endpoint
+router.get('/search', stockController.searchStocks)
+
+// Stock daily times series endpoint
+router.get('/daily/:symbol', stockController.getDailyTimeSeries)
+
+// Stock company overview endpoint
+router.get('/overview/:symbol', stockController.getCompanyOverview)
+
+
+// Test stock function
+router.get('/test-connection', async (req, res) => {
+    const result = await stockController.testConnection(req, res);
+    res.json(result);
 });
 
 module.exports = router;
