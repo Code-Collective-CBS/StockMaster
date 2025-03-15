@@ -8,7 +8,7 @@ const app = express();
 const PORT = config.server.port;
 
 
-app.use(express.static(path.join(__dirname, '../src'))); // Gør at HTML, CSS, JS (frontend) er statisk. Loader hurtigere, og holder backend clean.
+app.use('/src', express.static(path.join(__dirname, '../src'))); // Gør at HTML, CSS, JS (frontend) er statisk. Loader hurtigere, og holder backend clean.
 app.use(express.json()) // Parses JSON data. Dvs. konverterer rå data fra en HTTP request til en brugbar format, som serveren kan bruge.
 app.use(cors()) // Tillader frontend at fetch fra backend
 

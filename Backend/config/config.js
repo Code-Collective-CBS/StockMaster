@@ -6,7 +6,7 @@ NOT make any API calls directly
 */
 
 // Load environment variables form .env file
-require('dotenv').config();
+require('dotenv').config({ path: '../../.env' });
 
 const config = {
     // Server configuration
@@ -22,4 +22,6 @@ const config = {
     }
 };
 
+console.log(config.alphaVantage.apiKey);
+console.log(config.server.port, config.server.environment);
 module.exports = config;
