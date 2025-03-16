@@ -8,7 +8,7 @@ const stockAPI = {
   getStockQuote: async (symbol) => {
     try {
       // Using axios to make a GET request to our backend
-      const response = await axios.get(`${API_BASE_URL}/stocks/quote/${symbol}`);
+      const response = await axios.get(`${API_BASE_URL}/stocks/quote/${symbol}`); // this is a page with raw data from AV
 
       return response.data;
     } catch (error) {
@@ -60,7 +60,6 @@ const stockAPI = {
   }
 };
 
-console.log(stockAPI.getStockQuote('AAPL'));
 
 // Exporting the API functions
 module.exports = {
