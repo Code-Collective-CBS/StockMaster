@@ -1,7 +1,5 @@
 // This is our main routes file (centralized routing system) that serves to bring all of our specific route modules together - This ensures our application contains organized routing
 
-/* This is how the connection between routes, controllers, and services look like:
-routes/index.js → routes/stockRoutes.js → controllers/stockController.js → services/alphaVantageService.js (pretty cool hehe)*/
 const path = require('path');
 const express = require('express')
 const router = express.Router(); // Brug router i stedet for app

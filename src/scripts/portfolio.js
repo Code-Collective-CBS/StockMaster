@@ -1,7 +1,7 @@
 // Portfolio page specific functionality
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Error handling for missing ata
+    // Error handling for missing data
     try {
     // Load mock data (temporary solution for now)
     const portfolios = window.mockData?.portfolios || [];
