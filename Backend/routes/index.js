@@ -28,7 +28,7 @@ router.get('src/pages/:page.html', (req, res) => {
 });
 
 
-// Imported routes (for now just the stockRoutes)
+// Let app use our imported routes
 router.use('/api/stocks', stockRoutes); // This is an bsulote path so it will always start with api/stocks...the path
 
 
