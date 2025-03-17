@@ -30,7 +30,7 @@ document.getElementById("registerForm").addEventListener("submit", async functio
         const result = await response.json();
         if (response.status === 201) {
             alert("User succesfully created");
-            window.location.href = "../pages/login.html" // Redirects user to login-page
+            window.location.href = "../pages/dashboard.html" // Redirects user to login-page
         } else {
             alert("Fail: " + result.message)
         }
