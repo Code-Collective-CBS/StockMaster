@@ -121,7 +121,6 @@ section {
     border: none;
     outline: none;
     background-color: transparent;
-    color: var(--primary-text);
 }
 
 .search-container button {
