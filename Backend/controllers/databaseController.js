@@ -1,20 +1,26 @@
 const { sql, poolPromise } = require('../services/databaseServices');
+const pool = await poolPromise;
 
 const createUser = async (req, res) => {
     const { firstname, lastname, email, password, phone_number, country_code } = req.body;
 
     try {
-        const pool = await poolPromise;
 
         // Checks if user already exists
         const userExists = await pool.request()
+        .input("email", sql.NVarChar(100), email)
+        .query("SELECT COUNT(*) AS count FROM Users WHERE email = @email");
+
+        if (userExists.recordset[0].count) {
+            return res.status(400).json({ message: "E-mail already exists"})
+        }
 
             // "@-symbol" defines parameters in a SQL-query. More safe, optimizing query and prevents SQL injection
             .input("email", sql.NVarChar(100), email)
-            .query("SELECT COUNT(*) AS count FROM Users WHERE email = @email");
+            .query("SELECT COUNT(*) AS count FROM Users WHERE email = @email"); // SQL returns a count of how many users has this email
 
-        if (userExists.recordset[0].count) {
-            return res.status(400).json({ message: "Email already exists" });
+        if (userExists.recordset[0].count > 0) { // SQL returns an array of objects (recordset) and we checks if the count is more than 0
+            return res.status(400).json({ message: "E-mail already exists" });
         }
 
                 // SQL-query med parameterized input (for sikkerhed)
@@ -38,12 +44,10 @@ const createUser = async (req, res) => {
 
 
 // Accounts / Portfolio API-endpoints:
-
 const getPortfolio = async (req, res) => {
     const { user_id } = req.params; // Fetches values from URL (GET-requests)
 
     try {
-        const pool = await poolPromise;
 
         const result = await pool.request()
             .input("user_id", sql.Int, user_id) // sql.Int parses ID as a number 
@@ -59,4 +63,32 @@ const getPortfolio = async (req, res) => {
     }
 };
 
-module.exports = { createUser };
+const createPortfolio = async (req, res) => {
+    const { user_id, account_name, currency, balance, state } = req.body;
+
+    try {
+
+        await pool.request()
+        .input("user_id", sql.Int, user_id)
+        .input("account_name", sql.NVarChar(50), account_name)
+        .input("currency", sql.NVarChar(10), currency)
+        .input("balance", sql.Decimal(15,2), balance)
+        .input("state", sql.NVarChar(20), state)
+
+        .query(`
+            INSERT INTO Accounts (user_id, account_name, currency, balance, state)
+            VALUES (@user_id, @account_name, @currency, @balance, @state)
+            `);
+
+            res.status(201).json({ message : "Portfolio account created "});
+    } catch(err) {
+        console.log("Failed to create portfolio", err) 
+        res.status(500).json({ message: "Error creating portfolio" })
+    }
+};
+
+module.exports = {
+    createUser,
+    getPortfolio,
+    createPortfolio
+};

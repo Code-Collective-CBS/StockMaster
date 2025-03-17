@@ -1,8 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const userController = require('../controllers/databaseController');
+const databaseController = require('../controllers/databaseController');
 const database = require('../config/config');
 
-router.post('/users', userController.createUser);
+// User routes
+router.post('/users', databaseController.createUser);
+
+// Portfolio rutes
+router.get('/accounts/:user_id', databaseController.getPortfolio) // Shows portfolios
+router.post('/accounts', databaseController.createPortfolio) // Creates a new portfolio
 
 module.exports = router;
