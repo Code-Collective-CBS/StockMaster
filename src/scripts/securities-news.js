@@ -1,5 +1,12 @@
 import { stockAPI } from './api.js';
 
+const topPicksSymbols = [
+    '^OMXC20',
+    'SNP',
+    'EUNL',
+    'CCC'
+];
+
 const dummyResults = {
     bestMatches: [
         { symbol: 'MSF0.FRK', name: 'MICROSOFT CORP. CDR', type: 'Equity', region: 'Frankfurt', marketOpen: '08:00' },
@@ -18,11 +25,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchContainer = document.querySelector('.displaySearch');
 
     const topPicksContainer = document.querySelector('.top-picks');
+    console.log(topPicksContainer.childNodes);
 
-    async function loadTopPicksData() {
-        
+    async function loadTopPicksData(symbol) {
+        try {
+            const result = await stockAPI.getCompanyOverview(symbol);
+
+            const priceElement = document.getElementById(symbol)?.querySelector('.market-price');
+            if (priceElement) {
+                priceElement.textContent = result.price || 'N/A';
+            }
+        } catch (err) {
+            console.error('Error fetching top pick', symbol, err);
+        }
     }
 
+    topPicksSymbols.forEach((symbol) => {
+        loadTopPicksData(symbol);
+    });
 
     searchButton.addEventListener('click', async () => {
         const searchName = stockInput.value.trim();
@@ -32,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (searchName) {
             try {
                 const results = await stockAPI.searchStocks(searchName);
-                console.log('Search Results:', results); 
+                console.log('Search Results:', results);
 
                 dummyResults.bestMatches.forEach((match) => { // CHANGE dummyResults TO results
                     const stockName = match.name;
