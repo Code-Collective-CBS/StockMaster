@@ -17,6 +17,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchButton = document.querySelector('.search-button');
     const searchContainer = document.querySelector('.displaySearch');
 
+    const topPicksContainer = document.querySelector('.top-picks');
+
+    async function loadTopPicksData() {
+        
+    }
+
+
     searchButton.addEventListener('click', async () => {
         const searchName = stockInput.value.trim();
         stockInput.value = '';

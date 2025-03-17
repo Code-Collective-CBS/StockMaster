@@ -91,6 +91,4 @@ const alphaVantageService = {
   },
 };
 
-console.log(alphaVantageService.searchStocks('microsoft'))
-
 module.exports = alphaVantageService;
