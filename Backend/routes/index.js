@@ -17,10 +17,10 @@ router.get('/', (req, res) => {
 
 // Dynamic route handler for all our html pages, insted of hardcoding them all:
 router.get('src/pages/:page.html', (req, res) => {
-  const pageName = req.params.page + '.html';
+  const pageName = req.params.page;
   const filePath = path.join(__dirname, '../../src/pages', pageName);
 
-  // Check if the file exists:
+  // Check if the file exists
   if (fs.existsSync(filePath)) {
     res.sendFile(filePath);
   }

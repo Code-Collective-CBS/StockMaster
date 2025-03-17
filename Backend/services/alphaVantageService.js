@@ -12,14 +12,9 @@ const alphaVantageService = {
   // Get stock data for a symbol (MSF or APPL etc)
   getStockQuote: async (symbol) => {
     try {
-      // await is used to pause javascript untl this promise is resolves
-      const response = await axios.get(config.alphaVantage.baseUrl, {
-        params: {
-          function: "GLOBAL_QUOTE",
-          symbol: symbol,
-          apiKey: config.alphaVantage.apiKey,
-        },
-      });
+      const url = `${config.alphaVantage.baseUrl}?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${config.alphaVantage.apiKey}`;
+      console.log('Making request to:', url); // Add this for debugging
+      const response = await axios.get(url);
       return response.data;
     } catch (error) {
       console.error("Error fetching stock quote", error);
@@ -30,14 +25,9 @@ const alphaVantageService = {
   // Search for stock by keywords
   searchStocks: async (keywords) => {
     try {
-      const response = await axios.get(config.alphaVantage.baseUrl, {
-        params: {
-          function: "SYMBOL_SEARCH",
-          keywords: keywords,
-          apikey: config.alphaVantage.apiKey,
-        },
-      });
-
+      const url = `${config.alphaVantage.baseUrl}?function=SYMBOL_SEARCH&keywords=${keywords}&apikey=${config.alphaVantage.apiKey}`;
+      console.log('Making request to:', url); // Add this for debugging
+      const response = await axios.get(url);
       return response.data;
     } catch (error) {
       console.error("Error searching stocks:", error);
@@ -84,21 +74,23 @@ const alphaVantageService = {
     try {
       // Direct URL construction since we know this works
       const url = `${config.alphaVantage.baseUrl}?function=GLOBAL_QUOTE&symbol=AAPL&apikey=${config.alphaVantage.apiKey}`;
-      console.log('Testing URL:', url); // Log for debugging
+      console.log("Testing URL:", url); // Log for debugging
 
       const response = await axios.get(url);
       return {
         success: true,
-        data: response.data
+        data: response.data,
       };
     } catch (error) {
-      console.error('Error testing Alpha Vantage connection:', error);
+      console.error("Error testing Alpha Vantage connection:", error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
-  }
+  },
 };
+
+console.log(alphaVantageService.searchStocks('microsoft'))
 
 module.exports = alphaVantageService;
