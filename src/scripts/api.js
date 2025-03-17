@@ -1,68 +1,64 @@
-const axios = require('axios');
-// Base URL for all API requests
-const API_BASE_URL = 'http://localhost:3000/api';
+// api.js (Frontend API Calls)
+const API_BASE_URL = 'http://localhost:3000/api/stocks';
 
-// Stock API functionss, ofc in OOP for better organization
-const stockAPI = {
-  // Stock quote
+export const stockAPI = {
+  // Get stock quote
   getStockQuote: async (symbol) => {
     try {
-      // Using axios to make a GET request to our backend
-      const response = await axios.get(`${API_BASE_URL}/stocks/quote/${symbol}`); // this is a page with raw data from AV
-
-      return response.data;
+      const response = await fetch(`${API_BASE_URL}/quote/${symbol}`);
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      return await response.json();
     } catch (error) {
       console.error('Error fetching stock quote:', error);
       throw error;
     }
   },
 
-  // Function to search for stocks based on keywords
+  // Search stocks by keyword
   searchStocks: async (keywords) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/stocks/search`, {
-        params: { keywords: keywords }
-      });
-
-      // Return the data
-      return response.data;
+      const response = await fetch(`${API_BASE_URL}/search?keywords=${encodeURIComponent(keywords)}`);
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      return await response.json();
     } catch (error) {
       console.error('Error searching stocks:', error);
       throw error;
     }
   },
 
-  // Function to get daily time series data for a stock
+  // Get daily time series
   getDailyTimeSeries: async (symbol, outputsize = 'compact') => {
     try {
-      // Make the API request with optional outputsize parameter
-      const response = await axios.get(`${API_BASE_URL}/stocks/daily/${symbol}`, {
-        params: { outputsize: outputsize }
-      });
-
-      return response.data;
+      const response = await fetch(`${API_BASE_URL}/daily/${symbol}?outputsize=${outputsize}`);
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      return await response.json();
     } catch (error) {
       console.error('Error fetching daily time series:', error);
       throw error;
     }
   },
 
-  // Function to get company overview information
+  // Get company overview
   getCompanyOverview: async (symbol) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/stocks/overview/${symbol}`);
-
-      return response.data;
+      const response = await fetch(`${API_BASE_URL}/overview/${symbol}`);
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      return await response.json();
     } catch (error) {
       console.error('Error fetching company overview:', error);
       throw error;
     }
+  },
+
+  // Test connection
+  testConnection: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/test-connection`);
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      return await response.json();
+    } catch (error) {
+      console.error('Error testing connection:', error);
+      throw error;
+    }
   }
-};
-
-
-// Exporting the API functions
-module.exports = {
-  stock: stockAPI
-  // Later we can add the other api's such as user and portfolio
 };
