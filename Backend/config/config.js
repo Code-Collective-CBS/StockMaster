@@ -19,6 +19,19 @@ const config = {
     alphaVantage: {
         baseUrl: 'https://www.alphavantage.co/query',
         apiKey: process.env.ALPHA_VANTAGE_API_KEY
+    },
+
+    // DB login configuration
+    database: {
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        server: process.env.DB_SERVER,
+        database: process.env.DB_DATABASE,
+        port: parseInt(process.env.DB_PORT),
+        options: {
+            encrypt: true,
+            trustServerCertificate: false,
+        }
     }
 };
 

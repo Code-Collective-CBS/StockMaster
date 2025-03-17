@@ -1,3 +1,6 @@
+// Imports all the env-variables first
+require('dotenv').config();
+
 const express = require('express');
 const path = require('path') // inbuild node utility to help find file paths
 const cors = require('cors'); // Tillader frontend og backend at snakke sammen fra forskellige domains. Ex: localhost:3000 og localhost:5173
@@ -6,7 +9,6 @@ const app = express();
 
 // Use port from config that we imported
 const PORT = config.server.port;
-
 
 app.use('/src', express.static(path.join(__dirname, '../src'))); // Gør at HTML, CSS, JS (frontend) er statisk. Loader hurtigere, og holder backend clean.
 app.use(express.json()) // Parses JSON data. Dvs. konverterer rå data fra en HTTP request til en brugbar format, som serveren kan bruge.
