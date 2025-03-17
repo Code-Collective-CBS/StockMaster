@@ -9,13 +9,13 @@ const topPicksSymbols = [
 
 const dummyResults = {
     bestMatches: [
-        { symbol: 'MSF0.FRK', name: 'MICROSOFT CORP. CDR', type: 'Equity', region: 'Frankfurt', marketOpen: '08:00' },
-        { symbol: 'MSFT', name: 'Microsoft Corporation', type: 'Equity', region: 'United States', marketOpen: '09:30' },
-        { symbol: '0QYP.LON', name: 'Microsoft 2Corporation', type: 'Equity', region: 'United Kingdom', marketOpen: '08:00' },
-        { symbol: 'MSF.DEX', name: 'Microsoft 3Corporation', type: 'Equity', region: 'XETRA', marketOpen: '08:00' },
-        { symbol: 'MSF.FRK', name: 'Microsoft 4Corporation', type: 'Equity', region: 'Frankfurt', marketOpen: '08:00' },
-        { symbol: 'MSFT34.SAO', name: 'Microsoft 5Corporation', type: 'Equity', region: 'Brazil/Sao Paolo', marketOpen: '10:00' },
-        { symbol: 'MSFT.TRT', name: 'Microsoft CDR (CAD Hedged)', type: 'Equity', region: 'Toronto', marketOpen: '09:30' }
+        { "1. symbol": "MSF0.FRK", "2. name": "MICROSOFT CORP. CDR", "3. type": "Equity", "4. region": "Frankfurt", "5. marketOpen": "08:00", "6. marketClose": "22:00", "7. timezone": "UTC+1", "8. currency": "EUR", "9. matchScore": "0.90" },
+        { "1. symbol": "MSFT", "2. name": "Microsoft Corporation", "3. type": "Equity", "4. region": "United States", "5. marketOpen": "09:30", "6. marketClose": "16:00", "7. timezone": "UTC-04", "8. currency": "USD", "9. matchScore": "1.00" },
+        { "1. symbol": "0QYP.LON", "2. name": "Microsoft Corporation", "3. type": "Equity", "4. region": "United Kingdom", "5. marketOpen": "08:00", "6. marketClose": "16:30", "7. timezone": "UTC+0", "8. currency": "GBP", "9. matchScore": "0.85" },
+        { "1. symbol": "MSF.DEX", "2. name": "Microsoft Corporation", "3. type": "Equity", "4. region": "XETRA", "5. marketOpen": "08:00", "6. marketClose": "22:00", "7. timezone": "UTC+1", "8. currency": "EUR", "9. matchScore": "0.88" },
+        { "1. symbol": "MSF.FRK", "2. name": "Microsoft Corporation", "3. type": "Equity", "4. region": "Frankfurt", "5. marketOpen": "08:00", "6. marketClose": "22:00", "7. timezone": "UTC+1", "8. currency": "EUR", "9. matchScore": "0.87" },
+        { "1. symbol": "MSFT34.SAO", "2. name": "Microsoft Corporation", "3. type": "Equity", "4. region": "Brazil/Sao Paolo", "5. marketOpen": "10:00", "6. marketClose": "17:00", "7. timezone": "UTC-03", "8. currency": "BRL", "9. matchScore": "0.80" },
+        { "1. symbol": "MSFT.TRT", "2. name": "Microsoft CDR (CAD Hedged)", "3. type": "Equity", "4. region": "Toronto", "5. marketOpen": "09:30", "6. marketClose": "16:00", "7. timezone": "UTC-05", "8. currency": "CAD", "9. matchScore": "0.75" }
     ]
 };
 
@@ -25,9 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchContainer = document.querySelector('.displaySearch');
 
     const topPicksContainer = document.querySelector('.top-picks');
-    console.log(topPicksContainer.childNodes);
 
-    async function loadTopPicksData(symbol) {
+    async function loadTopPicksData(symbol) { //FIX THIS EGJ
         try {
             const result = await stockAPI.getCompanyOverview(symbol);
 
@@ -35,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (priceElement) {
                 priceElement.textContent = result.price || 'N/A';
             }
+            console.log(result);
         } catch (err) {
             console.error('Error fetching top pick', symbol, err);
         }
@@ -43,33 +43,37 @@ document.addEventListener('DOMContentLoaded', () => {
     topPicksSymbols.forEach((symbol) => {
         loadTopPicksData(symbol);
     });
+    //TO HERE
 
     searchButton.addEventListener('click', async () => {
         const searchName = stockInput.value.trim();
         stockInput.value = '';
         searchContainer.innerHTML = '';
 
-        if (searchName) {
-            try {
-                const results = await stockAPI.searchStocks(searchName);
-                console.log('Search Results:', results);
+        if(!searchName) {
+            console.warn('Indtast et søgeord');
+            return;
+        }
 
-                dummyResults.bestMatches.forEach((match) => { // CHANGE dummyResults TO results
-                    const stockName = match.name;
+        try{
+            const results = await stockAPI.searchStocks(searchName);
+            console.log('Search results', results);
+
+            results.bestMatches.forEach((match) => {
+                const stockSymbol = match['1. symbol'];
+                const stockName = match['2. name'];
+
+                if(stockSymbol && stockName){
                     const stockNameItem = document.createElement('p');
-
-                    stockNameItem.setAttribute('id', match.symbol)
-                    stockNameItem.innerHTML = `<a href="../pages/security.html?symbol=${stockNameItem.id}">${stockName}</a>`;
+                    stockNameItem.setAttribute('id', stockSymbol);
+                    stockNameItem.innerHTML = `<a href="../pages/security.html?symbol=${stockSymbol}">${stockName} (${stockSymbol})</a>`;
 
                     searchContainer.appendChild(stockNameItem);
-                    console.log(match.name);
-                });
-
-            } catch (error) {
-                console.error('Error fetching search results:', error);
-            }
-        } else {
-            console.warn('Please enter a valid stock name.');
+                    console.log(`Added: ${stockName}`);
+                }
+            });
+        } catch (err) {
+            console.error('Error fetching search results:', err);
         }
     });
 });
