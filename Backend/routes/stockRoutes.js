@@ -4,7 +4,7 @@ const router = express.Router();
 const stockController = require('../controllers/stockController');
 
 
-// This is just a test route 
+// This is just a test route
 router.get('/test', (req, res) => {
     res.json({ message: 'Stock API is working!' });
 });
