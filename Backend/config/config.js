@@ -37,4 +37,5 @@ const config = {
 
 console.log(config.alphaVantage.apiKey);
 console.log(config.server.port, config.server.environment);
+
 module.exports = config;

@@ -30,7 +30,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 dummyResults.bestMatches.forEach((match) => { // CHANGE dummyResults TO results
                     const stockName = match.name;
                     const stockNameItem = document.createElement('p');
-                    stockNameItem.innerHTML = stockName;
+
+                    stockNameItem.setAttribute('id', match.symbol)
+                    stockNameItem.innerHTML = `<a href="../pages/security.html?symbol=${stockNameItem.id}">${stockName}</a>`;
 
                     searchContainer.appendChild(stockNameItem);
                     console.log(match.name);
