@@ -69,7 +69,7 @@ function createPriceChart(timeSeriesData) {
     dataPoints.sort((a, b) => new Date(a[0]) - new Date(b[0]));
 
     // Using the last 30 days as data
-    const recentData = dataPoints.slice(-30);
+    const recentData = dataPoints.slice(-365);
 
 
     // Extracting the dates and clising prices for the chart
@@ -96,7 +96,7 @@ function createPriceChart(timeSeriesData) {
         data: {
             labels: dates, // this is the x-axis labels
             datasets: [{
-                label: 'Stock Price (USD)',
+                label: 'Aktie Pris (USD)',
                 data: prices, // The y-axis data (closing prices)
 
 
@@ -116,7 +116,7 @@ function createPriceChart(timeSeriesData) {
             plugins: {
                 title: {
                     display: true,
-                    text: 'Stock Price History (30 days)'
+                    text: 'Aktie pris (30 Dage)'
                 },
                 tooltip: {
                     mode: 'index', // showing all values at a particular x-value
@@ -130,14 +130,14 @@ function createPriceChart(timeSeriesData) {
                     beginAtZero: false, // Not forcing axes to start at 0
                     title: {
                         display: true,
-                        text: 'Price (USD)'
+                        text: 'Pris (USD)'
                     }
                 },
 
                 x: {
                     title: {
                         display: true,
-                        text: 'Date'
+                        text: 'Dato'
                     }
                 }
             }
