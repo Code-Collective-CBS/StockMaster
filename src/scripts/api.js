@@ -6,7 +6,9 @@ export const stockAPI = {
   getStockQuote: async (symbol) => {
     try {
       const response = await fetch(`${API_BASE_URL}/quote/${symbol}`);
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
       return await response.json();
     } catch (error) {
       console.error('Error fetching stock quote:', error);
@@ -18,7 +20,9 @@ export const stockAPI = {
   searchStocks: async (keywords) => {
     try {
       const response = await fetch(`${API_BASE_URL}/search?keywords=${encodeURIComponent(keywords)}`);
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
       return await response.json();
     } catch (error) {
       console.error('Error searching stocks:', error);
@@ -30,7 +34,9 @@ export const stockAPI = {
   getDailyTimeSeries: async (symbol, outputsize = 'compact') => {
     try {
       const response = await fetch(`${API_BASE_URL}/daily/${symbol}?outputsize=${outputsize}`);
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
       return await response.json();
     } catch (error) {
       console.error('Error fetching daily time series:', error);
@@ -42,7 +48,9 @@ export const stockAPI = {
   getCompanyOverview: async (symbol) => {
     try {
       const response = await fetch(`${API_BASE_URL}/overview/${symbol}`);
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
       return await response.json();
     } catch (error) {
       console.error('Error fetching company overview:', error);
@@ -51,14 +59,16 @@ export const stockAPI = {
   },
 
   // Test connection
-  testConnection: async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/test-connection`);
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-      return await response.json();
-    } catch (error) {
-      console.error('Error testing connection:', error);
-      throw error;
-    }
-  }
+  // testConnection: async () => {
+  //   try {
+  //     const response = await fetch(`${API_BASE_URL}/test-connection`);
+  //     if (!response.ok) {
+  //       throw new Error(`HTTP error! Status: ${response.status}`);
+  //     }
+  //     return await response.json();
+  //   } catch (error) {
+  //     console.error('Error testing connection:', error);
+  //     throw error;
+  //   }
+  // }
 };

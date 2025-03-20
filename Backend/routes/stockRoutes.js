@@ -14,7 +14,6 @@ router.get('/test', (req, res) => {
 router.get('/quote/:symbol', stockController.getQuote)
 
 // Stock search endpoint
-
 router.get('/search', stockController.searchStocks)
 
 // Stock daily times series endpoint
@@ -24,11 +23,11 @@ router.get('/daily/:symbol', stockController.getDailyTimeSeries)
 router.get('/overview/:symbol', stockController.getCompanyOverview)
 
 
-// Test stock function
-router.get('/test-connection', async (req, res) => {
-    const result = await stockController.testConnection(req, res);
-    res.json(result);
-});
+// // Test stock function
+// router.get('/test-connection', async (req, res) => {
+//     const result = await stockController.testConnection(req, res);
+//     res.json(result);
+// });
 
 
 

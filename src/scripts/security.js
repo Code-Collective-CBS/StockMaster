@@ -1,111 +1,146 @@
-import { stockAPI } from "./api";
+import { stockAPI } from "./api.js";
 
-document.addEventListener('DOMContentLoaded', async () => {
-    console.log('Security page loaded');
+document.addEventListener('DOMContentLoaded', async () =>  {
+    console.log('Security page loaded!');
 
-    // stock symbol from URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const symbol = urlParams.get('symbol');
-
-    console.log('Stock symbol from URL:', symbol);
-
-    // If no symbol
-    if (!symbol) {
-        console.error('No stock symbol provided in URL');
-        updateStockHeader('No stock symbol specified');
-        return;
-    }
-    updateStockHeader(symbol);
-
-    // title of the page
-    document.title = `${symbol} | StockMaster`;
+    console.log(`Stock symbol: ${symbol}`);
 
     try {
-        console.log('Fetching data for:', symbol)
+        // Get company overview data
         const companyData = await stockAPI.getCompanyOverview(symbol);
-        console.log('Company data recieved:' , companyData);
-
         displayCompanyInfo(companyData, symbol);
-    } catch (error) {
-        console.error('Error fetching company data', errror);
-    }
-});
 
-// Update the stock header
+        // price history data for graph (chart.js)
+        const timeSeriesData = await stockAPI.getDailyTimeSeries(symbol);
+        createPriceChart(timeSeriesData);
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+})
+
+
 function updateStockHeader(text) {
     const stockHeader = document.querySelector('.security-graph h2');
 
-    if (stockHeader) {
-        stockHeader.textContent = text;
-    } else {
-        console.error('Could not find the stock header element');
+    if (!stockHeader) {
+    console.error('Could not find the stock');
     }
+    stockHeader.textContent = text;
 }
 
 function displayCompanyInfo(companyData, symbol) {
-    if (!companyData) {
-        console.error('No company data available');
-        return;
-    }
-
-    if (companyData.Name) {
-        updateStockHeader(companyData.Name)
-    } else if (companyData.name) {
-        updateStockHeader(companyData.name)
-    }
-    console.log('Could not find the company name')
-
-    const infoSection = document.createElement('section');
-    infoSection.className = 'company-info';
-
-    const graphSection = document.querySelector('.security-graph');
-    if (graphSection && graphSection.parentNode) {
-        graphSection.parentNode.insertBefore(infoSection, graphSection.nextSibling);
-    } else {
-        // Fallback - append to main content
-        const mainContent = document.querySelector('.security-content');
-        if (mainContent) {
-            mainContent.appendChild(infoSection);
-        } else {
-            console.error('Could not find a place to insert company info');
+    console.log('Company data: ', companyData)
+        // Check if we have the data
+        if (!companyData || Object.keys(companyData).length === 0) {
+            console.error('No company data available');
+            updateStockHeader(`${symbol} - Data not available`);
             return;
         }
+        if (companyData.Name) {
+            updateStockHeader(companyData.Name)
+        } else if (companyData.name) {
+            updateStockHeader(companyData.name)
+        }
+        else {
+            updateStockHeader(symbol);
+        }
+}
+
+function createPriceChart(timeSeriesData) {
+    if (!timeSeriesData || !timeSeriesData['Time Series (Daily)']) {
+        console.error('Invalid time series data format');
+        return
     }
 
-    infoSection.innerHTML = '';
+    const canvas = document.getElementById('portfolioChart');
+    if (!canvas) {
+        console.error('Canvas element not found');
+    }
 
-    const heading = document.createElement('h2');
-    heading.textContent = 'Aktie Information';
-    infoSection.appendChild(heading);
+    // Defining the key in the json file
+    const timeSeries = timeSeriesData['Time Series (Daily)'];
 
-    const infoList = document.createElement('div');
-    infoList.className = 'company-details';
+    // converting the object to array for easier use with Object.entries
+    const dataPoints = Object.entries(timeSeries);
 
-    // Update this based on the api json format
-    const fields = [
-        { label: 'Symbol', key: 'Symbol', fallback: symbol },
-        { label: 'Industry', key: 'Industry', fallback: 'Not available' },
-        { label: 'Sector', key: 'Sector', fallback: 'Not available' },
-        { label: 'Exchange', key: 'Exchange', fallback: 'Not available' },
-        { label: 'Market Cap', key: 'MarketCapitalization', fallback: 'Not available', formatter: formatMarketCap },
-        { label: 'P/E Ratio', key: 'PERatio', fallback: 'Not available' },
-        { label: 'Dividend Yield', key: 'DividendYield', fallback: 'Not available', formatter: formatPercentage },
-        { label: '52-Week High', key: '52WeekHigh', fallback: 'Not available', formatter: formatCurrency },
-        { label: '52-Week Low', key: '52WeekLow', fallback: 'Not available', formatter: formatCurrency }
-    ];
+    // Sorting from oldest to newest
+    dataPoints.sort((a, b) => new Date(a[0]) - new Date(b[0]));
 
-    fields.forEach(field => {
-        const item = document.createElement('p');
-        let value = companyData[field.key] || field.fallback;
+    // Using the last 30 days as data
+    const recentData = dataPoints.slice(-30);
 
-              // Apply formatter if provided
-              if (field.formatter && value !== field.fallback) {
-                value = field.formatter(value);
+
+    // Extracting the dates and clising prices for the chart
+    const dates = [];
+    const prices = [];
+
+    recentData.forEach(([date, values]) => {
+        // Adding the date to our dates array
+        dates.push(date)
+
+        // Adding the closing price to our prices array, in the data from Alpha Vantage, it is the '4. close' that's the key for the closing price:
+        prices.push(parseFloat(values['4. close']));
+    });
+
+    // Logging our two arrays to the console for debugging
+    console.log('Dates: ', dates)
+    console.log('Prices: ', prices)
+
+    // Now I am creating the chart with chart.js
+    new Chart(canvas, {
+        type: 'line',
+
+        // providing the data:
+        data: {
+            labels: dates, // this is the x-axis labels
+            datasets: [{
+                label: 'Stock Price (USD)',
+                data: prices, // The y-axis data (closing prices)
+
+
+            // Here we are styling the line
+            borderColor: '#00DA91', // The highlight color color.css
+            backgroundColor: '#151F32', // Primary color
+            borderWidth: 2,
+            tension: 0.1 // This is just a slightly curve
+            }]
+        },
+
+        // Configurating the chart options:
+        options: {
+            responsive: true, // Capable of resizing the chart if the container size changes
+
+            // Plugins like (title, legend, tooltip)
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Stock Price History (30 days)'
+                },
+                tooltip: {
+                    mode: 'index', // showing all values at a particular x-value
+                    intersect: false,
+                }
+            },
+
+            // Configuring axes
+            scales: {
+                y: {
+                    beginAtZero: false, // Not forcing axes to start at 0
+                    title: {
+                        display: true,
+                        text: 'Price (USD)'
+                    }
+                },
+
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                }
             }
-
-            item.innerHTML = `<strong>${field.label}:</strong> ${value}`;
-            infoList.appendChild(item);
-        });
-
-        infoSection.appendChild(infoList);
+        }
+    });
 }

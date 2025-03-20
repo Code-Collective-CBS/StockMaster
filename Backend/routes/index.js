@@ -4,11 +4,13 @@ const path = require('path');
 const express = require('express')
 const router = express.Router(); // Brug router i stedet for app
 const fs = require('fs');
+const cors = require('cors');
 
 
 // Import API routes modules
 // As we create new route files, we should import them here:
-const stockRoutes = require('./stockRoutes'); // This is our stock routes file
+const stockRoutes = require('./stockRoutes'); // stock routes file
+const apiRoutes = require('../../src/scripts/api.js');
 
 // Main dashboard page route (this is our homepage)
 router.get('/', (req, res) => {
@@ -26,6 +28,8 @@ router.get('src/pages/:page.html', (req, res) => {
   }
   res.status(404).send('Page not found');
 });
+
+router.use(cors());
 
 
 // Let app use our imported routes

@@ -154,14 +154,16 @@
         </header>
         <section class="security-grid">
             <section class="security-graph">
-                <h2>Aktie navn</h2>
+                <h2>Loading stock information...</h2>
+                <div class="option-wrapper">
+                  <option value="day">Dag</option>
+                  <option value="month">Måned</option>
+                  <option value="current-year">I år</option>
+                  <option value="year">år</option>
+                  <select name="portfolio-graph-interval" id="portfolio-graph-interval">
+                  </select>
+                </div>
                 <canvas id="portfolioChart"></canvas>
-                <select name="portfolio-graph-interval" id="portfolio-graph-interval">
-                    <option value="day">Dag</option>
-                    <option value="month">Måned</option>
-                    <option value="current-year">I år</option>
-                    <option value="year">år</option>
-                </select>
             </section>
 
             <section class="action">
@@ -184,7 +186,9 @@
             </section>
         </section>
     </main>
-    <script src="/src/scripts/sidebar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="/src/scripts/api.js"></script>
     <script type="module" src="/src/scripts/security.js"></script>
+    <script src="/src/scripts/sidebar.js"></script>
 </body>
 </html>
