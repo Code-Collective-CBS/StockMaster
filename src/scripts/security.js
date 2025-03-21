@@ -116,7 +116,7 @@ function createPriceChart(timeSeriesData) {
             plugins: {
                 title: {
                     display: true,
-                    text: 'Aktie pris (30 Dage)'
+                    text: 'Aktie pris (1 år)'
                 },
                 tooltip: {
                     mode: 'index', // showing all values at a particular x-value
