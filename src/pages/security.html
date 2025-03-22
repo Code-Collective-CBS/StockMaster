@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transaktioner</title>
+    <title>StockMaster | Aktier</title>
     <link rel="stylesheet" href="/src/layouts/security.css">
     <link rel="stylesheet" href="/src/base/color.css">
     <link rel="stylesheet" href="/src/base/typography.css">
@@ -147,9 +147,15 @@
     <main class="security-content">
         <header class="page-header">
             <h1>Køb/sælg</h1>
-            <div class="header-actions">
-                <button class="btn btn-secondary" id="addPortfolioButton">Tilføj portefølje</button>
-                <button class="btn btn-primary" id="depositButton">Indbetal</button>
+            <div class="action-wrapper">
+              <div class="header-actions">
+                  <button class="btn btn-secondary" id="addPortfolioButton">Køb</button>
+                  <button class="btn btn-primary" id="depositButton">Sælg</button>
+              </div>
+              <!-- <div class="ammount-input-div">
+                <label for="security-ammoun">Indtast antal</label>
+                <input type="number" id="security-ammoun" placeholder="Antal">
+            </div> -->
             </div>
         </header>
         <section class="security-grid">
@@ -167,14 +173,12 @@
             </section>
 
             <section class="action">
-                <h2>Køb/sælg</h2>
-                <div class="buy-sell-actions">
-                    <button class="btn btn-primary" id="buy-security">Køb</button>
-                    <button class="btn btn-secondary" id="sell-security">Sælg</button>
-                </div>
-                <div class="ammount-input-div">
-                    <label for="security-ammoun">Indtast antal</label>
-                    <input type="number" id="security-ammoun" placeholder="Antal">
+                <!--Company descripion-->
+                <div class="company-description-container">
+                  <h3>Om virksomheden</h3>
+                  <div class="company-description">
+                    <p></p>
+                  </div>
                 </div>
             </section>
 

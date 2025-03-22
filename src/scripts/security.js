@@ -10,7 +10,8 @@ document.addEventListener('DOMContentLoaded', async () =>  {
     try {
         // Get company overview data
         const companyData = await stockAPI.getCompanyOverview(symbol);
-        displayCompanyInfo(companyData, symbol);
+        displayCompanyName(companyData, symbol);
+        displayCompanyOverview(companyData, symbol);
 
         // price history data for graph (chart.js)
         const timeSeriesData = await stockAPI.getDailyTimeSeries(symbol);
@@ -30,22 +31,43 @@ function updateStockHeader(text) {
     stockHeader.textContent = text;
 }
 
-function displayCompanyInfo(companyData, symbol) {
+function displayCompanyName(companyData, symbol) {
     console.log('Company data: ', companyData)
         // Check if we have the data
-        if (!companyData || Object.keys(companyData).length === 0) {
+        if (!companyData) {
             console.error('No company data available');
             updateStockHeader(`${symbol} - Data not available`);
             return;
         }
         if (companyData.Name) {
             updateStockHeader(companyData.Name)
-        } else if (companyData.name) {
-            updateStockHeader(companyData.name)
         }
-        else {
             updateStockHeader(symbol);
-        }
+}
+
+function displayCompanyOverview(companyData, symbol) {
+    // Check if we have company data
+    if (!companyData) {
+        console.error(`No company data available for ${symbol}`);
+        return;
+    }
+
+    const companyDescription = document.querySelector('.company-description p');
+    if (!companyDescription) {
+        console.error('Company description element not found in the DOM');
+        return;
+    }
+
+    // Check if we have a description in the data
+    if (!companyData.Description) {
+        console.warn(`No description available for ${symbol}`);
+        companyDescription.textContent = `No description available for ${symbol}.`;
+        return;
+    }
+
+    // Display the description
+    companyDescription.textContent = companyData.Description;
+    console.log(`Successfully displayed ${symbol} details`);
 }
 
 function createPriceChart(timeSeriesData) {
