@@ -24,9 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchButton = document.querySelector('.search-button');
     const searchContainer = document.querySelector('.displaySearch');
 
+    //// TOP PICKS ////
     const topPicksContainer = document.querySelector('.top-picks');
 
-    async function loadTopPicksData(symbol) { //FIX THIS EGJ
+    async function loadTopPicksData(symbol) {
         try {
             const result = await stockAPI.getCompanyOverview(symbol);
 
@@ -43,10 +44,14 @@ document.addEventListener('DOMContentLoaded', () => {
     topPicksSymbols.forEach((symbol) => {
         loadTopPicksData(symbol);
     });
-    //TO HERE
 
+    //// TOP PICKS ////
+
+    //// SEARCH STOCKS ////
     searchButton.addEventListener('click', async () => {
-        const searchName = stockInput.value.trim();
+        const searchQuery = stockInput.value.trim(); // REMOVES WHITESPACE
+
+        // CLEAR INPUTS //
         stockInput.value = '';
         searchContainer.innerHTML = '';
 
@@ -55,25 +60,27 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        try{
-            const results = await stockAPI.searchStocks(searchName);
-            console.log('Search results', results);
+        try {
+            const response = await fetch(`/api/stocks/search?query=${encodeURI(searchQuery)}`);
+            const result = await response.json();
 
-            results.bestMatches.forEach((match) => {
-                const stockSymbol = match['1. symbol'];
-                const stockName = match['2. name'];
+            if(!response.ok){
+                throw new Error('Error when fetchin response from database');
+                return;
+            } else if(!result.length){
+                console.warn('Ingen resultater fundet');
+                return;
+            }
 
-                if(stockSymbol && stockName){
-                    const stockNameItem = document.createElement('p');
-                    stockNameItem.setAttribute('id', stockSymbol);
-                    stockNameItem.innerHTML = `<a href="../pages/security.html?symbol=${stockSymbol}">${stockName} (${stockSymbol})</a>`;
-
-                    searchContainer.appendChild(stockNameItem);
-                    console.log(`Added: ${stockName}`);
-                }
+            result.forEach(({ symbol, name }) => {
+                const stockNameItem = document.createElement('p');
+                stockNameItem.innerHTML = `
+                <a href="../pages/security.html?symbol=${symbol}">
+                        ${name} (${symbol})
+                </a>`;
             });
         } catch (err) {
-            console.error('Error fetching search results:', err);
+             console.error('Search failed', err);
         }
     });
 });
