@@ -7,6 +7,7 @@ NOT make any API calls directly
 
 // Load environment variables form .env file
 require('dotenv').config({ path: '../../.env' });
+const sql = require('mssql');
 
 const config = {
     // Server configuration
@@ -34,8 +35,5 @@ const config = {
         }
     }
 };
-
-console.log(config.alphaVantage.apiKey);
-console.log(config.server.port, config.server.environment);
 
 module.exports = config;

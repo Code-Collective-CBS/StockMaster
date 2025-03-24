@@ -13,7 +13,7 @@ app.use(session({
     secret: 'din-hemmelige-nøgle-her', // vælg en sikker nøgle i produktion
     resave: false,
     saveUninitialized: false,
-    cookie: { 
+    cookie: {
         secure: true,  // brug "true" hvis du har HTTPS
         maxAge: 1000 * 60 * 60 // fx 1 time
     }

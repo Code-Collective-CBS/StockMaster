@@ -70,7 +70,7 @@ function displayCompanyOverview(companyData, symbol) {
     console.log(`Successfully displayed ${symbol} details`);
 }
 
-function createPriceChart(timeSeriesData) {
+function createPriceChart(timeSeriesData, interval = -365) {
     if (!timeSeriesData || !timeSeriesData['Time Series (Daily)']) {
         console.error('Invalid time series data format');
         return
@@ -91,7 +91,7 @@ function createPriceChart(timeSeriesData) {
     dataPoints.sort((a, b) => new Date(a[0]) - new Date(b[0]));
 
     // Using the last 30 days as data
-    const recentData = dataPoints.slice(-365);
+    const recentData = dataPoints.slice(interval);
 
 
     // Extracting the dates and clising prices for the chart
