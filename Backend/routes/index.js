@@ -9,8 +9,7 @@ const cors = require('cors');
 
 // Import API routes modules
 // As we create new route files, we should import them here:
-const stockRoutes = require('./stockRoutes'); // stock routes file
-const apiRoutes = require('../../src/scripts/api.js');
+const stockRoutes = require('./stockRoutes'); //
 
 // Main dashboard page route (this is our homepage)
 router.get('/', (req, res) => {
