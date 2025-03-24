@@ -6,6 +6,18 @@ const path = require('path') // inbuild node utility to help find file paths
 const cors = require('cors'); // Tillader frontend og backend at snakke sammen fra forskellige domains. Ex: localhost:3000 og localhost:5173
 const config = require('./config/config'); // Importing the configuration from the config.js file
 const app = express();
+const session = require('express-session');
+
+// Session Middleware setup
+app.use(session({
+    secret: 'din-hemmelige-nøgle-her', // vælg en sikker nøgle i produktion
+    resave: false,
+    saveUninitialized: false,
+    cookie: { 
+        secure: true,  // brug "true" hvis du har HTTPS
+        maxAge: 1000 * 60 * 60 // fx 1 time
+    }
+}));
 
 // Use port from config that we imported
 const PORT = config.server.port;
