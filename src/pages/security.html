@@ -146,7 +146,7 @@
 
     <main class="security-content">
         <header class="page-header">
-            <h1>Køb/sælg</h1>
+            <h1 class="page-title">Aktie</h1>
             <div class="action-wrapper">
               <div class="header-actions">
                   <button class="btn btn-secondary" id="addPortfolioButton">Køb</button>
@@ -162,11 +162,11 @@
             <section class="security-graph">
                 <h2>Loading stock information...</h2>
                 <div class="option-wrapper">
-                  <option value="day">Dag</option>
-                  <option value="month">Måned</option>
-                  <option value="current-year">I år</option>
-                  <option value="year">år</option>
                   <select name="portfolio-graph-interval" id="portfolio-graph-interval">
+                    <option value="1">Dag</option>
+                    <option value="30">Måned</option>
+                    <option value="90">Kvartal</option>
+                    <option value="365" selected>År</option>
                   </select>
                 </div>
                 <canvas id="portfolioChart"></canvas>

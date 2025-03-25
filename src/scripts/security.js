@@ -7,15 +7,32 @@ document.addEventListener('DOMContentLoaded', async () =>  {
     const symbol = urlParams.get('symbol');
     console.log(`Stock symbol: ${symbol}`);
 
+    // Storing time series globally so we can use it again
+    let globalTimeSeriesData;
+
     try {
         // Get company overview data
         const companyData = await stockAPI.getCompanyOverview(symbol);
         displayCompanyName(companyData, symbol);
         displayCompanyOverview(companyData, symbol);
+        updatePageTitle(companyData.Name);
+        document.title = 'StockMaster | ', symbol;
 
         // price history data for graph (chart.js)
         const timeSeriesData = await stockAPI.getDailyTimeSeries(symbol);
+        globalTimeSeriesData = timeSeriesData; // Storing the time data (caching)
         createPriceChart(timeSeriesData);
+
+        // Setting up the event listener for change in time interval
+        const intervalSelect = document.getElementById('portfolio-graph-interval');
+        if (intervalSelect) {
+            intervalSelect.addEventListener('change', function() {
+                const days = parseInt(this.value); // from security.html value, and then parse it to a number
+                createPriceChart(globalTimeSeriesData, -days)
+            })
+        }
+
+
     } catch (error) {
         console.error('Error fetching data:', error);
     }
@@ -73,12 +90,18 @@ function displayCompanyOverview(companyData, symbol) {
 function createPriceChart(timeSeriesData, interval = -365) {
     if (!timeSeriesData || !timeSeriesData['Time Series (Daily)']) {
         console.error('Invalid time series data format');
-        return
+        return;
     }
 
     const canvas = document.getElementById('portfolioChart');
     if (!canvas) {
         console.error('Canvas element not found');
+        return;
+    }
+
+    // Clear existing chart
+    if (window.priceChart) {
+        window.priceChart.destroy();
     }
 
     // Defining the key in the json file
@@ -90,28 +113,32 @@ function createPriceChart(timeSeriesData, interval = -365) {
     // Sorting from oldest to newest
     dataPoints.sort((a, b) => new Date(a[0]) - new Date(b[0]));
 
-    // Using the last 30 days as data
+    // Using the specified interval
     const recentData = dataPoints.slice(interval);
 
-
-    // Extracting the dates and clising prices for the chart
+    // Extracting the dates and closing prices for the chart
     const dates = [];
     const prices = [];
 
     recentData.forEach(([date, values]) => {
         // Adding the date to our dates array
-        dates.push(date)
+        dates.push(date);
 
-        // Adding the closing price to our prices array, in the data from Alpha Vantage, it is the '4. close' that's the key for the closing price:
+        // Adding the closing price to our prices array
         prices.push(parseFloat(values['4. close']));
     });
 
-    // Logging our two arrays to the console for debugging
-    console.log('Dates: ', dates)
-    console.log('Prices: ', prices)
+    // Calculate price difference for the info block
+    const startPrice = prices[0];
+    const endPrice = prices[prices.length - 1];
+    const priceDifference = endPrice - startPrice;
+    const percentageDifference = (priceDifference / startPrice) * 100;
 
-    // Now I am creating the chart with chart.js
-    new Chart(canvas, {
+    // Update price difference display
+    updatePriceDifferenceDisplay(endPrice, priceDifference, percentageDifference);
+
+    // Creating the chart with chart.js
+    window.priceChart = new Chart(canvas, {
         type: 'line',
 
         // providing the data:
@@ -121,28 +148,48 @@ function createPriceChart(timeSeriesData, interval = -365) {
                 label: 'Aktie Pris (USD)',
                 data: prices, // The y-axis data (closing prices)
 
-
-            // Here we are styling the line
-            borderColor: '#00DA91', // The highlight color color.css
-            backgroundColor: '#151F32', // Primary color
-            borderWidth: 2,
-            tension: 0.1 // This is just a slightly curve
+                // Here we are styling the line
+                borderColor: '#00DA91', // The highlight color from color.css
+                backgroundColor: 'rgba(0, 218, 145, 0.1)', // Semi-transparent area under line
+                borderWidth: 2,
+                tension: 0.1, //Slightly curve
+                fill: true
             }]
         },
 
-        // Configurating the chart options:
+        // Configuring the chart options:
         options: {
             responsive: true, // Capable of resizing the chart if the container size changes
+            interaction: {
+                intersect: false,
+                mode: 'index',
+            },
 
             // Plugins like (title, legend, tooltip)
             plugins: {
                 title: {
                     display: true,
-                    text: 'Aktie pris (1 år)'
+                    text: 'Aktie pris'
                 },
                 tooltip: {
-                    mode: 'index', // showing all values at a particular x-value
+                    enabled: true,
+                    mode: 'index',
                     intersect: false,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += new Intl.NumberFormat('da-DK', {
+                                    style: 'currency',
+                                    currency: 'USD'
+                                }).format(context.parsed.y);
+                            }
+                            return label;
+                        }
+                    }
                 }
             },
 
@@ -165,4 +212,60 @@ function createPriceChart(timeSeriesData, interval = -365) {
             }
         }
     });
+}
+
+
+function updatePriceDifferenceDisplay(currentPrice, difference, percentDifference) {
+        // Create the element if it doesn't exist
+        const priceInfoElement = document.createElement('div');
+        priceInfoElement.className = 'price-info';
+
+        // Insert it before the canvas in the security-graph section
+        const securityGraph = document.querySelector('.security-graph');
+        const canvas = document.getElementById('portfolioChart');
+        if (securityGraph && canvas) {
+            securityGraph.insertBefore(priceInfoElement, canvas);
+        }
+
+        // Format values for display
+        const formattedPrice = new Intl.NumberFormat('da-DK', {
+            style: 'decimal',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(currentPrice);
+
+        const formattedDifference = new Intl.NumberFormat('da-DK', {
+            style: 'decimal',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+            signDisplay: 'always'
+        }).format(difference);
+
+        const formattedPercent = new Intl.NumberFormat('da-DK', {
+            style: 'decimal',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+            signDisplay: 'always'
+        }).format(percentDifference);
+
+        // Set color class based on whether difference is positive or negative
+        const colorClass = difference >= 0 ? 'positive-change' : 'negative-change';
+
+        // Update the HTML content
+        priceInfoElement.innerHTML = `
+            <div class="current-price">${formattedPrice} DKK</div>
+            <div class="price-change ${colorClass}">
+                <span>${formattedDifference}</span>
+                <span>${formattedPercent}%</span>
+            </div>
+        `;
+}
+
+function updatePageTitle (stockName) {
+    const pageTitle = document.querySelector('.page-title');
+
+    if (!pageTitle) {
+    console.error('Could not find the stock');
+    }
+    pageTitle.textContent = stockName;
 }

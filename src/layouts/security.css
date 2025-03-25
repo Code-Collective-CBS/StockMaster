@@ -111,22 +111,35 @@ section.security-graph {
     padding: 20px;
 }
 
-.option-wrapper {
+
+.price-info {
+    background-color: var(--secondary-color);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
     display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    background-color: var(--grey);
-    color: var(--primary-text);
-    border-radius: 10px;
-    padding: 5px;
+    flex-direction: column;
+    gap: 5px;
 }
 
-.option-wrapper select {
-    color: var(--primary-color);
-    background-color: transparent;
-    border: none;
+.current-price {
+    font-size: var(--h3-size);
+    font-weight: var(--h3-weight);
+    color: var(--primary-text);
+}
+
+.price-change {
+    display: flex;
+    gap: 10px;
+    font-weight: var(--text-weight-bold);
+}
+
+.positive-change {
+    color: var(--highlight);
+}
+
+.negative-change {
+    color: var(--red)
 }
 
 .security-graph canvas {
