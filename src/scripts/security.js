@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', async () =>  {
         displayCompanyName(companyData, symbol);
         displayCompanyOverview(companyData, symbol);
         updatePageTitle(companyData.Name);
-        document.title = 'StockMaster | ', symbol;
+        document.title = `StockMaster | ${symbol}`;
 
         // price history data for graph (chart.js)
         const timeSeriesData = await stockAPI.getDailyTimeSeries(symbol);
@@ -114,7 +114,13 @@ function createPriceChart(timeSeriesData, interval = -365) {
     dataPoints.sort((a, b) => new Date(a[0]) - new Date(b[0]));
 
     // Using the specified interval
-    const recentData = dataPoints.slice(interval);
+    const recentData = dataPoints.slice(interval); /* .slice() usually takes two parameters, so 1 parameter means:
+    Positive number: Starts slicing from that index position to the end of the array
+    Negative number: Counts backward from the end of the array
+
+    Which means we are starting from the end of the orginial datsPoints array and slicing -365 numbers data points from that array to display 1 year
+*/
+
 
     // Extracting the dates and closing prices for the chart
     const dates = [];
@@ -125,7 +131,7 @@ function createPriceChart(timeSeriesData, interval = -365) {
         dates.push(date);
 
         // Adding the closing price to our prices array
-        prices.push(parseFloat(values['4. close']));
+        prices.push(parseFloat(values['4. close'])); // converts string to number
     });
 
     // Calculate price difference for the info block
@@ -138,6 +144,7 @@ function createPriceChart(timeSeriesData, interval = -365) {
     updatePriceDifferenceDisplay(endPrice, priceDifference, percentageDifference);
 
     // Creating the chart with chart.js
+    // Using window so it is global and more accessible in other scripts
     window.priceChart = new Chart(canvas, {
         type: 'line',
 
@@ -161,7 +168,7 @@ function createPriceChart(timeSeriesData, interval = -365) {
         options: {
             responsive: true, // Capable of resizing the chart if the container size changes
             interaction: {
-                intersect: false,
+                intersect: false, // So the mouse can hover anywhere in the canvas element, and do not have to intersect
                 mode: 'index',
             },
 
