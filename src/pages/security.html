@@ -163,19 +163,151 @@
                 <h2>Loading stock information...</h2>
                 <div class="option-wrapper">
                   <select name="portfolio-graph-interval" id="portfolio-graph-interval">
-                    <option value="1">Dag</option>
-                    <option value="30">Måned</option>
-                    <option value="90">Kvartal</option>
-                    <option value="365" selected>År</option>
+                    <option value="1">Day</option>
+                    <option value="7">Week</option>
+                    <option value="30">Month</option>
+                    <option value="90">Quarter</option>
+                    <option value="365" selected>Year</option>
+                    <option value="0">All</option>
                   </select>
                 </div>
                 <canvas id="portfolioChart"></canvas>
             </section>
 
+<!-- Stock Information Section -->
+<section class="stock-info-container">
+  <!-- Key Statistics -->
+  <div class="stock-info-section statistics-section">
+    <h3>Key Statistics</h3>
+    <div class="stock-info-grid">
+      <div class="info-row">
+        <div class="info-label">Previous Close</div>
+        <div class="info-value" id="prevClose">-</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Day's Range</div>
+        <div class="info-value" id="daysRange">-</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Market Cap</div>
+        <div class="info-value" id="marketCap">-</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">52 Week Range</div>
+        <div class="info-value" id="weekRange">-</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Beta (5Y Monthly)</div>
+        <div class="info-value" id="beta">-</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Volume</div>
+        <div class="info-value" id="volume">-</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">PE Ratio (TTM)</div>
+        <div class="info-value" id="peRatio">-</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Forward PE</div>
+        <div class="info-value" id="forwardPE">-</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">EPS (TTM)</div>
+        <div class="info-value" id="eps">-</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dividends Section -->
+  <div class="stock-info-section">
+    <h3>Dividends & Yields</h3>
+    <div class="stock-info-grid">
+      <div class="info-row">
+        <div class="info-label">Dividend Per Share</div>
+        <div class="info-value" id="dividendPerShare">-</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Dividend Yield</div>
+        <div class="info-value" id="dividendYield">-</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Ex-Dividend Date</div>
+        <div class="info-value" id="exDividendDate">-</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Company Profile -->
+  <div class="stock-info-section">
+    <h3>Company Profile</h3>
+    <div class="stock-info-grid">
+      <div class="info-row">
+        <div class="info-label">Sector</div>
+        <div class="info-value" id="sector">-</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Industry</div>
+        <div class="info-value" id="industry">-</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Country</div>
+        <div class="info-value" id="country">-</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Exchange</div>
+        <div class="info-value" id="exchange">-</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Moving Averages -->
+  <div class="stock-info-section">
+    <h3>Technical Indicators</h3>
+    <div class="stock-info-grid">
+      <div class="info-row">
+        <div class="info-label">50-Day Moving Average</div>
+        <div class="info-value" id="movingAvg50">-</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">200-Day Moving Average</div>
+        <div class="info-value" id="movingAvg200">-</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Analyst Ratings Section -->
+  <div class="stock-info-section analyst-section">
+    <h3>Analyst Recommendations</h3>
+    <div class="analyst-container">
+      <div class="ratings-chart-container">
+        <canvas id="analystRatingsChart"></canvas>
+      </div>
+      <div class="price-target-container">
+        <h4>Price Target</h4>
+        <div class="target-gauge">
+          <div class="target-labels">
+            <span id="lowTarget" class="low-target">$0</span>
+            <span id="avgTarget" class="avg-target">$0</span>
+            <span id="highTarget" class="high-target">$0</span>
+          </div>
+          <div class="target-bar">
+            <div id="targetRange" class="target-range"></div>
+            <div id="currentPrice" class="current-price-marker"></div>
+          </div>
+          <div class="price-labels">
+            <span>Current: <span id="currentPriceValue">$0</span></span>
+            <span>Target: <span id="targetPriceValue">$0</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
             <section class="action">
                 <!--Company descripion-->
                 <div class="company-description-container">
-                  <h3>Om virksomheden</h3>
+                  <h3>Summary</h3>
                   <div class="company-description">
                     <p></p>
                   </div>
@@ -191,8 +323,11 @@
         </section>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script type="module" src="/src/scripts/api.js"></script>
+    <script type="module" src="/src/scripts/stockScripts/api.js"></script>
     <script type="module" src="/src/scripts/security.js"></script>
+    <script type="module" src="/src/scripts/stockScripts/stockMetrics.js"></script>
     <script src="/src/scripts/sidebar.js"></script>
+    <script type="module" src="/backend/config/stockData.js"></script>
+    <script type="module" src="/src/scripts/stockScripts/chartService.js"></script>
 </body>
 </html>

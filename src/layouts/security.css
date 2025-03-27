@@ -95,6 +95,10 @@ section.security-grid {
 section.security-graph{
     grid-column: span 3;
 }
+
+section.stock-info-container{
+    grid-column: span 3;
+}
 section.action{
     grid-column: span 2;
 }
@@ -175,6 +179,126 @@ section {
     margin-bottom: 10px;
 }
 
+#portfolio-graph-interval {
+    padding: 5px;
+}
+
+/* Stock Information Styling */
+.stock-info-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .stock-info-section {
+    background-color: var(--secondary-color);
+    border-radius: 10px;
+    padding: 16px;
+  }
+
+  .stock-info-section h3 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    color: var(--primary-text);
+    font-size: var(--h5-size);
+    font-weight: var(--h5-weight);
+    border-bottom: 1px solid var(--grey);
+    padding-bottom: 8px;
+  }
+
+  .stock-info-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+  }
+
+  .info-label {
+    color: var(--secondary-text);
+    font-size: 14px;
+  }
+
+  .info-value {
+    color: var(--primary-text);
+    font-weight: 500;
+  }
+
+  /* Analyst Section Styling */
+  .analyst-section {
+    grid-column: span 2; /* Make this section span both columns */
+  }
+
+  .analyst-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .ratings-chart-container {
+    height: 200px;
+  }
+
+  .price-target-container {
+    padding: 10px;
+  }
+
+  .price-target-container h4 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: var(--primary-text);
+  }
+
+  .target-gauge {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .target-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--text-size);
+  }
+
+  .low-target { color: var(--red); }
+  .avg-target { color: #ffe600; }
+  .high-target { color: #4caf50; }
+
+  .target-bar {
+    position: relative;
+    height: 8px;
+    background-color: var(--grey);
+    border-radius: 4px;
+    margin: 10px 0;
+  }
+
+  .target-range {
+    position: absolute;
+    height: 100%;
+    background: linear-gradient(to right, var(--red), #ffe600, #4caf50);
+    border-radius: 4px;
+  }
+
+  .current-price-marker {
+    position: absolute;
+    width: 4px;
+    height: 16px;
+    background-color: var(--highlight);
+    top: -4px;
+    transform: translateX(-50%);
+  }
+
+  .price-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+  }
+
 /* Company description styling */
 .company-description-container {
     padding: 10px;
@@ -184,7 +308,7 @@ section {
     font-size: var(--h4-size);
     font-weight: var(--h4-weight);
     margin-bottom: 15px;
-    color: var(--highlight);
+    color: var(--primary-text);
   }
 
   .company-description {
@@ -227,3 +351,18 @@ section {
     height: 25px;
     margin-top: 20px;
 }
+
+  /* responsive */
+  @media (max-width: 768px) {
+    .stock-info-container {
+      grid-template-columns: 1fr;
+    }
+
+    .analyst-section {
+      grid-column: span 1;
+    }
+
+    .analyst-container {
+      grid-template-columns: 1fr;
+    }
+  }
