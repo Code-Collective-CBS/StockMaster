@@ -6,6 +6,7 @@ const cors = require('cors');
 const config = require('./config/config');
 const app = express();
 const session = require('express-session');
+const routes = require('./routes')
 
 // Session Middleware setup
 app.use(session({
@@ -25,6 +26,7 @@ const PORT = config.server.port;
 app.use('/src', express.static(path.resolve(__dirname, '../src')));
 app.use(express.json());
 app.use(cors());
+app.use(routes);
 
 // Import router from routes/index.js
 const userRoutes = require('./routes');

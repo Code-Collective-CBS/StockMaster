@@ -58,8 +58,9 @@ const login = async (req, res) => {
 };
 
 const createAccount = async (req, res) => {
-    const { account_name, currency, balance, state } = req.body;
+    const { account_name, currency, state } = req.body;
     const user_id = req.session.user_id; 
+    console.log(user_id);
 
     if (!user_id) {
         return res.status(401).json({ message: "Bruger ikke logget ind" });
@@ -71,7 +72,7 @@ const createAccount = async (req, res) => {
             .input("user_id", sql.Int, user_id)
             .input("account_name", sql.NVarChar(50), account_name)
             .input("currency", sql.NVarChar(10), currency)
-            .input("balance", sql.Decimal(15,2), balance)
+            .input("balance", sql.Decimal(15,2), 0)
             .input("state", sql.NVarChar(20), state)
             .query(`
                 INSERT INTO Accounts (user_id, account_name, currency, balance, state)
