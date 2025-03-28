@@ -1,34 +1,39 @@
-// Imports all the env-variables first
-require('dotenv').config();
+const path = require('path'); // Import path before using it
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 const express = require('express');
-const path = require('path') // inbuild node utility to help find file paths
-const cors = require('cors'); // Tillader frontend og backend at snakke sammen fra forskellige domains. Ex: localhost:3000 og localhost:5173
-const config = require('./config/config'); // Importing the configuration from the config.js file
+const cors = require('cors');
+const config = require('./config/config');
 const app = express();
 const session = require('express-session');
 
+// Debugging logs
+console.log('Current working directory:', process.cwd());
+console.log('Server file directory:', __dirname);
+console.log('Config:', config);
+
 // Session Middleware setup
 app.use(session({
-    secret: 'din-hemmelige-nøgle-her', // vælg en sikker nøgle i produktion
+    secret: 'din-hemmelige-nøgle-her',
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: true,  // brug "true" hvis du har HTTPS
-        maxAge: 1000 * 60 * 60 // fx 1 time
-    }
+        secure: true,
+        maxAge: 1000 * 60 * 60,
+    },
 }));
 
-// Use port from config that we imported
+// Use port from config
 const PORT = config.server.port;
 
-app.use('/src', express.static(path.join(__dirname, '../src'))); // Gør at HTML, CSS, JS (frontend) er statisk. Loader hurtigere, og holder backend clean.
-app.use(express.json()) // Parses JSON data. Dvs. konverterer rå data fra en HTTP request til en brugbar format, som serveren kan bruge.
-app.use(cors()) // Tillader frontend at fetch fra backend
+// Use absolute paths for static files
+app.use('/src', express.static(path.resolve(__dirname, '../src')));
+app.use(express.json());
+app.use(cors());
 
-// Importér router fra routes/index.js
+// Import router from routes/index.js
 const userRoutes = require('./routes');
-app.use(userRoutes); // Brug ruter fra router-filen
+app.use(userRoutes);
 
-// Starter serveren
-app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`))
+// Start the server
+app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));
