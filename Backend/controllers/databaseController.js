@@ -1,4 +1,5 @@
-const { sql, poolPromise } = require('../services/databaseServices');
+// const { sql, poolPromise } = require('../services/databaseServices'); ONLY IMPORTING TWO MODULES SO BENATH WE IMPORT IT ALLLLL!
+const databaseServices = require('../services/databaseServices');
 
 const createUser = async (req, res) => {
     const { firstname, lastname, email, password, phone_number, country_code } = req.body;
@@ -84,8 +85,25 @@ const createAccount = async (req, res) => {
     }
 };
 
+const searchStockNames = async (req, res) => {
+    try {
+        const { query } = req.query; // Extract the query parameter from the request
+
+        if (!query) {
+            return res.status(400).json({ error: 'Search query is required' }); // Handle missing query
+        }
+
+        const result = await databaseServices.searchStockNames(query); // Call the service function
+        res.json(result); // Send the result back to the client
+    } catch (err) {
+        console.error('Error searching for stocks:', err);
+        res.status(500).json({ error: 'Failed to search for stocks' }); // Handle errors
+    }
+};
+
 module.exports = {
     createUser,
     login,
-    createAccount
+    createAccount,
+    searchStockNames
 };

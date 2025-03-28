@@ -108,48 +108,48 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  /*
   topPicksSymbols.forEach((symbol) => {
     loadTopPicksData(symbol);
   });
+  */
 
   //// TOP PICKS ////
 
   //// SEARCH STOCKS ////
-  searchButton.addEventListener("click", async () => {
-    const searchQuery = stockInput.value.trim(); // REMOVES WHITESPACE
+  stockInput.addEventListener('input', async () => {
+    const searchQuery = stockInput.value.trim();
 
-    // CLEAR INPUTS //
-    stockInput.value = "";
-    searchContainer.innerHTML = "";
+    if(searchQuery.length < 2) {return}
 
-    if (!searchName) {
-      console.warn("Indtast et søgeord");
+    try {
+      const response = await fetch(`/api/database/search-stocks?query=${encodeURIComponent(searchQuery)}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch search results');
+      }
+
+      const results = await response.json();
+      displaySearchResults(results);
+    } catch (err) {
+      console.error('Error fetching search results:', err);
+    }
+  });
+
+  const displaySearchResults = function (searchResults) {
+    searchContainer.innerHTML = ""; // Clear previous results
+
+    if (searchResults.length === 0) {
+      searchContainer.innerHTML = '<p>No results</p>';
       return;
     }
 
-    try {
-      const response = await fetch(
-        `/api/stocks/search?query=${encodeURI(searchQuery)}`
-      );
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error("Error when fetchin response from database");
-        return;
-      } else if (!result.length) {
-        console.warn("Ingen resultater fundet");
-        return;
-      }
-
-      result.forEach(({ symbol, name }) => {
-        const stockNameItem = document.createElement("p");
-        stockNameItem.innerHTML = `
-                <a href="../pages/security.html?symbol=${symbol}">
-                        ${name} (${symbol})
-                </a>`;
-      });
-    } catch (err) {
-      console.error("Search failed", err);
-    }
-  });
+    searchResults.forEach((stock) => {
+      const stockElement = document.createElement('div');
+      stockElement.classList.add('stock-result');
+      stockElement.innerHTML = `
+            <p>${stock.symbol} - ${stock.name}</p>
+        `;
+      searchContainer.appendChild(stockElement);
+    });
+  };
 });

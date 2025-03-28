@@ -36,7 +36,6 @@ router.use('/api/stocks', stockRoutes); // This is an bsulote path so it will al
 
 // Database routes
 const databaseRoutes = require('./databaseRoutes.js')
-router.use('/api', databaseRoutes);
-
+router.use('/api/database', databaseRoutes);
 
 module.exports = router;
