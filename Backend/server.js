@@ -7,11 +7,6 @@ const config = require('./config/config');
 const app = express();
 const session = require('express-session');
 
-// Debugging logs
-console.log('Current working directory:', process.cwd());
-console.log('Server file directory:', __dirname);
-console.log('Config:', config);
-
 // Session Middleware setup
 app.use(session({
     secret: 'din-hemmelige-nøgle-her',
