@@ -1,6 +1,6 @@
 import { stockAPI } from "./stockScripts/api.js";
 import { stockMetrics } from "./stockScripts/stockMetrics.js";
-import { IBMStockData } from "../../backend/config/IBMStockData.js";
+import { IBMStockData } from "./stockScripts/IBMStockData.js";
 import { chartService } from "./stockScripts/chartService.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
