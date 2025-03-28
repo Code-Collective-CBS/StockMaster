@@ -120,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
   stockInput.addEventListener('input', async () => {
     const searchQuery = stockInput.value.trim();
 
-    if(searchQuery.length < 2) {return}
+    if(searchQuery.length < 2) return
 
     try {
       const response = await fetch(`/api/database/search-stocks?query=${encodeURIComponent(searchQuery)}`);
@@ -145,9 +145,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     searchResults.forEach((stock) => {
       const stockElement = document.createElement('div');
-      stockElement.classList.add('stock-result');
+      stockElement.classList.add('stock-result-div');
       stockElement.innerHTML = `
-            <p>${stock.symbol} - ${stock.name}</p>
+            <p class="stock-result-p"><a href="/src/pages/security.html?symbol=${stock.symbol}">${stock.symbol} - ${stock.name}</a></p>
         `;
       searchContainer.appendChild(stockElement);
     });

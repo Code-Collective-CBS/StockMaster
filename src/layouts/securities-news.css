@@ -138,3 +138,21 @@ section {
     background-color: var(--primary-text);
     color: var(--secondary-color);
 }
+
+/* SEARCH DISPLAY CONTAINER */
+
+.displaySearch{
+    background-color: var(--grey);
+    margin-top: -10px;
+    padding: 5px;
+}
+
+/* SEARCH RESULTS */
+div.stock-result-div *{
+    color: var(--secondary-highligth);
+    padding-left: 5px;
+}
+
+div.stock-result-div:hover *{
+    color: var(--highlight);
+}
