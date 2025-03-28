@@ -142,113 +142,47 @@ export const chartService = {
 
   formatDatesByInterval: function (rawDates, interval) {
     const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     ];
     const formattedDates = [];
 
-    // Convert string dates to Date objects
-    const dateObjects = rawDates.map((dateStr) => new Date(dateStr));
+    // Determine how many labels to show based on interval
+    let skipFactor;
 
-    // Determine date format based on interval
-    if (interval >= 0) {
-      // All history - show only years
-      let currentYear = null;
-
-      dateObjects.forEach((date, index) => {
-        const year = date.getFullYear();
-
-        // Show year only when it changes
-        if (currentYear !== year) {
-          currentYear = year;
-          formattedDates.push(year.toString());
-        } else {
-          formattedDates.push("");
-        }
-      });
-    } else if (interval >= -7) {
-      // Daily view - show dates as "Mar 21", "Mar 22", etc.
-      dateObjects.forEach((date) => {
-        const day = date.getDate();
-        const month = months[date.getMonth()];
-        formattedDates.push(`${month} ${day}`);
-      });
-    } else if (interval >= -31) {
-      // Monthly view - show selected dates
-      dateObjects.forEach((date) => {
-        const day = date.getDate();
-
-        // Show only every 5th day or start/end of month
-        if (
-          day === 1 ||
-          day === 5 ||
-          day === 10 ||
-          day === 15 ||
-          day === 20 ||
-          day === 25 ||
-          day === 30 ||
-          day === 31 ||
-          date.getTime() === dateObjects[0].getTime() ||
-          date.getTime() === dateObjects[dateObjects.length - 1].getTime()
-        ) {
-          formattedDates.push(day.toString());
-        } else {
-          formattedDates.push("");
-        }
-      });
-    } else if (interval >= -90) {
-      // Quarterly view - show month names
-      let currentMonth = null;
-
-      dateObjects.forEach((date) => {
-        const month = date.getMonth();
-
-        if (currentMonth !== month) {
-          currentMonth = month;
-          formattedDates.push(months[month]);
-        } else {
-          formattedDates.push("");
-        }
-      });
-    } else {
-      // Yearly view (or longer) - show month + year for first of each month
-      let currentMonth = null;
-      let currentYear = null;
-
-      dateObjects.forEach((date) => {
-        const month = date.getMonth();
-        const year = date.getFullYear();
-
-        if (currentMonth !== month || currentYear !== year) {
-          currentMonth = month;
-          currentYear = year;
-
-          if (interval < -1095) {
-            // > 3 years
-            // For very long intervals, only show month + year at 3-month intervals
-            if (month === 0 || month === 3 || month === 6 || month === 9) {
-              formattedDates.push(`${months[month]} ${year}`);
-            } else {
-              formattedDates.push("");
-            }
-          } else {
-            formattedDates.push(months[month]);
-          }
-        } else {
-          formattedDates.push("");
-        }
-      });
+    if (interval === 0 || interval <= -1100) { // All or 3+ years - show only years
+      skipFactor = Math.max(1, Math.floor(rawDates.length / 10)); // Show ~10 labels
+    } else if (interval <= -365) { // 1-3 years - show quarters
+      skipFactor = Math.max(1, Math.floor(rawDates.length / 12)); // Show ~12 labels (months)
+    } else if (interval <= -31) { // 1-12 months - show weeks
+      skipFactor = Math.max(1, Math.floor(rawDates.length / 8)); // Show ~8 labels
+    } else { // 7-30 days - show individual days
+      skipFactor = 1; // Show all days
     }
+
+    // Format dates
+    rawDates.forEach((dateStr, index) => {
+      const date = new Date(dateStr);
+
+      // Only show label for dates that fall on our skip factor
+      if (index % skipFactor === 0 || index === rawDates.length - 1) {
+        if (interval === 0 || interval <= -1095) {
+          // For long intervals, just show year
+          formattedDates.push(date.getFullYear().toString());
+        } else if (interval <= -365) {
+          // For 1+ year, show month + year
+          formattedDates.push(`${months[date.getMonth()]} ${date.getFullYear()}`);
+        } else if (interval <= -31) {
+          // For 1+ month, show month + day
+          formattedDates.push(`${months[date.getMonth()]} ${date.getDate()}`);
+        } else {
+          // For weeks, show month + day
+          formattedDates.push(`${months[date.getMonth()]} ${date.getDate()}`);
+        }
+      } else {
+        formattedDates.push("");
+      }
+    });
 
     return formattedDates;
   },
