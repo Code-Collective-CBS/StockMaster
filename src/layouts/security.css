@@ -80,6 +80,7 @@ main.security-content {
     max-width: 1400px;
     margin-left: 250px;
     width: 100%;
+    color: var(--primary-text);
 }
 
 /* GRID LAYOUT */
