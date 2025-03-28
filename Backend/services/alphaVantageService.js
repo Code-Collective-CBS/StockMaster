@@ -36,7 +36,7 @@ const alphaVantageService = {
   },
 
   // Get the daily time series for a stock
-  getDailyTimeSeries: async (symbol, outputsize = "compact") => {
+  getDailyTimeSeries: async (symbol, outputsize = "full") => {
     try {
       const url = `${config.alphaVantage.baseUrl}?function=TIME_SERIES_DAILY&symbol=${symbol}&outputsize=${outputsize}&apikey=${config.alphaVantage.apiKey}`;
       console.log('Making request to:', url);

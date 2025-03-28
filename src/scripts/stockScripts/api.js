@@ -31,7 +31,7 @@ export const stockAPI = {
   },
 
   // Get daily time series
-  getDailyTimeSeries: async (symbol, outputsize = 'compact') => {
+  getDailyTimeSeries: async (symbol, outputsize = "full") => {
     try {
       const response = await fetch(`${API_BASE_URL}/daily/${symbol}?outputsize=${outputsize}`);
       if (!response.ok) {
