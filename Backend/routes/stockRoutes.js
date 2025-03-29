@@ -22,6 +22,8 @@ router.get('/daily/:symbol', stockController.getDailyTimeSeries)
 // Stock company overview endpoint
 router.get('/overview/:symbol', stockController.getCompanyOverview)
 
+// Stock symbol financials endpoint from Polygon Api
+router.get('/financials/:symbol', stockController.getfinancials);
 
 // // Test stock function
 // router.get('/test-connection', async (req, res) => {

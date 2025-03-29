@@ -22,6 +22,12 @@ const config = {
         apiKey: process.env.ALPHA_VANTAGE_API_KEY
     },
 
+    // Polygon API configuration
+    polygon: {
+        baseUrl: 'https://api.polygon.io',
+        apiKey: process.env.POLYGON_API_KEY
+    },
+
     // DB login configuration
     database: {
         user: process.env.DB_USER,

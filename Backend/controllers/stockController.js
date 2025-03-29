@@ -1,6 +1,7 @@
 // This file handles stock-related HTTP request and uses the Alpha Vantage service file
 // Import alphaVantageService module
 const alphaVantageService = require("../services/alphaVantageService");
+const polygonService = require("../services/polygonService");
 
 const stockController = {
   getQuote: async (req, res) => {
@@ -74,8 +75,24 @@ const stockController = {
     }
   },
 
+  getfinancials: async (req, res) => {
+    try {
+      const { symbol } = req.params;
+
+      if(!symbol) {
+        return res.status(400).json({ error: 'Could not find the stock'});
+      }
+
+      const result = await polygonService.getfinancials(symbol);
+      res.json(result);
+    } catch (error) {
+      console.error('Error in getfinancials controller', error);
+      res.status(500).json({ error: 'Failed to fetch the financials for security' });
+    }
+  },
+
   // Test the connection
-testConnection: async (req, res) => {
+  testConnection: async (req, res) => {
     try {
       const result = await alphaVantageService.testConnection();
       res.json(result);
