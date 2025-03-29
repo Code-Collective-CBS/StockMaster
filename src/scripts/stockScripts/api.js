@@ -60,11 +60,14 @@ export const stockAPI = {
 
   getFinancialsPolygon: async (symbol) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/financials/${symbol}`);
+      const url = `${API_BASE_URL}/financials/${symbol}`;
+      console.log('Fetching url: ', url); // DEBUG LOG
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`HTTP error! Status, ${response.status}`);
       }
-      return await response.json();
+      const data = await response.json();
+      return data
     } catch (error) {
       console.error(`Error fetching financials for symbol ${symbol}`, error);
       throw error;

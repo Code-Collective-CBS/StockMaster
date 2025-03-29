@@ -1,6 +1,7 @@
 import { stockAPI } from "./stockScripts/api.js";
 
-const topPicksSymbols = ["AAPL", "IBIT", "TSLA", "SP500F"];
+const topPicksSymbols = ["AAPL"];
+// const topPicksSymbols = ["AAPL", "IBIT", "TSLA", "SP500F"];
 
 document.addEventListener("DOMContentLoaded", () => {
   const stockInput = document.getElementById("stockInput");
@@ -19,21 +20,21 @@ document.addEventListener("DOMContentLoaded", () => {
   //// TOP PICKS ////
 
 
-//// TOP PICKS ////
+  //// TOP PICKS ////
 
-topPicksSymbols.forEach(async (topPick) => {
-  try {
-    const response = await stockAPI.getFinancialsPolygon(topPick); // Make the API call
-    if (!response.ok) {
-      throw new Error(`Failed to fetch top pick: ${topPick}`);
+  topPicksSymbols.forEach(async (topPick) => {
+    try {
+      console.log(`Fetching data for top pick: ${topPick}`); // Log the symbol
+      const result = await stockAPI.getFinancialsPolygon(topPick); // Use the parsed JSON directly
+      console.log(`Top Pick (${topPick}):`, {
+        name: result.name || "N/A",
+        symbol: result.symbol || "N/A",
+        financials: result.financials ? result.financials.slice(0, 2) : "N/A", // Log only the first 2 financial entries
+      });
+    } catch (error) {
+      console.error(`Error fetching top pick (${topPick}):`, error);
     }
-
-    const result = await response.json(); // Parse the JSON response
-    console.log(`Top Pick (${topPick}):`, result); // Log the result to the console
-  } catch (error) {
-    console.error(`Error fetching top pick (${topPick}):`, error);
-  }
-});
+  });
 
 
   //// SEARCH STOCKS ////
