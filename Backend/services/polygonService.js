@@ -15,6 +15,16 @@ const polygonService = {
             console.error('Error fetching financials ', error);
             throw error;
         }
+    },
+    getIndicesoverview: async (symbol) => {
+        try {
+            const url = `${config.polygon.baseUrl}/v2/aggs/ticker/${symbol}/prev?apiKey=${config.polygon.apiKey}`;
+            const response = await axios.get(url);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching indicies data ', error);
+            throw error;
+        }
     }
 }
 

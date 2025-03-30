@@ -75,19 +75,19 @@ const stockController = {
     }
   },
 
-  getfinancials: async (req, res) => {
+  getIndicesoverview: async (req, res) => {
     try {
       const { symbol } = req.params;
 
       if(!symbol) {
-        return res.status(400).json({ error: 'Could not find the stock'});
+        return res.status(400).json({ error: 'Could not find the indicies', symbol});
       }
 
-      const result = await polygonService.getfinancials(symbol);
+      const result = await polygonService.getIndicesoverview(symbol);
       res.json(result);
     } catch (error) {
-      console.error('Error in getfinancials controller', error);
-      res.status(500).json({ error: 'Failed to fetch the financials for security' });
+      console.error('Error in getIndicesoverview controller', error);
+      res.status(500).json({ error: 'Failed to fetch data for indicies' });
     }
   },
 

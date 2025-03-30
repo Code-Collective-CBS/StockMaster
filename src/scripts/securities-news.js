@@ -1,7 +1,23 @@
 import { stockAPI } from "./stockScripts/api.js";
 
-const topPicksSymbols = ["AAPL"];
-// const topPicksSymbols = ["AAPL", "IBIT", "TSLA", "SP500F"];
+const topPicksSymbols = [
+  {
+    symbol: "I:NDX",
+    htmlElement: document.getElementById("I:NDX"),
+  },
+  {
+    symbol: "I:CX10GI",
+    htmlElement: document.getElementById("I:CX10GI"),
+  },
+  {
+    symbol: "I:CX35PI",
+    htmlElement: document.getElementById("I:CX35PI"),
+  },
+  {
+    symbol: "I:CX20GI",
+    htmlElement: document.getElementById("I:CX20GI"),
+  },
+];
 
 document.addEventListener("DOMContentLoaded", () => {
   const stockInput = document.getElementById("stockInput");
@@ -19,18 +35,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   //// TOP PICKS ////
 
-
-  //// TOP PICKS ////
-
   topPicksSymbols.forEach(async (topPick) => {
     try {
-      console.log(`Fetching data for top pick: ${topPick}`); // Log the symbol
-      const result = await stockAPI.getFinancialsPolygon(topPick); // Use the parsed JSON directly
-      console.log(`Top Pick (${topPick}):`, {
-        name: result.name || "N/A",
-        symbol: result.symbol || "N/A",
-        financials: result.financials ? result.financials.slice(0, 2) : "N/A", // Log only the first 2 financial entries
-      });
+      console.log(`Fetching data for top pick: ${topPick.symbol}`); // Log the symbol
+      const data = await stockAPI.getIndicesoverview(topPick.symbol); // Use the parsed JSON directly
+      const closedPrice = data.results[0].c;
+
+      if(topPick.htmlElement){
+        const marketPriceElement = topPick.htmlElement.querySelector(".market-price");
+        marketPriceElement.innerHTML = `${parseFloat(closedPrice.toFixed(1)) || "N/A"}`;
+      }
     } catch (error) {
       console.error(`Error fetching top pick (${topPick}):`, error);
     }
