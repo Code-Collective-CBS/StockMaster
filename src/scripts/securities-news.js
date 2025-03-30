@@ -23,8 +23,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const stockInput = document.getElementById("stockInput");
   const deleteButton = document.querySelector(".delete-search");
   const searchContainer = document.querySelector(".displaySearch");
-  const topPicksContainer = document.querySelector(".top-picks");
-
+  
+  const newsContainerAuthor = document.getElementById("news-author");
+  const newsContainerDescription = document.getElementById("news-description");
 
   //// BUTTONS ////
 
@@ -37,11 +38,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   topPicksSymbols.forEach(async (topPick) => {
     try {
-      console.log(`Fetching data for top pick: ${topPick.symbol}`); // Log the symbol
       const data = await stockAPI.getIndicesoverview(topPick.symbol); // Use the parsed JSON directly
       const closedPrice = data.results[0].c;
 
-      if(topPick.htmlElement){
+      if (topPick.htmlElement) {
         const marketPriceElement = topPick.htmlElement.querySelector(".market-price");
         marketPriceElement.innerHTML = `${parseFloat(closedPrice.toFixed(1)) || "N/A"}`;
       }
@@ -49,7 +49,6 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error(`Error fetching top pick (${topPick}):`, error);
     }
   });
-
 
   //// SEARCH STOCKS ////
   stockInput.addEventListener('input', async () => {
@@ -59,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (searchQuery.length < 2) return
 
     try {
-      const response = await fetch(`/api/database/search-stocks?query=${encodeURIComponent(searchQuery)}`);
+      const response = await fetch(`/api/database/search-stocks?query=${encodeURIComponent(searchQuery)}`); // MAKE FUNCTION INSIDE API.js
       if (!response.ok) {
         throw new Error('Failed to fetch search results');
       }
@@ -88,4 +87,20 @@ document.addEventListener("DOMContentLoaded", () => {
       searchContainer.appendChild(stockElement);
     });
   };
+
+  //// NEWS ////
+
+  const gethNews = async () => {
+    try {
+      const data = await stockAPI.getNews();
+      const randomNumber = Math.floor(Math.random() * data.results.length);
+      const article = data.results[randomNumber];
+  
+      newsContainerAuthor.innerHTML = article.author;
+      newsContainerDescription.innerHTML = `${article.description}<br><br><a href="${article.article_url}" target="_blank">Read more here</a>`; // The content will now scroll if it overflows
+    } catch (error) {
+      console.error('Error fetching news: ', error);
+    }
+  };
+  gethNews();
 });

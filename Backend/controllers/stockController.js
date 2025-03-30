@@ -91,6 +91,16 @@ const stockController = {
     }
   },
 
+  getNews: async (req, res) => {
+    try {  
+      const result = await polygonService.getNews();
+      res.json(result);
+    } catch (error) {
+      console.error('Error in getNews', error);
+      res.status(500).json({ error: 'Failed to fetch data for indicies' });
+    }
+  },
+
   // Test the connection
   testConnection: async (req, res) => {
     try {

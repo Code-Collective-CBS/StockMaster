@@ -25,6 +25,16 @@ const polygonService = {
             console.error('Error fetching indicies data ', error);
             throw error;
         }
+    },
+    getNews: async () => {
+        try {
+            const url = `${config.polygon.baseUrl}/v2/reference/news?order=asc&limit=10&sort=published_utc&apiKey=${config.polygon.apiKey}`;
+            const response = await axios.get(url);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching news', error);
+            throw error;
+        }
     }
 }
 

@@ -9,6 +9,10 @@ body {
     color: var(--primary-text);
     min-height: 100vh;
 }
+
+.bold-text {
+  font-weight: var(--text-weight-bold);
+}
 /* Main content area */
 .main-content {
     flex: 1;

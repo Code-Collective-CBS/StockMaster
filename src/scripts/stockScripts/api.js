@@ -61,15 +61,29 @@ export const stockAPI = {
   getIndicesoverview: async (symbol) => {
     try {
       const url = `${API_BASE_URL}/overview-indices/${symbol}`;
-      console.log('Fetching url: ', url); // DEBUG LOG
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`HTTP error! Status, ${response.status}`);
       }
       const data = await response.json();
-      return data
+      return data;
     } catch (error) {
       console.error(`Error fetching indicies data: ${symbol}`, error);
+      throw error;
+    }
+  },
+
+  getNews: async () => {
+    try {
+      const url = `${API_BASE_URL}/news/`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status, ${response.ok}`);
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching news: ', error);
       throw error;
     }
   }

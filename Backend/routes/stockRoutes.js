@@ -22,15 +22,16 @@ router.get('/daily/:symbol', stockController.getDailyTimeSeries)
 // Stock company overview endpoint
 router.get('/overview/:symbol', stockController.getCompanyOverview)
 
-// Stock symbol financials endpoint from Polygon Api
+// Indicies symbol financials endpoint from Polygon Api
 router.get('/overview-indices/:symbol', stockController.getIndicesoverview);
+
+// News from Polygon io endpoint from Polygon Api 
+router.get('/news/', stockController.getNews);
 
 // // Test stock function
 // router.get('/test-connection', async (req, res) => {
 //     const result = await stockController.testConnection(req, res);
 //     res.json(result);
 // });
-
-
 
 module.exports = router;
