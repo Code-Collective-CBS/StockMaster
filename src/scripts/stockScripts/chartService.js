@@ -25,13 +25,13 @@ export const chartService = {
     // Use the provided time series data
     const timeSeries = timeSeriesData;
 
-    // converting the object to array for easier use with Object.entries
+    // converting the object to array of key value pairs for easier use with Object.entries
     const dataPoints = Object.entries(timeSeries);
 
     // Sorting from oldest to newest
     dataPoints.sort((a, b) => new Date(a[0]) - new Date(b[0]));
 
-    // Using the specified interval
+    // Using the specified interval using .slice that copys the array for example, if interval was -100 refers to the last 100 elements of the array.)
     const recentData = interval < 0 ? dataPoints.slice(interval) : dataPoints;
 
     // Extracting the dates and closing prices for the chart
@@ -52,7 +52,7 @@ export const chartService = {
     const priceDifference = endPrice - startPrice;
     const percentageDifference = (priceDifference / startPrice) * 100;
 
-    // Use this.updatePriceDifferenceDisplay to call the method within the object
+    // Using this.updatePriceDifferenceDisplay to call the method within the object
     this.updatePriceDifferenceDisplay(
       endPrice,
       priceDifference,
