@@ -158,6 +158,10 @@ section {
 /* Discription Container  */
 .news-description-container {
     padding: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    line-height: 1.6;
+    color: var(--primary-text);
 }
 
 .news-description-container h3 {
