@@ -27,7 +27,7 @@ This project is developed as part of the **"Programming and Small Systems Develo
 
 ---
 
-## 🚀 Features
+## Features
 
 ### ✅ User & Account Management
 
