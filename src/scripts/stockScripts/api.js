@@ -1,5 +1,6 @@
 // api.js (Frontend API Calls)
 const API_BASE_URL = 'http://localhost:3000/api/stocks';
+const API_CURRENCY_URL = 'http://localhost:3000/api/currency'
 
 export const stockAPI = {
   // Get stock quote
@@ -71,6 +72,21 @@ export const stockAPI = {
       return data;
     } catch (error) {
       console.error('Error fetching news: ', error);
+      throw error;
+    }
+  },
+
+  getCurrency: async (currency) => {
+    try {
+      const url = `${API_CURRENCY_URL}/exchange/${currency}`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status, ${response.ok}`);
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching exchange data', error);
       throw error;
     }
   }

@@ -1,7 +1,7 @@
 import { stockAPI } from "./stockScripts/api.js";
 import { stockMetrics } from "./stockScripts/stockMetrics.js";
 import { IBMStockData } from "./stockScripts/IBMStockData.js";
-import { chartService } from "./stockScripts/chartService.js";
+import { chartService } from "./utilityFunctions/chartService.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("Security page loaded!");

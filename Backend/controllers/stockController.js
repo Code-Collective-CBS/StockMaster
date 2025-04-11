@@ -92,7 +92,7 @@ const stockController = {
   },
 
   getNews: async (req, res) => {
-    try {  
+    try {
       const result = await polygonService.getNews();
       res.json(result);
     } catch (error) {
