@@ -1,5 +1,6 @@
 const sql = require('mssql');
 const config = require('../config/config');
+const databaseController = require('../controllers/databaseController');
 
 // Creates connection to our mssql databse through our login in config.database
 // Creates a pool of connections. More reusable and effective
@@ -15,6 +16,8 @@ const poolPromise = new sql.ConnectionPool(config.database)
 
 // Create user
 const createUser = async function (body) {
+    const { firstname, lastname, email, password, phone_number, country_code } = body; // <- tilføj denne linje
+
     const pool = await poolPromise;
 
     const userExists = await pool.request()

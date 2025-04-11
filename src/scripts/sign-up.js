@@ -12,7 +12,7 @@ document.getElementById("registerForm").addEventListener("submit", async functio
 
     // Sends sign-up data to backend via fetch
     try {
-        const response = await fetch("http://localhost:3000/api/users", {
+        const response = await fetch("http://localhost:3000/api/database/users", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json" // JSON data

@@ -1,4 +1,4 @@
-// const { sql, poolPromise } = require('../services/databaseServices'); ONLY IMPORTING TWO MODULES SO BENATH WE IMPORT IT ALLLLL!
+const { sql, poolPromise } = require('../services/databaseServices'); // ONLY IMPORTING TWO MODULES SO BENATH WE IMPORT IT ALLLLL!
 const databaseServices = require('../services/databaseServices');
 
 const createUser = async (req, res) => {
@@ -20,29 +20,6 @@ const createUser = async (req, res) => {
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: "Fejl ved oprettelse af bruger" });
-    }
-};
-
-const login = async (req, res) => {
-    const { email, password } = req.body;
-
-    try {
-        const pool = await poolPromise;
-        const result = await pool
-            .request()
-            .input('email', sql.NVarChar, email)
-            .input('password', sql.NVarChar, password) 
-            .query(`SELECT user_id, email FROM Users WHERE email = @email AND password = @password`);
-
-        if (result.recordset.length === 1) {
-            req.session.user_id = result.recordset[0].user_id;
-            alert("Logget ind")
-            res.status(200).json({ message: "Logget ind!" });
-        } else {
-            res.status(401).json({ message: "Ugyldigt login" });
-        }
-    } catch (err) {
-        res.status(500).json({ message: "Server fejl", error: err });
     }
 };
 
