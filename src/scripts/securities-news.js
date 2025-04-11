@@ -1,5 +1,5 @@
 import { stockAPI } from "./stockScripts/api.js";
-import { utilityFunction } from "./stockScripts/utility-functions.js";
+import { utilityFunction } from "./utility/utility-functions.js";
 
 const topPicksSymbols = [
   {
