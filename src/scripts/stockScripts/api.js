@@ -16,20 +16,6 @@ export const stockAPI = {
     }
   },
 
-  // Search stocks by keyword
-  searchStocks: async (keywords) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/search?keywords=${encodeURIComponent(keywords)}`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      return await response.json();
-    } catch (error) {
-      console.error('Error searching stocks:', error);
-      throw error;
-    }
-  },
-
   // Get daily time series
   getDailyTimeSeries: async (symbol, outputsize = "full") => {
     try {
@@ -58,6 +44,7 @@ export const stockAPI = {
     }
   },
 
+  // GET NEWS FROM POLYGON
   getIndicesoverview: async (symbol) => {
     try {
       const url = `${API_BASE_URL}/overview-indices/${symbol}`;

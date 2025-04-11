@@ -1,4 +1,5 @@
 import { stockAPI } from "./stockScripts/api.js";
+import { utilityFunction } from "./stockScripts/utility-functions.js";
 
 const topPicksSymbols = [
   {
@@ -23,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const stockInput = document.getElementById("stockInput");
   const deleteButton = document.querySelector(".delete-search");
   const searchContainer = document.querySelector(".displaySearch");
-  
+
   const newsContainerAuthor = document.getElementById("news-author");
   const newsContainerDescription = document.getElementById("news-description");
 
@@ -58,15 +59,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (searchQuery.length < 2) return
 
     try {
-      const response = await fetch(`/api/database/search-stocks?query=${encodeURIComponent(searchQuery)}`); // MAKE FUNCTION INSIDE API.js
-      if (!response.ok) {
-        throw new Error('Failed to fetch search results');
-      }
-
-      const results = await response.json();
-      displaySearchResults(results);
+      const data = await utilityFunction.searchStock(searchQuery);
+      displaySearchResults(data);
     } catch (err) {
-      console.error('Error fetching search results:', err);
+      console.error('Error fetching search results: ', err);
     }
   });
 
@@ -95,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await stockAPI.getNews();
       const randomNumber = Math.floor(Math.random() * data.results.length);
       const article = data.results[randomNumber];
-  
+
       newsContainerAuthor.innerHTML = article.author;
       newsContainerDescription.innerHTML = `${article.description}<br><br><a href="${article.article_url}" target="_blank">Read more here</a>`; // The content will now scroll if it overflows
     } catch (error) {
