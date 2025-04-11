@@ -73,7 +73,6 @@ main.securities-news-content {
     flex-direction: column;
     flex-grow: 1;
     margin-left: 250px;
-    width: 100%;
     padding: 20px;
 }
 
@@ -84,7 +83,6 @@ section.securities-news-grid {
     /* Left column (search/news) takes more space */
     gap: 20px;
     /* Adds spacing between sections */
-    width: 100%;
 }
 
 /* LEFT COLUMN: Nested Grid (Search + News) */

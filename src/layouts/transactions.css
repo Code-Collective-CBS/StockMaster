@@ -12,6 +12,13 @@ header{
     padding: 20px;
 }
 
+.transaction-content {
+    flex: 1;
+    margin-left: 250px; /*same as sidebar width*/
+    padding: 30px;
+    box-sizing: border-box;
+}
+
 /* Header */
 .page-header {
     display: flex;
@@ -78,8 +85,6 @@ section.transaction-grid {
     display: grid;
     gap: 20px;
     grid-template-columns: repeat(3, 1fr);
-    width: 100%;
-    max-width: 100%;
     background-color: transparent;
 }
 

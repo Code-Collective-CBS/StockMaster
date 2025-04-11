@@ -6,6 +6,7 @@ body {
     background-color: var(--primary-color);
     color: var(--primary-text);
     min-height: 100vh;
+    overflow-x: hidden;
 }
 
 header{
@@ -79,7 +80,6 @@ main.dashboard-content {
     flex-direction: column;
     flex-grow: 1;
     margin-left: 250px;
-    width: 100%;
 }
 
 /* GRID LAYOUT */
@@ -87,8 +87,6 @@ section.dashboard-grid {
     display: grid;
     gap: 20px;
     grid-template-columns: repeat(3, 1fr);
-    width: 100%;
-    max-width: 100%;
     background-color: transparent;
 }
 

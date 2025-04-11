@@ -9,6 +9,10 @@ body {
     min-height: 100vh;
 }
 
+header{
+    padding: 20px;
+}
+
 /* Main content area */
 .main-content {
     flex: 1;
