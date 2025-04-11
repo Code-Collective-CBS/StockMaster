@@ -1,5 +1,5 @@
 import { stockAPI } from "./stockScripts/api.js";
-import { utilityFunction } from "./utility/utility-functions.js";
+import { searchFunction } from "./utilityFunctions/searchFunction.js";
 
 const topPicksSymbols = [
   {
@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (searchQuery.length < 2) return
 
     try {
-      const data = await utilityFunction.searchStock(searchQuery);
+      const data = await searchFunction.searchStock(searchQuery);
       displaySearchResults(data);
     } catch (err) {
       console.error('Error fetching search results: ', err);

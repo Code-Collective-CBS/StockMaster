@@ -2,7 +2,7 @@
 const API_BASE_URL = 'http://localhost:3000/api/stocks';
 const DATABASE_BASE_URL = '/api/database';
 
-export const utilityFunction = {
+export const searchFunction = {
     // SEARCH STOCKS IN DATABASE
     searchStock: async (searchQuery) => {
         try {
