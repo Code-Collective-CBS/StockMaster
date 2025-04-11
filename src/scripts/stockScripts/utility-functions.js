@@ -6,7 +6,7 @@ export const utilityFunction = {
     // SEARCH STOCKS IN DATABASE
     searchStock: async (searchQuery) => {
         try {
-            const response = await fetch(`${DATABASE_BASE_URL}/search-stocks?query=${encodeURIComponent(searchQuery)}`); // MAKE FUNCTION INSIDE API.js
+            const response = await fetch(`${DATABASE_BASE_URL}/search-stocks?query=${encodeURIComponent(searchQuery)}`);
             if (!response.ok) {
                 throw new Error('HTTP error! Status: ', response.status);
             }
