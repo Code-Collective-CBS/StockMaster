@@ -7,3 +7,7 @@ router.get('/test', (req, res) => {
     res.json({ message: 'Stock API is working!' });
 });
 
+// Exchange route to get currency
+router.get('/exchange/:currency', currencyController.getCurrency);
+
+module.exports =router;

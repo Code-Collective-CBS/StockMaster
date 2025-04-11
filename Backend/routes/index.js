@@ -11,6 +11,9 @@ const cors = require('cors');
 // As we create new route files, we should import them here:
 const stockRoutes = require('./stockRoutes'); //
 
+// Exchange routes
+const currencyRoutes = require('./currencyRoutes');
+
 // Main dashboard page route (this is our homepage)
 router.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../../src/pages/dashboard.html'));
@@ -31,8 +34,11 @@ router.get('src/pages/:page.html', (req, res) => {
 router.use(cors());
 
 
-// Let app use our imported routes
+// Let app use our imported stocks routes
 router.use('/api/stocks', stockRoutes); // This is an bsulote path so it will always start with api/stocks...the path
+
+// Let app use our imported exchanges routes
+router.use('/api/currency', currencyRoutes);
 
 // Database routes
 const databaseRoutes = require('./databaseRoutes')
