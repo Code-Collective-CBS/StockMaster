@@ -22,6 +22,11 @@ const config = {
         apiKey: process.env.ALPHA_VANTAGE_API_KEY
     },
 
+    exchangeRate: {
+        baseUrl: 'https://v6.exchangerate-api.com/v6',
+        apiKey: process.env.EXCHANGE_RATE_API_KEY
+    },
+
     // Polygon API configuration
     polygon: {
         baseUrl: 'https://api.polygon.io',
