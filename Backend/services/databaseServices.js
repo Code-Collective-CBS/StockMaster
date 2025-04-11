@@ -43,6 +43,8 @@ const createUser = async function (body) {
     return { status: 201 };
 };
 
+const createAccount = async function (){}
+
 const searchStockNames = async function (query) {
     try {
         const pool = await poolPromise; // Use the existing poolPromise

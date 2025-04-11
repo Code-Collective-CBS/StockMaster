@@ -70,7 +70,6 @@ const searchStockNames = async (req, res) => {
 
 module.exports = {
     createUser,
-    login,
     createAccount,
     searchStockNames
 };
