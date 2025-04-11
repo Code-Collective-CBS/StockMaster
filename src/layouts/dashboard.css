@@ -78,7 +78,6 @@ main.dashboard-content {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    max-width: 1400px;
     margin-left: 250px;
     width: 100%;
 }
