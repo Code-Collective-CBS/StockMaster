@@ -13,6 +13,33 @@ const poolPromise = new sql.ConnectionPool(config.database)
         console.log('Database connection failed:', err);
     })
 
+// Create user
+const createUser = async function (body) {
+    const pool = await poolPromise;
+
+    const userExists = await pool.request()
+        .input("email", sql.NVarChar(100), email)
+        .query("SELECT COUNT(*) AS count FROM Users WHERE email = @email");
+
+    if (userExists.recordset[0].count > 0) {
+        return { status: 400, message: "E-mail already exists" };
+    }
+
+    await pool.request()
+        .input("firstname", sql.NVarChar(50), firstname)
+        .input("lastname", sql.NVarChar(50), lastname)
+        .input("email", sql.NVarChar(100), email)
+        .input("password", sql.NVarChar(255), password)
+        .input("phone_number", sql.NVarChar(20), phone_number)
+        .input("country_code", sql.NVarChar(5), country_code)
+        .query(`
+            INSERT INTO Users (firstname, lastname, email, password, phone_number, country_code, create_date)
+            VALUES (@firstname, @lastname, @email, @password, @phone_number, @country_code, GETDATE())
+        `);
+
+    return { status: 201 };
+};
+
 const searchStockNames = async function (query) {
     try {
         const pool = await poolPromise; // Use the existing poolPromise
@@ -35,5 +62,6 @@ const searchStockNames = async function (query) {
 module.exports = {
     sql,
     poolPromise,
-    searchStockNames
+    searchStockNames,
+    createUser
 };

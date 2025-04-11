@@ -3,35 +3,23 @@ const databaseServices = require('../services/databaseServices');
 
 const createUser = async (req, res) => {
     const { firstname, lastname, email, password, phone_number, country_code } = req.body;
-    const pool = await poolPromise;
+    const body = req.body;
+    if (!firstname || !lastname || !email || !password) {
+        return res.status(400).json({ message: "Manglende information" });
+    }
+
+
     try {
+        const result = await databaseServices.createUser(body);
 
-        // Checks if user already exists
-        const userExists = await pool.request()
-            // "@-symbol" defines parameters in a SQL-query. More safe, optimizing query and prevents SQL injection
-            .input("email", sql.NVarChar(100), email)
-            .query("SELECT COUNT(*) AS count FROM Users WHERE email = @email"); // SQL returns a count of how many users has this email
-
-        if (userExists.recordset[0].count > 0) { // SQL returns an array of objects (recordset) and we checks if the count is more than 0
-            return res.status(400).json({ message: "E-mail already exists" });
+        if (result.status === 400) {
+            return res.status(400).json({ message: result.message });
         }
 
-        // SQL-query med parameterized input (for sikkerhed)
-        await pool.request()
-            .input("firstname", sql.NVarChar(50), firstname)
-            .input("lastname", sql.NVarChar(50), lastname)
-            .input("email", sql.NVarChar(100), email)
-            .input("password", sql.NVarChar(255), password) // Skal hashes i fremtiden
-            .input("phone_number", sql.NVarChar(20), phone_number)
-            .input("country_code", sql.NVarChar(5), country_code)
-            .query(`
-                    INSERT INTO Users (firstname, lastname, email, password, phone_number, country_code, create_date)
-                    VALUES (@firstname, @lastname, @email, @password, @phone_number, @country_code, GETDATE())
-                `);
-        res.status(201).json({ message: 'User created ' });
+        res.status(201).json({ message: "User created" });
     } catch (err) {
         console.log(err);
-        res.status(500).json({ message: 'Fail to create user' });
+        res.status(500).json({ message: "Fejl ved oprettelse af bruger" });
     }
 };
 
@@ -40,7 +28,8 @@ const login = async (req, res) => {
 
     try {
         const pool = await poolPromise;
-        const result = await pool.request()
+        const result = await pool
+            .request()
             .input('email', sql.NVarChar, email)
             .input('password', sql.NVarChar, password) 
             .query(`SELECT user_id, email FROM Users WHERE email = @email AND password = @password`);

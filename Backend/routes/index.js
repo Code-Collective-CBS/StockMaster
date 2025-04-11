@@ -35,7 +35,7 @@ router.use(cors());
 router.use('/api/stocks', stockRoutes); // This is an bsulote path so it will always start with api/stocks...the path
 
 // Database routes
-const databaseRoutes = require('./databaseRoutes.js')
+const databaseRoutes = require('./databaseRoutes')
 router.use('/api/database', databaseRoutes);
 
 module.exports = router;
