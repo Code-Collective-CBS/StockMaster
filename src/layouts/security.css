@@ -77,9 +77,8 @@ main.security-content {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    max-width: 1400px;
     margin-left: 250px;
-    width: 100%;
+    padding: 20px;
     color: var(--primary-text);
 }
 
@@ -88,8 +87,6 @@ section.security-grid {
     display: grid;
     gap: 20px;
     grid-template-columns: repeat(3, 1fr);
-    width: 100%;
-    max-width: 100%;
     background-color: transparent;
 }
 
