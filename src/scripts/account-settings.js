@@ -1,33 +1,33 @@
-const button = document.getElementById("createAcc")
-const kontonavn = document.getElementById("kontonavn")
-const valuta = document.getElementById("valuta");
-const hej = document.getElementById("status");
+document.getElementById("createAcc").addEventListener("submit", async function (event) {
+event.preventDefault(); // Prevents standard form-handling
 
-button.addEventListener("click", async () => {
-    const data = {
-        account_name: kontonavn.value,
-        currency: valuta.value,
-        state: hej.value
-    };
-
+// const button = document.getElementById("createAcc").value;
+const accountName = document.getElementById("accountName").value;
+const accountCurrency = document.getElementById("accountCurrency").value;
+const accountState = document.getElementById("accountState").value;
+    // Sends account data to backend via fetch
     try {
-        const res = await fetch('/api/create-account', {
-            method: 'POST',
+        const response = await fetch("http://localhost:3000/api/database/accounts", {
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json'
+                "Content-Type": "application/json" // JSON data
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify({
+                accountName,
+                accountCurrency,
+                accountState
+            })
         });
 
-        const result = await res.json();
-
-        if (res.ok) {
-            alert(result.message || 'Konto oprettet!');
+        const result = await response.json();
+        if (response.status === 201) {
+            alert("Account succesfully created");
+            window.location.href = "../pages/dashboard.html" // Redirects user to login-page
         } else {
-            alert(result.message || 'Noget gik galt');
+            alert("Fail: " + result.message)
         }
-    } catch (err) {
-        console.error('Fejl ved oprettelse:', err);
-        alert('Serverfejl ved oprettelse af konto');
+    } catch (error) {
+        console.log("Failed to create account: " + error)
+        alert("Failed to create account")
     }
 });

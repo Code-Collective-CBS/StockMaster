@@ -6,13 +6,10 @@ const databaseController = require('../controllers/databaseController');
 router.post('/users', databaseController.createUser);
 
 // Login routes
-// router.post('/login', databaseController.login);
+router.post('/login', databaseController.login);
 
 // Create account route
-router.post('/create-account', databaseController.createAccount);
-
-// Portfolio routes
-router.post('/accounts', databaseController.createAccount); // Creates a new portfolio
+//router.post('/create-account', databaseController.createAccount);
 
 // Search stocks from table stockNames
 router.get('/search-stocks', databaseController.searchStockNames);

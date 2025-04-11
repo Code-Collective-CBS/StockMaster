@@ -15,8 +15,8 @@ const poolPromise = new sql.ConnectionPool(config.database)
     })
 
 // Create user
-const createUser = async function (body) {
-    const { firstname, lastname, email, password, phone_number, country_code } = body; // <- tilføj denne linje
+const createUser = async (body) => {
+    const { firstname, lastname, email, password, phone_number, country_code } = body;
 
     const pool = await poolPromise;
 
@@ -43,9 +43,33 @@ const createUser = async function (body) {
     return { status: 201 };
 };
 
-const createAccount = async function (){}
+const login = async (body) => {
+    const { email, password } = body;
 
-const searchStockNames = async function (query) {
+    try {
+        const pool = await poolPromise;
+        const checkLogin = await pool.request()
+            .input('email', sql.NVarChar(100), email)
+            .input('password', sql.NVarChar(255), password)
+            .query(`SELECT * FROM Users WHERE email = @email AND password = @password`)
+
+        // Returnér brugeren hvis fundet
+        if (checkLogin.recordset.length > 0) {
+            return checkLogin.recordset[0]; 
+        } else {
+            return null; // forkert login
+        }
+    } catch (err) {
+        console.error("Fejl i login-service:", err);
+        throw err;
+    }
+};
+/*
+const createAccount = async function (){
+
+}
+*/
+const searchStockNames = async (query) => {
     try {
         const pool = await poolPromise; // Use the existing poolPromise
         const result = await pool
@@ -68,5 +92,6 @@ module.exports = {
     sql,
     poolPromise,
     searchStockNames,
-    createUser
+    createUser,
+    login
 };

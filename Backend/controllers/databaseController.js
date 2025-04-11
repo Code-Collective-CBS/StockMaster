@@ -7,8 +7,6 @@ const createUser = async (req, res) => {
     if (!firstname || !lastname || !email || !password) {
         return res.status(400).json({ message: "Manglende information" });
     }
-
-
     try {
         const result = await databaseServices.createUser(body);
 
@@ -23,35 +21,38 @@ const createUser = async (req, res) => {
     }
 };
 
-const createAccount = async (req, res) => {
-    const { account_name, currency, state } = req.body;
-    const user_id = req.session.user_id; 
-    console.log(user_id);
-
-    if (!user_id) {
-        return res.status(401).json({ message: "Bruger ikke logget ind" });
-    }
+const login = async (req, res) => {
+    const { email, password } = req.body;
+    const body = req.body;
 
     try {
-        const pool = await poolPromise;
-        await pool.request()
-            .input("user_id", sql.Int, user_id)
-            .input("account_name", sql.NVarChar(50), account_name)
-            .input("currency", sql.NVarChar(10), currency)
-            .input("balance", sql.Decimal(15,2), 0)
-            .input("state", sql.NVarChar(20), state)
-            .query(`
-                INSERT INTO Accounts (user_id, account_name, currency, balance, state)
-                VALUES (@user_id, @account_name, @currency, @balance, @state)
-            `);
+        const user = await databaseServices.login(body)   
+        
+        if (user) {
+            req.session.user_id = user.id
+            res.status(201).json({ message: 'Login succesfull' });
+        } else {
+            res.status(401).json({ message: 'Wrong username or password' });
+        }
+    } catch (err) {
+        console.error('Login failed', err);
+        res.status(500).json({ message: 'Intern serverfail' })
+    }
+}
+/*
+const createAccount = async (req, res) => {
+    const { account_name, currency, state } = req.body;
+    const body = req.body;
 
-        res.status(201).json({ message: "Konto oprettet" });
-    } catch(err) {
-        console.error("Create Account error:", err);
-        res.status(500).json({ message: "Fejl ved oprettelse af konto" });
+    // Gets the user_id from the database
+    const userId = sessionStorage.getItem("user_id")
+    console.log(userId);
+
+    if (!userId) {
+        return res.status(401).json({ message: "Bruger ikke logget ind" });
     }
 };
-
+*/
 const searchStockNames = async (req, res) => {
     try {
         const { query } = req.query; // Extract the query parameter from the request
@@ -70,6 +71,7 @@ const searchStockNames = async (req, res) => {
 
 module.exports = {
     createUser,
-    createAccount,
-    searchStockNames
+    //createAccount,
+    searchStockNames,
+    login
 };
