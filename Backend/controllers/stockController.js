@@ -3,6 +3,10 @@
 const alphaVantageService = require("../services/alphaVantageService");
 const polygonService = require("../services/polygonService");
 
+// CACHE
+const cache = require("../utilityFunctions/cache");
+const { getOrSetCache } = require('../utilityFunctions/cacheHelper');
+
 const stockController = {
   getQuote: async (req, res) => {
     try {
@@ -83,8 +87,16 @@ const stockController = {
         return res.status(400).json({ error: 'Could not find the indicies', symbol});
       }
 
-      const result = await polygonService.getIndicesoverview(symbol);
-      res.json(result);
+      const cacheKey = `indices-${symbol}`;
+      
+      // Use the cache helper function to get cached or fresh data
+      const { data, source } = await getOrSetCache(
+        cacheKey,
+        () => polygonService.getIndicesoverview(symbol),
+        600
+      );
+
+      res.json({ source, data });
     } catch (error) {
       console.error('Error in getIndicesoverview controller', error);
       res.status(500).json({ error: 'Failed to fetch data for indicies' });
@@ -93,8 +105,15 @@ const stockController = {
 
   getNews: async (req, res) => {
     try {
-      const result = await polygonService.getNews();
-      res.json(result);
+      const cacheKey = 'news';
+
+      const { data, source } = await getOrSetCache(
+        cacheKey, 
+        () => polygonService.getNews(),
+        3600 // 1 hour
+      );
+
+      res.json({ source, data });
     } catch (error) {
       console.error('Error in getNews', error);
       res.status(500).json({ error: 'Failed to fetch data for indicies' });

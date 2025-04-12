@@ -40,7 +40,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   topPicksSymbols.forEach(async (topPick) => {
     try {
-      const data = await stockAPI.getIndicesoverview(topPick.symbol); // Use the parsed JSON directly
+      const response = await stockAPI.getIndicesoverview(topPick.symbol);
+      const data = response.data;
+
+      // Safely check for valid data
+      if (!data?.results?.length || !data.results[0]?.c) {
+        console.warn(`No valid results for ${topPick.symbol}`);
+        return; // Skip to next symbol
+      }
+
       const closedPrice = data.results[0].c;
 
       if (topPick.htmlElement) {
@@ -48,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
         marketPriceElement.innerHTML = `${parseFloat(closedPrice.toFixed(1)) || "N/A"}`;
       }
     } catch (error) {
-      console.error(`Error fetching top pick (${topPick}):`, error);
+      console.error(`Top pick fetch failed for ${topPick.symbol}:`, error.message);
     }
   });
 
@@ -89,14 +97,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const gethNews = async () => {
     try {
-      const data = await stockAPI.getNews();
-      const randomNumber = Math.floor(Math.random() * data.results.length);
-      const article = data.results[randomNumber];
+      const response = await stockAPI.getNews();
+      const data = response.data;
 
-      newsContainerAuthor.innerHTML = article.author;
-      newsContainerDescription.innerHTML = `${article.description}<br><br><a href="${article.article_url}" target="_blank">Read more here</a>`; // The content will now scroll if it overflows
+      // Safeguard: make sure we have valid results
+      if (!data?.results?.length) {
+        console.warn("No news articles received.");
+        return;
+      }
+
+      // Pick a random article
+      const randomIndex = Math.floor(Math.random() * data.results.length);
+      const article = data.results[randomIndex];
+
+      // Defensive rendering to avoid crashes if fields are missing
+      newsContainerAuthor.innerHTML = article.author ?? "Unknown author";
+      newsContainerDescription.innerHTML = `
+        ${article.description ?? "No description available"}<br><br>
+        <a href="${article.article_url}" target="_blank">Read more here</a>
+      `;
     } catch (error) {
-      console.error('Error fetching news: ', error);
+      console.error("Error fetching news:", error.message);
     }
   };
   gethNews();
