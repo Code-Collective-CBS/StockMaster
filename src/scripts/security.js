@@ -1,15 +1,15 @@
 import { stockAPI } from "./stockScripts/api.js";
 import { stockMetrics } from "./stockScripts/stockMetrics.js";
-import { IBMStockData } from "./stockScripts/IBMStockData.js";
+// import { IBMStockData } from "./stockScripts/IBMStockData.js";
 import { chartService } from "./utilityFunctions/chartService.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("Security page loaded!");
 
-  //   const urlParams = new URLSearchParams(window.location.search);
-  //   const symbol = urlParams.get("symbol");
-  const symbol = IBMStockData.companyOverview.Symbol;
-  console.log(`Stock symbol: ${symbol}`);
+  const urlParams = new URLSearchParams(window.location.search);
+  const symbol = urlParams.get("symbol");
+  //   const symbol = IBMStockData.companyOverview.Symbol;
+  //   console.log(`Stock symbol: ${symbol}`);
 
   // Storing time series globally so we can use it again
   let globalTimeSeriesData;
@@ -17,10 +17,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
     // Get company overview data
-    // const companyData = await stockAPI.getCompanyOverview(symbol);
-    // globalCompanyOverview = companyData; // Caching
-    globalCompanyOverview = IBMStockData.companyOverview;
-    globalTimeSeriesData = IBMStockData.dailyTimeSeries;
+    const companyData = await stockAPI.getCompanyOverview(symbol);
+    globalCompanyOverview = companyData.data; // Caching
+    // globalCompanyOverview = IBMStockData.companyOverview;
+    // globalTimeSeriesData = IBMStockData.dailyTimeSeries;
 
     displayCompanyName(globalCompanyOverview, symbol);
     displayCompanyOverview(globalCompanyOverview, symbol);
@@ -28,8 +28,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.title = `${globalCompanyOverview.Name} (${symbol})`;
 
     // price history data for stock graph (chart.js)
-    // const timeSeriesData = await stockAPI.getDailyTimeSeries(symbol);
-    // globalTimeSeriesData = timeSeriesData; // Storing the time data (caching)
+    const timeSeriesResponse = await stockAPI.getDailyTimeSeries(symbol);
+    const fullTimeSeriesData = timeSeriesResponse.data; // unwrap it first
+    globalTimeSeriesData = fullTimeSeriesData?.["Time Series (Daily)"];
+    
     chartService.createPriceChart(globalTimeSeriesData, globalCompanyOverview);
 
     // Displaying all stock metrics from the stockMetrics module

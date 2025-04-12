@@ -52,11 +52,14 @@ const stockController = {
         return res.status(400).json({ error: "Could not find stock symbol" });
       }
 
-      const timeSeriesData = await alphaVantageService.getDailyTimeSeries(
-        symbol,
-        outputsize
-      );
-      res.json(timeSeriesData);
+      const cacheKey = `timeSeries-${symbol}`;
+      const { data, source } = await getOrSetCache(
+        cacheKey,
+        () => alphaVantageService.getDailyTimeSeries(symbol, outputsize),
+        86400000
+      )
+
+      res.json({ data, source });
     } catch (error) {
       console.error("Error in getDailyTimeSeries controller", error);
       res.status(500).json({ error: "Failed to fetch time series data" });
@@ -71,8 +74,15 @@ const stockController = {
         return res.status(400).json({ error: "Could not find stock symbol" });
       }
 
-      const overviewData = await alphaVantageService.getCompanyOverview(symbol);
-      res.json(overviewData);
+      const cacheKey = `symbol-${symbol}`;
+
+      const { data, source } = await getOrSetCache(
+        cacheKey,
+        () => alphaVantageService.getCompanyOverview(symbol),
+        86400000 // 1 day
+      );
+
+      res.json({ data, source });
     } catch (error) {
       console.error("Error in getCompanyOverview controller", error);
       res.status(500).json({ error: "Failed to fetch company overview" });
@@ -92,7 +102,7 @@ const stockController = {
       // Use the cache helper function to get cached or fresh data
       const { data, source } = await getOrSetCache(
         cacheKey,
-        () => polygonService.getIndicesoverview(symbol),
+        () => polygonService.getIndicesoverview(symbol), // Wrap function in function to not call immediately
         600
       );
 

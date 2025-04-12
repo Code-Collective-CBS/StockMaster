@@ -8,7 +8,7 @@ async function getOrSetCache(key, fetchFunction, ttl = 600) {
     if (cached) return { data: cached, source: "cache" };
 
     const freshData = await fetchFunction();
-    cache.set(key, freshData, ttl); // ✅ Cache only the data
+    cache.set(key, freshData, ttl);
     return { data: freshData, source: "api" };
 }
 
