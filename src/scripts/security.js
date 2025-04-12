@@ -1,6 +1,5 @@
 import { stockAPI } from "./stockScripts/api.js";
 import { stockMetrics } from "./stockScripts/stockMetrics.js";
-// import { IBMStockData } from "./stockScripts/IBMStockData.js";
 import { chartService } from "./utilityFunctions/chartService.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -31,7 +30,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const timeSeriesResponse = await stockAPI.getDailyTimeSeries(symbol);
     const fullTimeSeriesData = timeSeriesResponse.data; // unwrap it first
     globalTimeSeriesData = fullTimeSeriesData?.["Time Series (Daily)"];
-    
     chartService.createPriceChart(globalTimeSeriesData, globalCompanyOverview);
 
     // Displaying all stock metrics from the stockMetrics module
