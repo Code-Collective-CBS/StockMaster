@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function() {
     
     loginForm.addEventListener("submit", async (event) => {
         event.preventDefault();
-        const email = document.getElementById("brugernavn").value;
+        const email = document.getElementById("email").value;
         const password = document.getElementById("adgangskode").value;
 
         try {

@@ -39,6 +39,25 @@ const login = async (req, res) => {
         res.status(500).json({ message: 'Intern serverfail' })
     }
 }
+
+const userInfo = async (req, res) => {
+    const userID = req.session.user_id;
+
+    if(!userID) {
+        return res.status(401).json({ message: 'Fejl i database. Kunne ikke hente navn' })
+    }
+
+    const user = await databaseServices.userInfo(userID)
+    if(!user) {
+        return res.status(404).json({ message: 'Fejl i database. Kunne ikke finde brugeren' })
+    }
+
+    res.status(200).json({ 
+        fornavn: user.firstname,
+        efternavn: user.lastname
+    });
+}
+
 /*
 const createAccount = async (req, res) => {
     const { account_name, currency, state } = req.body;
@@ -73,5 +92,6 @@ module.exports = {
     createUser,
     //createAccount,
     searchStockNames,
-    login
+    login,
+    userInfo
 };

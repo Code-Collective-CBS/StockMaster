@@ -55,7 +55,7 @@ const login = async (body) => {
 
         // Returnér brugeren hvis fundet
         if (checkLogin.recordset.length > 0) {
-            return checkLogin.recordset[0]; 
+            return checkLogin.recordset[0];
         } else {
             return null; // forkert login
         }
@@ -64,6 +64,23 @@ const login = async (body) => {
         throw err;
     }
 };
+
+const userInfo = async (id) => {
+    try {
+        const pool = await sql.pool;
+        const getUser = await pool.request()
+            .input('id', sql.Int, id)
+            .query('SELECT firstname, lastname FROM Users WHERE id = @id')
+        if (getUser.recordset.length === 1) {
+            return getUser.recordset[0]
+        } else {
+            return null;
+        }
+    } catch(err) {
+        console.err('Fejl. Kunne ikke finde user-id', err)
+        throw err;
+    }
+}
 /*
 const createAccount = async function (){
 
@@ -93,5 +110,6 @@ module.exports = {
     poolPromise,
     searchStockNames,
     createUser,
-    login
+    login,
+    userInfo
 };
