@@ -83,6 +83,26 @@ const databaseServices = {
         }
     },
 
+    getUserProfile: async (id) => {
+        try {
+            const pool = await poolPromise;
+            const result = await pool.request()
+
+                .input('id', sql.Int, id)
+                .query(('SELECT firstname, lastname, email, phone_number AS phone FROM Users WHERE id = @id'));
+
+            if (result.recordset.length > 0) {
+                return result.recordset[0];
+            } else {
+                return null;
+            }
+        } catch (err) {
+            console.error('Fejl i at hente profil oplysninger med id', err);
+            throw err;
+        }
+    },
+
+
     searchStockNames: async (query) => {
         try {
             const pool = await poolPromise;

@@ -70,6 +70,31 @@ const databaseController = {
         });
     },
 
+    getUserProfile: async (req, res) => {
+        const userID = req.session.user_id;
+
+        if (!userID) {
+            return res.status(401).json({ message: 'Bruger ikke logget ind' });
+        }
+
+        try {
+            const user = await databaseServices.userInfo(userID);
+
+            if (!user) {
+                return res.status(401).json({ message: 'Brugeren findes ikke' })
+            }
+            res.status(200).json({
+                firstname: user.firstname,
+                lastname: user.lastname,
+                email: user.email,
+                phone: user.phone
+            })
+        } catch (err) {
+            console.log('Fejl ved hentning af profil', err);
+            res.status(500).json({ message: 'Fejl i database' })
+        }
+    },
+
     createAccount: async (req, res) => {
         const { accountName, accountCurrency } = req.body;
         const body = req.body;
