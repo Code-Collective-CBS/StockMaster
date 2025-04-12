@@ -1,6 +1,6 @@
 import { stockAPI } from "./stockScripts/api.js";
 import { searchFunction } from "./utilityFunctions/searchFunction.js";
-import { popUps } from "./utilityFunctions/pop.js";
+import { popUps } from "./utilityFunctions/popup.js";
 
 // PRESENT IN THE DASHBOARD.JS MAYBE MOVE IT?
 const topPicksSymbols = [

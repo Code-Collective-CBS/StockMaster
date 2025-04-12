@@ -23,12 +23,120 @@
     width: 300px;
     z-index: 1001;
     border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
 .modal-close {
     position: absolute;
     color: var(--highlight);
+    font-size: var(--h3-size);
     right: 10px;
     top: 5px;
     cursor: pointer;
+}
+
+.modal-content h2 {
+    font-family: var(--font-primary);
+    font-size: var(--h4-size);
+    color: var(--primary-color);
+    margin-bottom: 4px;
+}
+
+.modal-content p {
+    font-family: var(--font-primary);
+    font-size: var(--text-size);
+    margin-top: 0;
+}
+
+input {
+    width: 100%;
+    background-color: var(--secondary-highligth);
+    border: solid 1px var(--secondary-color);
+    padding: 12px;
+    border-radius: 10px;
+    color: var(--primary-color);
+    font-size: var(--text-size);
+    transition: border-color 0.3s;
+    box-sizing: border-box;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--highlight);
+}
+
+input::placeholder {
+    color: var(--primary-color);
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.currency-label {
+    font-size: var(--text-size);
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+
+/* Buttons */
+.btn {
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: var(--text-size);
+    font-weight: var(--text-size);
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn:hover {
+    transform: translateY(2px);
+    /* lift the button slightly on hover*/
+}
+
+.btn-primary {
+    background-color: var(--highlight);
+    color: var(--secondary-color);
+}
+
+.btn-primary:hover {
+    background-color: #00c080;
+    /* Darker shade of highlight */
+}
+
+.modal-toggle {
+    display: flex;
+    justify-content: space-between;
+    margin: 25px 0 25px 0;
+    gap: 8px;
+}
+
+.toggle-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: var(--text-size);
+    border: 1px solid var(--sidebar-hover);
+    background-color: var(--primary-text);
+    color: var(--primary-color);
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.toggle-btn.active {
+    background-color: var(--highlight);
+    color: var(--secondary-color);
+    font-weight: bold;
 }
