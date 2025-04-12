@@ -18,7 +18,6 @@ const createUser = async (req, res) => {
        req.session.user_id = result.userID
 
         const user = await databaseServices.userInfo(result.userID)
-        console.log('Controller: ', user, 'hej')
         if(!user) {
             return res.status(404).json({ message: 'Fejl i database. Kunne ikke finde brugeren' })
         }
@@ -71,20 +70,11 @@ const userInfo = async (req, res) => {
     });
 }
 
-/*
 const createAccount = async (req, res) => {
-    const { account_name, currency, state } = req.body;
-    const body = req.body;
+    const { accountName, accountCurrency } = req.body
+    const body = req.body
+}
 
-    // Gets the user_id from the database
-    const userId = sessionStorage.getItem("user_id")
-    console.log(userId);
-
-    if (!userId) {
-        return res.status(401).json({ message: "Bruger ikke logget ind" });
-    }
-};
-*/
 const searchStockNames = async (req, res) => {
     try {
         const { query } = req.query; // Extract the query parameter from the request
@@ -103,7 +93,7 @@ const searchStockNames = async (req, res) => {
 
 module.exports = {
     createUser,
-    //createAccount,
+    createAccount,
     searchStockNames,
     login,
     userInfo

@@ -2,9 +2,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const createAccBtn = document.getElementById('createAcc')
 
     createAccBtn.addEventListener('click', async () => {
-        const accountCurrency = document.getElementById('accountCurrency').value
-        const accountName = document.getElementById('accountName').value
-        
+    const accountCurrency = document.getElementById('accountCurrency').value
+    const accountName = document.getElementById('accountName').value
+
+        if (accountCurrency === 'chooseCurrency') return alert('Du skal vælge en valuta')
+        if (accountName === "") return alert ('Du skal indtaste et kontonavn')
+
         try {
             const response = await fetch("http://localhost:3000/api/database/create-account", {
                 method: "POST",
