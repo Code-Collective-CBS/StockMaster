@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (intervalSelect) {
       intervalSelect.addEventListener("change", function () {
         const days = parseInt(this.value); // from security.html value, and then parse it to a number
-        chartService.createPriceChart(globalTimeSeriesData, -days);
+        chartService.createPriceChart(globalTimeSeriesData, globalCompanyOverview, -days);
       });
     }
   } catch (error) {
