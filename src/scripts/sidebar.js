@@ -153,7 +153,7 @@ const getUserInfo = async () => {
           console.log(data)
       }
   } catch(err) {
-      console.err('Kunne ikke hente brugeren', err)
+      console.error('Kunne ikke hente brugeren', err)
       document.getElementById('profile-name').textContent = 'Bruger ikke fundet'
       throw err;
   }
