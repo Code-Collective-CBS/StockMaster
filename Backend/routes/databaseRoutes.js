@@ -14,7 +14,7 @@ router.post('/login', databaseController.login);
 router.get('/userInfo', databaseController.userInfo)
 
 // Create account route
-//router.post('/create-account', databaseController.createAccount);
+router.post('/create-account', databaseController.createAccount);
 
 // Search stocks from table stockNames
 router.get('/search-stocks', databaseController.searchStockNames);
