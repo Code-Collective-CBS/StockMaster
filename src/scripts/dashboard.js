@@ -1,5 +1,5 @@
 import { stockAPI } from "./stockScripts/api.js";
-import { popUps } from "./utilityFunctions/pop.js";
+import { popUps } from "./utilityFunctions/popup.js";
 
 // PRESENT IN THE SECURITIES-NEWS.JS MAYBE MOVE IT?
 const topPicksSymbols = [
