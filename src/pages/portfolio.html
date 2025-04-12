@@ -20,7 +20,7 @@
  <aside class="sideBar">
   <span class="brandName">StockMaster</span>
   <nav class="sideBarNav">
-    
+
     <div class="nav-item">
       <svg
         class="icon"
@@ -271,8 +271,16 @@
     </div>
   </div>
 
-  <!-- Load JavaScript files -->
-  <script src="/src/scripts/sidebar.js"></script>
+<!-- Add Chart.js library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Add data files -->
+<script src="/src/scripts/stockScripts/IBMStockData.js"></script>
+<script src="/src/scripts/stockScripts/currencyDKKData.js"></script>
+
+<!-- Add portfolio.js and Sidebar.js -->
+<script src="../scripts/stockScripts/portfolio.js"></script>
+<script src="/src/scripts/sidebar.js"></script>
 </body>
 
 </html>
