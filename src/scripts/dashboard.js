@@ -1,4 +1,5 @@
 import { stockAPI } from "./stockScripts/api.js";
+import { popUps } from "./utilityFunctions/pop.js";
 
 // PRESENT IN THE SECURITIES-NEWS.JS MAYBE MOVE IT?
 const topPicksSymbols = [
@@ -21,6 +22,9 @@ const topPicksSymbols = [
 ];
 
 document.addEventListener("DOMContentLoaded", () => {
+    // POP UP
+    popUps.setupDepositPopup()
+
     const newsContainerAuthor = document.getElementById("news-author");
     const newsContainerDescription = document.getElementById("news-description");
 

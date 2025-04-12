@@ -1,5 +1,6 @@
 import { stockAPI } from "./stockScripts/api.js";
 import { searchFunction } from "./utilityFunctions/searchFunction.js";
+import { popUps } from "./utilityFunctions/pop.js";
 
 // PRESENT IN THE DASHBOARD.JS MAYBE MOVE IT?
 const topPicksSymbols = [
@@ -28,6 +29,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const newsContainerAuthor = document.getElementById("news-author");
   const newsContainerDescription = document.getElementById("news-description");
+
+  // POP UP
+  popUps.setupDepositPopup()
 
   //// BUTTONS ////
 

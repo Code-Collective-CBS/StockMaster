@@ -1,0 +1,34 @@
+.modal-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+}
+
+.modal-overlay {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.5);
+    width: 100%;
+    height: 100%;
+}
+
+.modal-content {
+    position: relative;
+    margin: 10% auto;
+    background: white;
+    color: var(--secondary-color);
+    padding: 20px;
+    width: 300px;
+    z-index: 1001;
+    border-radius: 8px;
+}
+
+.modal-close {
+    position: absolute;
+    color: var(--highlight);
+    right: 10px;
+    top: 5px;
+    cursor: pointer;
+}
