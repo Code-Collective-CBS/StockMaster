@@ -156,3 +156,12 @@ const getUserInfo = async () => {
   }
 };
 window.addEventListener('DOMContentLoaded', getUserInfo);
+
+// Add account from sidebar
+const dropdown = document.getElementById('account-select')
+
+dropdown.addEventListener('change', () => {
+  const redirectUser = dropdown.value;
+
+  if (redirectUser) window.location.href = `/src/pages/${redirectUser}`;
+});

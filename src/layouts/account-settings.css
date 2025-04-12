@@ -98,7 +98,7 @@ body {
     font-weight: var(--text-weight-medium);
   }
 
-  input {
+  input, select {
     width: 100%;
     padding: 12px;
     border-radius: 10px;
