@@ -20,7 +20,7 @@
  <aside class="sideBar">
   <span class="brandName">StockMaster</span>
   <nav class="sideBarNav">
-    
+
     <div class="nav-item">
       <svg
         class="icon"
@@ -193,8 +193,8 @@
 
       <!-- Pie chart card -->
       <div class="card pie-chart-card">
-        <div id="portfolioDistributionChart" class="chart-container">
-          <!-- Pie chart will be inserted here by JavaScript -->
+        <div class="chart-container">
+          <canvas id="portfolioDistributionChart"></canvas>
         </div>
       </div>
     </section>
@@ -215,8 +215,8 @@
             </select>
           </div>
         </div>
-        <div id="portfolioGrowthChart" class="chart-container">
-          <!-- Line graph will be inserted here by JavaScript -->
+        <div class="chart-container">
+          <canvas id="portfolioGrowthChart"></canvas>
         </div>
       </div>
     </section>
@@ -276,7 +276,11 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <!-- Add data files -->
-<script src="/src/scripts/stockScripts/api.js" type="module"></script>
+ <script src="../scripts/stockScripts/mockPortfolioData.js" type="module"></script>
+
+<!-- Add api files -->
+<script src="../scripts/stockScripts/api.js" type="module"></script>
+
 
 <!-- Add portfolio.js and Sidebar.js -->
 <script src="../scripts/stockScripts/portfolio.js" type="module"></script>

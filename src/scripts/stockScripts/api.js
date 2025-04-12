@@ -1,6 +1,9 @@
+import { mockPortfolioData } from "./mockPortfolioData.js";
+
 // api.js (Frontend API Calls)
 const API_BASE_URL = 'http://localhost:3000/api/stocks';
 const API_CURRENCY_URL = 'http://localhost:3000/api/currency'
+const PORTFOLIO_URL = 'http://localhost:3000/api/database'
 
 export const stockAPI = {
   // Get stock quote
@@ -93,12 +96,25 @@ export const stockAPI = {
 
   getPortfolioSummary: async (userId) => {
     try {
-      const response = await fetch(`/api/portfolios/user${userId}`);
-      if (!response.ok) {
-        throw new Error('HTTP error! Status:', `${response.status}`)
+
+      const USE_MOCK_DATA = true;
+
+      if (USE_MOCK_DATA) {
+        console.log('Using mock portfolio data for user:', userId);
+        // Simulate network delay for realistic testing
+        await new Promise(resolve => setTimeout(resolve, 300));
+        return mockPortfolioData;
       }
-      return await response.json();
-    } catch (error) {
+
+
+    //   // our actual api call (when USE_MOCK_DATA is)
+    //   const url = `${PORTFOLIO_URL}/${userId}`
+    //   const response = await fetch(url);
+    //   if (!response.ok) {
+    //     throw new Error('HTTP error, could not get the portfolio url! Status:', `${response.status}`)
+    //   }
+    //   return await response.json();
+       } catch (error) {
       console.error('Error fetching portfolio summary', error);
       throw error;
     }
