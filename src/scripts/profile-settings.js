@@ -1,5 +1,5 @@
 // Henter userens data
-document.addEventListener('DOMContentLoaded', async function () {
+document.addEventListener('DOMContentLoaded', async () => {
     try {
         const response = await fetch('http://localhost:3000/api/database/profile', {
             method: 'GET',
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 });
 
 // Opdateren userens data
-document.getElementById('profileForm').addEventListener('submit', async function (event) {
+document.getElementById('profileForm').addEventListener('submit', async (event) => {
     event.preventDefault();
 
     const firstname = document.getElementById('firstname').value;
