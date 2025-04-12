@@ -26,7 +26,7 @@ router.get('/pages/:page.html', (req, res) => {
 
   // Check if the file exists
   if (fs.existsSync(filePath)) {
-    res.sendFile(filePath);
+    return res.sendFile(filePath);
   }
   res.status(404).send('Page not found');
 });
