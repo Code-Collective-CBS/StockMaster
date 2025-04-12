@@ -100,7 +100,7 @@ const searchStockNames = async (query) => {
             .input('query', sql.VarChar, `%${query}%`) // Use parameterized query to prevent SQL injection
             .query(`
                     SELECT TOP 10 *
-                    FROM stockNames
+                    FROM Securities
                     WHERE name LIKE @query OR symbol LIKE @query
                 `);
         return result.recordset; // Return the results
@@ -110,12 +110,52 @@ const searchStockNames = async (query) => {
     }
 };
 
-// Exports mssql and our poolPromise (connection)
+const getPortfoliosForUser = async (userId) => {
+    try {
+        const pool = await poolPromise;
+        const result = await pool.request()
+            .input('userId', sql.Int, userId)
+            .query(`
+                SELECT p.id, p.name, p.account_id, p.create_date, p.balance,
+                       a.currency, a.account_name
+                FROM Portfolio p
+                JOIN Accounts a ON p.account_id = a.id
+                WHERE a.user_id = @userId
+            `);
+        return result.recordset;
+    } catch (err) {
+        console.error('Error getting portfolios for user:', err);
+        throw err;
+    }
+};
+
+const getTransactionsForPortfolio = async (portfolioId) => {
+    try {
+        const pool = await poolPromise;
+        const result = await pool.request()
+            .input('portfolioId', sql.Int, portfolioId)
+            .query(`
+                SELECT t.*, s.symbol, s.name as security_name, s.type as security_type
+                FROM Transactions t
+                JOIN Securities s ON t.securities_id = s.id
+                WHERE t.portfolio_id = @portfolioId
+                ORDER BY t.transaction_date DESC
+            `);
+        return result.recordset;
+    } catch (err) {
+        console.error('Error getting transactions for portfolio:', err);
+        throw err;
+    }
+};
+
+// Exports mssql and our poolPromise (connection) and all the functions
 module.exports = {
     sql,
     poolPromise,
     searchStockNames,
     createUser,
     login,
-    userInfo
+    userInfo,
+    getPortfoliosForUser,
+    getTransactionsForPortfolio
 };

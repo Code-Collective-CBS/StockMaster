@@ -14,6 +14,9 @@ const stockRoutes = require('./stockRoutes'); //
 // Exchange routes
 const currencyRoutes = require('./currencyRoutes');
 
+// Database routes
+const databaseRoutes = require('./databaseRoutes')
+
 // Main dashboard page route (this is our homepage)
 router.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../../src/pages/login.html'));  // Changed this to login instead of dashboard
@@ -40,8 +43,9 @@ router.use('/api/stocks', stockRoutes); // This is an bsulote path so it will al
 // Let app use our imported exchanges routes
 router.use('/api/currency', currencyRoutes);
 
-// Database routes
-const databaseRoutes = require('./databaseRoutes')
+// Let app use our imported portfolio route
+router.use('api/portfolios', databaseRoutes);
+
 router.use('/api/database', databaseRoutes);
 
 module.exports = router;

@@ -89,6 +89,19 @@ export const stockAPI = {
       console.error('Error fetching exchange data', error);
       throw error;
     }
+  },
+
+  getPortfolioSummary: async (userId) => {
+    try {
+      const response = await fetch(`/api/portfolios/user${userId}`);
+      if (!response.ok) {
+        throw new Error('HTTP error! Status:', `${response.status}`)
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching portfolio summary', error);
+      throw error;
+    }
   }
 
   // Test connection

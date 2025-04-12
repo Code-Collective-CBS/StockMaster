@@ -28,9 +28,5 @@ app.use(express.json());
 app.use(cors());
 app.use(routes);
 
-// Import router from routes/index.js
-const userRoutes = require('./routes');
-app.use(userRoutes);
-
 // Start the server
 app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));
