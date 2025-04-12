@@ -160,34 +160,34 @@
           </div>
         </div>
 
-        <div class="profile-form">
+        <form id="profileForm" class="profile-form">
           <div class="name-row">
             <div class="form-group">
               <label for="firstname">Fornavn</label>
-              <input type="text" id="firstname" value="Storm" />
+              <input type="text" id="firstname" />
             </div>
-
+    
             <div class="form-group">
               <label for="lastname">Efternavn</label>
-              <input type="text" id="lastname" value="Volf" />
+              <input type="text" id="lastname" />
             </div>
           </div>
-
+    
           <div class="form-group">
             <label for="email">Email</label>
-            <input type="email" id="email" value="stormsirius@gmail.com" />
+            <input type="email" id="email" />
           </div>
-
+    
           <div class="form-group">
             <label for="phone">Telefonnummer</label>
-            <input type="tel" id="phone" value="+45 27208075" />
+            <input type="tel" id="phone" />
           </div>
-
+    
           <div class="form-group">
             <label for="current-password">Adgangskode</label>
-            <input type="password" id="current-password" value="••••••••••" />
+            <input type="password" id="current-password" value="••••••••••" disabled />
           </div>
-
+    
           <div class="form-group btn">
             <label for="new-password">Nulstil adgangskode</label>
             <input
@@ -196,16 +196,19 @@
               placeholder="Write a new password here..."
             />
           </div>
-
+    
           <div class="form-actions">
-            <button class="cancel-btn">Anuller</button>
-            <button class="save-btn">Gem</button>
+            <button type="button" class="cancel-btn" id="cancelButton">Annuller</button>
+            <button type="submit" class="save-btn" id="saveButton">Gem</button>
           </div>
-        </div>
+        </form>
       </div>
     </main>
+    
 
     <script src="/src/scripts/sidebar.js"></script>
     <script src="/src/scripts/profile-picture.js"></script>
+    <script src="/src/scripts/profile-settings.js"></script>
+
   </body>
 </html>
