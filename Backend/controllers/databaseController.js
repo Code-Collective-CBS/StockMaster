@@ -1,4 +1,7 @@
 const databaseServices = require('../services/databaseServices');
+// CACHE
+const cache = require("../utilityFunctions/cache");
+const { getOrSetCache } = require('../utilityFunctions/cacheHelper');
 
 const databaseController = {
     createUser: async (req, res) => {
@@ -99,6 +102,32 @@ const databaseController = {
         const { accountName, accountCurrency } = req.body;
         const body = req.body;
         // Implementation for creating an account can go here
+    },
+
+    getAllAccountsForUser: async (req, res) => {
+        try {
+            const userId = req.params.id;
+
+            if (!userId) {
+                return res.status(400).json({ error: "User ID is required" });
+            }
+
+            const cacheKey = `accounts-user_id-${userId}`;
+            const { data, source } = await getOrSetCache(
+                cacheKey,
+                () => databaseServices.getAccountInfo(userId),
+                600
+            );
+
+            if (!data || data.length === 0) {
+                return res.status(404).json({ error: "No accounts found for this user" });
+            }
+
+            res.json({ data, source });
+        } catch (err) {
+            console.error("Error fetching user accounts:", err);
+            res.status(500).json({ error: "Internal server error" });
+        }
     },
 
     searchStockNames: async (req, res) => {

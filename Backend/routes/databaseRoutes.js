@@ -21,6 +21,8 @@ router.get('/search-stocks', databaseController.searchStockNames);
 
 router.get('/user/:userId', portfolioController.getPortfolioSummary)
 
+router.get('/get-accounts/:id', databaseController.getAllAccountsForUser);
+
 // Profile info route
 router.get('/profileInfo', databaseController.getUserProfile);
 

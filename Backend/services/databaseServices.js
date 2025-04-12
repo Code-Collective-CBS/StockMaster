@@ -101,7 +101,36 @@ const databaseServices = {
             throw err;
         }
     },
+    
+    getAccountInfo: async (id) => {
+        try {
+            const pool = await poolPromise;
+            const getAccount = await pool.request()
+                .input('id', sql.Int, id)
+                .query(`
+                        SELECT 
+                            u.id AS user_id, 
+                            u.firstname, 
+                            u.lastname, 
+                            a.id AS account_id, 
+                            a.account_name, 
+                            a.currency, 
+                            a.total_balance
+                        FROM Accounts a
+                        JOIN Users u ON a.user_id = u.id
+                        WHERE u.id = @id
+                    `);
 
+            if (getAccount.recordset.length > 0) {
+                return getAccount.recordset;
+            } else {
+                return null;
+            }
+        } catch (error) {
+            console.error('Fejl: kunne ikke finde konto til user-id', error);
+            return null;
+        }
+    },
 
     searchStockNames: async (query) => {
         try {
