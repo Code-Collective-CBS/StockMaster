@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 function createMockPortfolio() {
 
     // Function to get the latest closing price from time series data
-function getLatestClosingPrice(timeSeriesData) {
+const getLatestClosingPrice = (timeSeriesData) => {
     // If there's no data, return null
     if (!timeSeriesData || Object.keys(timeSeriesData).length === 0) {
       return null;

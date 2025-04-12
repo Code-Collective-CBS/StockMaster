@@ -16,13 +16,13 @@ const currencyRoutes = require('./currencyRoutes');
 
 // Main dashboard page route (this is our homepage)
 router.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../../src/pages/dashboard.html'));
+    res.sendFile(path.join(__dirname, '../../src/pages/login.html'));  // Changed this to login instead of dashboard
 });
 
 // Dynamic route handler for all our html pages, insted of hardcoding them all:
-router.get('src/pages/:page.html', (req, res) => {
+router.get('/pages/:page.html', (req, res) => {
   const pageName = req.params.page;
-  const filePath = path.join(__dirname, '../../src/pages', pageName);
+  const filePath = path.join(__dirname, '../../src/pages', `${pageName}.html`);
 
   // Check if the file exists
   if (fs.existsSync(filePath)) {
