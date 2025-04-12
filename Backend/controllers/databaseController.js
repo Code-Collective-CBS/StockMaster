@@ -87,7 +87,7 @@ const databaseController = {
                 firstname: user.firstname,
                 lastname: user.lastname,
                 email: user.email,
-                phone: user.phone
+                phone: user.phone_number
             })
         } catch (err) {
             console.log('Fejl ved hentning af profil', err);

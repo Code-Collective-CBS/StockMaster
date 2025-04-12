@@ -57,7 +57,6 @@ document.getElementById('profileForm').addEventListener('submit', async (event) 
         const result = await response.json();
         if (response.ok) {
             alert('profil opdateret');
-            window.location.href = '../pages/dashboard.html';
         } else {
             alert('Fejl ved opdatering af profil ', result.message)
 
