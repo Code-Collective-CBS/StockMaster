@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // price history data for stock graph (chart.js)
     // const timeSeriesData = await stockAPI.getDailyTimeSeries(symbol);
     // globalTimeSeriesData = timeSeriesData; // Storing the time data (caching)
-    chartService.createPriceChart(globalTimeSeriesData);
+    chartService.createPriceChart(globalTimeSeriesData, globalCompanyOverview);
 
     // Displaying all stock metrics from the stockMetrics module
     stockMetrics.displayStockData(globalCompanyOverview, 251.25);

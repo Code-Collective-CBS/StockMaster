@@ -1,5 +1,5 @@
 export const chartService = {
-  createPriceChart: function (timeSeriesData, interval = -365) {
+  createPriceChart: function (timeSeriesData, companyCurrency, interval = -365) {
     if (!timeSeriesData) {
       console.error("Invalid time series data format");
       return;
@@ -68,7 +68,7 @@ export const chartService = {
         labels: formattedDates,
         datasets: [
           {
-            label: "Aktie Pris (USD)",
+            label: ` Stock Price (${companyCurrency["Currency"]})`,
             data: prices,
             borderColor: "#00DA91",
             backgroundColor: "rgba(0, 218, 145, 0.1)",
@@ -85,10 +85,6 @@ export const chartService = {
           mode: "index",
         },
         plugins: {
-          title: {
-            display: true,
-            text: "Aktie pris",
-          },
           tooltip: {
             enabled: true,
             mode: "index",
@@ -117,10 +113,6 @@ export const chartService = {
         scales: {
           y: {
             beginAtZero: false,
-            title: {
-              display: true,
-              text: "Pris (USD)",
-            },
           },
           x: {
             title: {

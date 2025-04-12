@@ -1,4 +1,4 @@
-// This is a service file that interacts with Echange Rate Service API and include # key functions inside one object (OOP):
+// This is a service file that interacts with Echange Rate Service API and include 1 key function inside one object (OOP):
 
 
 const axios = require("axios");
@@ -9,7 +9,7 @@ const exchangeRateService = {
     try {
       const url = `${config.exchangeRate.baseUrl}/${config.exchangeRate.apiKey}/latest/${baseCurrency}`;
       const response = await axios.get(url);
-      
+
       return response.data;
     } catch (error) {
       console.error("Error fetching currency rates", error);

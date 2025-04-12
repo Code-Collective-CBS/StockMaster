@@ -1,6 +1,3 @@
-import { exchangeRate } from "../../../backend/config/config";
-import { stockAPI } from "../stockScripts/api";
-
 export const currencyHandler = {
   convertCurrency: (amount, fromCurrency, toCurrency, rates) => {
     // If currencies are the same, no conversion needed
