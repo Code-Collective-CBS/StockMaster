@@ -67,11 +67,11 @@ const login = async (body) => {
 
 const userInfo = async (id) => {
     try {
-        const pool = await sql.pool;
+        const pool = await poolPromise;
         const getUser = await pool.request()
             .input('id', sql.Int, id)
             .query('SELECT firstname, lastname FROM Users WHERE id = @id')
-        if (getUser.recordset.length === 1) {
+        if (getUser.recordset.length > 0) {
             return getUser.recordset[0]
         } else {
             return null;
