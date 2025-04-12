@@ -10,7 +10,7 @@ router.post('/users', databaseController.createUser);
 router.post('/login', databaseController.login);
 
 // User info routes
-router.get('/getUser', databaseController.userInfo)
+router.get('/userInfo', databaseController.userInfo)
 
 // Create account route
 //router.post('/create-account', databaseController.createAccount);

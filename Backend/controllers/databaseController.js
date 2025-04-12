@@ -1,4 +1,4 @@
-const { sql, poolPromise } = require('../services/databaseServices'); // ONLY IMPORTING TWO MODULES SO BENATH WE IMPORT IT ALLLLL!
+//const { sql, poolPromise } = require('../services/databaseServices'); // ONLY IMPORTING TWO MODULES SO BENATH WE IMPORT IT ALLLLL!
 const databaseServices = require('../services/databaseServices');
 
 const createUser = async (req, res) => {
@@ -14,7 +14,20 @@ const createUser = async (req, res) => {
             return res.status(400).json({ message: result.message });
         }
 
-        res.status(201).json({ message: "User created" });
+        // Gemmer brugerens id ved oprettelse af konto
+       req.session.user_id = result.userID
+
+        const user = await databaseServices.userInfo(result.userID)
+        console.log('Controller: ', user, 'hej')
+        if(!user) {
+            return res.status(404).json({ message: 'Fejl i database. Kunne ikke finde brugeren' })
+        }
+    
+        res.status(201).json({ 
+            message: "User created",
+            fornavn: user.firstname,
+            efternavn: user.lastname
+        });
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: "Fejl ved oprettelse af bruger" });

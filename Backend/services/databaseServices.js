@@ -28,7 +28,7 @@ const createUser = async (body) => {
         return { status: 400, message: "E-mail already exists" };
     }
 
-    await pool.request()
+    const userCreated = await pool.request()
         .input("firstname", sql.NVarChar(50), firstname)
         .input("lastname", sql.NVarChar(50), lastname)
         .input("email", sql.NVarChar(100), email)
@@ -37,10 +37,16 @@ const createUser = async (body) => {
         .input("country_code", sql.NVarChar(5), country_code)
         .query(`
             INSERT INTO Users (firstname, lastname, email, password, phone_number, country_code, create_date)
+            OUTPUT INSERTED.id
             VALUES (@firstname, @lastname, @email, @password, @phone_number, @country_code, GETDATE())
         `);
 
-    return { status: 201 };
+        // Gemmer brugerens id ved oprettelse af konto
+    const insertedID = userCreated.recordset[0].id
+    console.log('Inserted ID: ', insertedID)
+    const returnValue = { status: 201 , userID: insertedID};
+    console.log('UserID: ', returnValue.userID)
+    return returnValue
 };
 
 const login = async (body) => {
