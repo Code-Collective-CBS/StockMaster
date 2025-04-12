@@ -103,9 +103,9 @@
       <div class="profile-name-account">
         <p class="profile-name" id="profile-name"></p>
         <select name="account" id="account-select">
-          <option value="account_1">Konto 1</option>
-          <option value="account_2">Konto 2</option>
-          <option value="account-settings.html">--Tilføj Konto--</option>
+          <option value="account-settings.html">Konto 1</option>
+          <option value="account-settings.html">Konto 2</option>
+          <option value="create-account.html">-- Tilføj Konto --</option>
         </select>
       </div>
     </div>
@@ -155,24 +155,23 @@
       <div class="account-settings-container">
         <div class="account-header">
           <h1>Kontoindstillinger</h1>
-          <div class="account-btn-section">
-            <div class="btn-div">
-                <button class="account-btn">Udbetal</button>
-                <button class="account-btn primary-btn">Indbetal</button>
-            </div>
-          </div>
         </div>
 
         <div class="profile-form">
           <div class="name-row">
             <div class="form-group">
               <label for="accountName">Kontonavn</label>
-              <input type="text" id="accountName" value="Opsparing" />
+              <input type="text" id="accountName" placeholder="Udfyld venligst dette med navn på din konto" />
             </div>
 
             <div class="form-group">
               <label for="accountCurrency">Valuta</label>
-              <input type="text" id="accountCurrency" value="$USD" />
+              <select name="accountCurrency" id="accountCurrency">
+                <option value="chooseCurrency">-- Vælg valuta her --</option>
+                <option value="DKK">DKK</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+              </select>
             </div>
           </div>
 
@@ -185,9 +184,15 @@
             </select>
           </div>
 
+          <div class="form-group">
+            <label for="accountBalance">Balance</label>
+            <input type="text" id="accountBalance" readonly />
+          </div>
+        </div>
+
 
           <div class="form-actions">
-            <button class="cancel-btn">Anullér</button>
+            <button class="cancel-btn" id="deleteAcc">Slet konto</button>
             <button class="save-btn" id="createAcc">Opret konto</button>
           </div>
         </div>
