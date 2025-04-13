@@ -126,7 +126,6 @@ const databaseController = {
         // Fetches the users id from the session
         const userID = req.session.user_id;
 
-
         try {
             const account = await databaseServices.createAccount(userID, accountName, accountCurrency)
 

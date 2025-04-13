@@ -92,10 +92,10 @@ const databaseServices = {
                 .input("firstname", sql.NVarChar(50), firstname)
                 .input("lastname", sql.NVarChar(50), lastname)
                 .input("email", sql.NVarChar(100), email)
-                .input("phone_number", sql.NVarChar(20), phone);
+                .input("phone_number", sql.NVarChar(20), phone_number);
             // Checks if password is changed
             if (newPassword !== "") {
-                request.input("newpassword", sql.NVarChar(255), newPassword);
+                updateUser.input("newpassword", sql.NVarChar(255), newPassword);
             }
             // Creates query
             const query = 'UPDATE Users SET firstname = @firstname, lastname = @lastname, email = @email, phone_number = @phone_number'
@@ -106,7 +106,7 @@ const databaseServices = {
             // Search by user-id
             query += 'WHERE id = @id';
 
-            await request.query(query);
+            await updateUser.query(query);
 
             return { success: true };
 
@@ -180,6 +180,24 @@ const databaseServices = {
             return result.recordset;
         } catch (err) {
             console.error(`Error querying stockNames table with query "${query}":`, err);
+            throw err;
+        }
+    },
+
+    searchCurrencies: async (query) => {
+        try {
+            const pool = await poolPromise;
+            const result = await pool
+                .request()
+                .input('query', sql.NVarChar(10), `%${query}%`)
+                .query(`
+                    SELECT TOP 10 *
+                    FROM Currency
+                    WHERE name LIKE @query
+                `);
+            return result.recordset;
+        } catch (err) {
+            console.error(`Error querying Currency table with query "${query}":`, err);
             throw err;
         }
     },
