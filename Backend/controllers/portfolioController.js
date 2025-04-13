@@ -1,143 +1,180 @@
-const databaseServices = require('../services/databaseServices');
-const alphaVantageService = require('../services/alphaVantageService');
-const exchangeRateService = require('../services/exchangeRateService');
-const stockController = require('./stockController');
+const databaseServices = require("../services/databaseServices");
+const alphaVantageService = require("../services/alphaVantageService");
+const exchangeRateService = require("../services/exchangeRateService");
 
 const portfolioController = {
-    getPortfolioSummary: async (req, res) => {
-        try {
-            const userId = req.params.userId;
+  getPortfolioSummary: async (req, res) => {
+    try {
+      const userId = req.params.userId;
 
-            const portfolios = await databaseServices.getPortfoliosForUser(userId);
+      const portfolios = await databaseServices.getPortfoliosForUser(userId);
 
-            if (portfolios.length === 0) {
-                return res.status(404).json({ message: "No portfolios found" });
-            }
+      if (portfolios.length === 0) {
+        return res.status(404).json({ message: "No portfolios found" });
+      }
 
-            // Now we take each portfolio and get their transactions
-            const portfolioData = await Promise.all(portfolios.map(async (portfolio) => {
-                const transactions = await databaseServices.getTransactionsForPortfolio(portfolio.id);
+      // Now we take each portfolio and get their transactions
+      const portfolioData = await Promise.all(
+        portfolios.map(async (portfolio) => {
+          const transactions =
+            await databaseServices.getTransactionsForPortfolio(portfolio.id);
 
-                // Calculate holdings based on transactions
-                const holdings = calculateHoldings(transactions);
+          // Calculate holdings based on transactions
+          const holdings = calculateHoldings(transactions);
 
-                // Get current prices for securities in the portfolio
-                const securitiesData = await getSecuritiesData(holdings);
+          // Get current prices for securities in the portfolio
+          const securitiesData = await getSecuritiesData(holdings);
 
-                // Calculate metrics like total value, unrealized gain/loss
-                const metrics = calculatePortfolioMetrics(holdings, securitiesData, portfolio.currency);
+          // Calculate metrics like total value, unrealized gain/loss
+          const metrics = calculatePortfolioMetrics(
+            holdings,
+            securitiesData,
+            portfolio.currency
+          );
 
-                return {
-                    ...portfolio,
-                    holdings: holdings,
-                    metrics: metrics
-                };
-            }));
+          return {
+            ...portfolio,
+            holdings: holdings,
+            metrics: metrics,
+          };
+        })
+      );
 
-            res.json(portfolioData);
-        } catch (error) {
-            console.error("Error in getPortfolioSummary", error);
-            res.status(500).json({ error: "Failed to fetch portfolio data" });
-        }
-    },
+      res.json(portfolioData);
+    } catch (error) {
+      console.error("Error in getPortfolioSummary", error);
+      res.status(500).json({ error: "Failed to fetch portfolio data" });
+    }
+  },
 };
 
 // Helper function to calculate holdings
 function calculateHoldings(transactions) {
-    const holdingsBySecurityId = {};
+  const holdingsBySecurityId = {};
 
-    transactions.forEach(transaction => {
-        const securityId = transaction.securities_id;
+  transactions.forEach((transaction) => {
+    const securityId = transaction.securities_id;
 
-        if (!holdingsBySecurityId[securityId]) {
-            holdingsBySecurityId[securityId] = {
-                securityId,
-                security_name: transaction.security_name,
-                symbol: transaction.symbol,
-                type: transaction.security_type,
-                quantity: 0,
-                totalCost: 0,
-                transactions: []
-            };
-        }
+    if (!holdingsBySecurityId[securityId]) {
+      holdingsBySecurityId[securityId] = {
+        securityId,
+        security_name: transaction.security_name,
+        symbol: transaction.symbol,
+        type: transaction.security_type,
+        quantity: 0,
+        totalCost: 0,
+        transactions: [],
+      };
+    }
 
-        const holding = holdingsBySecurityId[securityId];
+    const holding = holdingsBySecurityId[securityId];
 
-        if (transaction.transaction_type === 'BUY') {
-            holding.quantity += transaction.amount;
-            holding.totalCost += transaction.total_price; // remember this line, because I can't see any totalCost row in the transactions table
-        } else if (transaction.transaction_type === 'SELL') {
-            holding.quantity -= transaction.amount;
-            // In a more complex implementation, we would calculate realized gains here
-        }
+    if (transaction.transaction_type === "BUY") {
+      holding.quantity += transaction.amount;
+      holding.totalCost += transaction.total_price; // remember this line, because I can't see any totalCost row in the transactions table
+    } else if (transaction.transaction_type === "SELL") {
+      holding.quantity -= transaction.amount;
+      // In a more complex implementation, we would calculate realized gains here
+    }
 
-        holding.transactions.push(transaction);
-    });
+    holding.transactions.push(transaction);
+  });
 
-    // Convert to array and filter out securities with zero quantity
-    return Object.values(holdingsBySecurityId)
-        .filter(holding => holding.quantity > 0)
-        .map(holding => ({
-            ...holding,
-            gak: holding.quantity > 0 ? holding.totalCost / holding.quantity : 0,
-        }));
+  // Convert to array and filter out securities with zero quantity
+  return Object.values(holdingsBySecurityId)
+    .filter((holding) => holding.quantity > 0)
+    .map((holding) => ({
+      ...holding,
+      gak: holding.quantity > 0 ? holding.totalCost / holding.quantity : 0,
+    }));
 }
 
 // Helper function to get current securities data
 async function getSecuritiesData(holdings) {
-    // Get current prices and data for all securities in the portfolio
-    const securitiesData = {};
+  // Get current prices and data for all securities in the portfolio
+  const securitiesData = {};
 
-    // For each security in holdings, fetch current price data
-    await Promise.all(holdings.map(async (holding) => {
-        try {
-            // Get company overview for more details (optional)
-            const companyData = await alphaVantageService.getCompanyOverview(holding.symbol);
+  // For each security in holdings, fetch current price data
+  await Promise.all(
+    holdings.map(async (holding) => {
+      try {
+        // Get company overview for more details (optional)
+        const companyData = await alphaVantageService.getCompanyOverview(
+          holding.symbol
+        );
 
-            // Get current quote
-            const quoteData = await alphaVantageService.getStockQuote(holding.symbol);
+        // Get current quote
+        const quoteData = await alphaVantageService.getStockQuote(
+          holding.symbol
+        );
 
-            // Extract current price from quote
-            const currentPrice = quoteData['Global Quote'] ?
-                parseFloat(quoteData['Global Quote']['05. price']) : 0;
+        // Extract current price from quote
+        const currentPrice = quoteData["Global Quote"]
+          ? parseFloat(quoteData["Global Quote"]["05. price"])
+          : 0;
 
-            securitiesData[holding.securityId] = {
-                currentPrice,
-                companyData
-            };
-        } catch (error) {
-            console.error(`Error fetching data for ${holding.symbol}:`, error);
-            securitiesData[holding.securityId] = { currentPrice: 0 };
-        }
-    }));
+        securitiesData[holding.securityId] = {
+          currentPrice,
+          companyData,
+        };
+      } catch (error) {
+        console.error(`Error fetching data for ${holding.symbol}:`, error);
+        securitiesData[holding.securityId] = { currentPrice: 0 };
+      }
+    })
+  );
 
-    return securitiesData;
+  return securitiesData;
 }
 
 // Helper function to calculate portfolio metrics
-function calculatePortfolioMetrics(holdings, securitiesData, portfolioCurrency) {
+async function calculatePortfolioMetrics(holdings, securitiesData, portfolioCurrency) {
+    // Get exchange rates for the portfolio currency
+    const exchangeRates = await exchangeRateService.getCurrency(portfolioCurrency);
+
     let totalCost = 0;
     let totalCurrentValue = 0;
 
-    // Calculate values for each holding
-    const holdingsWithMetrics = holdings.map(holding => {
+    // Calculate values for each holding with currency conversion
+    const holdingsWithMetrics = await Promise.all(holdings.map(async holding => {
         const securityData = securitiesData[holding.securityId] || { currentPrice: 0 };
-        const currentValue = holding.quantity * securityData.currentPrice;
-        const unrealizedGain = currentValue - holding.totalCost;
-        const unrealizedGainPercent = holding.totalCost > 0 ?
-            (unrealizedGain / holding.totalCost) * 100 : 0;
+        const stockCurrency = securityData.companyData?.Currency || 'DKK'; // Default to DKK
 
-        totalCost += holding.totalCost;
+        // Convert currentValue to portfolio currency
+        const valueInStockCurrency = holding.quantity * securityData.currentPrice;
+        const currentValue = convertCurrency(
+            valueInStockCurrency,
+            stockCurrency,
+            portfolioCurrency,
+            exchangeRates.conversion_rates
+        );
+
+        // Convert cost to portfolio currency if needed
+        // (costs were recorded in the stock's currency)
+        const costInPortfolioCurrency = convertCurrency(
+            holding.totalCost,
+            stockCurrency, // totalCost is in the stock's currency
+            portfolioCurrency,
+            exchangeRates.conversion_rates
+        );
+
+        const unrealizedGain = currentValue - costInPortfolioCurrency;
+        const unrealizedGainPercent = costInPortfolioCurrency > 0 ?
+            (unrealizedGain / costInPortfolioCurrency) * 100 : 0;
+
+        totalCost += costInPortfolioCurrency;
         totalCurrentValue += currentValue;
 
         return {
             ...holding,
+            stockCurrency,
             currentPrice: securityData.currentPrice,
             currentValue,
+            costInPortfolioCurrency,
             unrealizedGain,
             unrealizedGainPercent
         };
-    });
+    }));
 
     // Calculate overall portfolio metrics
     const totalUnrealizedGain = totalCurrentValue - totalCost;
@@ -151,6 +188,45 @@ function calculatePortfolioMetrics(holdings, securitiesData, portfolioCurrency) 
         totalUnrealizedGain,
         totalUnrealizedGainPercent
     };
+}
+
+
+function convertCurrency(amount, fromCurrency, toCurrency, ratesData) {
+    // If currencies are the same, no conversion needed
+    if (fromCurrency === toCurrency) return amount;
+
+    // Check if we have valid rates data
+    if (!ratesData || !ratesData.base_code || !ratesData.conversion_rates) {
+        console.error("Invalid rates data format");
+        return amount; // Return original amount as fallback
+    }
+
+    const baseCurrency = ratesData.base_code;
+    const conversionRates = ratesData.conversion_rates;
+
+    // Check if we have rates for both currencies
+    if (!conversionRates[fromCurrency] || !conversionRates[toCurrency]) {
+        console.error(`Missing conversion rate for ${fromCurrency} or ${toCurrency}`);
+        return amount; // Return unconverted amount as fallback
+    }
+
+    // First convert to the base currency of the rates
+    let amountInBaseCurrency;
+    if (fromCurrency === baseCurrency) {
+        amountInBaseCurrency = amount;
+    } else {
+        amountInBaseCurrency = amount / conversionRates[fromCurrency];
+    }
+
+    // Then convert from base currency to target currency
+    let amountInTargetCurrency;
+    if (toCurrency === baseCurrency) {
+        amountInTargetCurrency = amountInBaseCurrency;
+    } else {
+        amountInTargetCurrency = amountInBaseCurrency * conversionRates[toCurrency];
+    }
+
+    return amountInTargetCurrency;
 }
 
 module.exports = portfolioController;
