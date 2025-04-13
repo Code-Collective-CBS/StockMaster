@@ -6,13 +6,10 @@ import { portfolioChartService } from "../utilityFunctions/portfolioChartService
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("Portfolio page loaded!");
 
-  // Instead of using mock data, fetch real data
   try {
-    // Get the user ID from localStorage or session
-    const userId = localStorage.getItem('userId') || 1;
-
-    // For now, use a fixed userId
-    // const userId = 1;
+    // Correctly get user ID from sessionStorage
+    const userId = sessionStorage.getItem('userId');
+    console.log('Logged in as user ', userId);
 
     if (!userId) {
       console.error("No user found. Redirecting to login...");
@@ -20,13 +17,25 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    // Fetch portfolio data
-    console.log("Fetching portfolio data for user:", userId);
-    const portfolioData = await stockAPI.getPortfolioSummary(userId);
+    // First fetch user accounts
+    const accounts = await stockAPI.getUserAccounts(userId);
 
-    // Update UI with portfolio data
-    if (portfolioData && portfolioData.length > 0) {
-      updatePortfolioUI(portfolioData);
+    if (!accounts || accounts.length === 0) {
+      showNoAccountsMessage();
+      return;
+    }
+
+    // For each account, fetch its portfolios
+    const portfoliosPromises = accounts.map(account =>
+      stockAPI.getPortfoliosForAccount(account.id)
+    );
+    const portfoliosByAccount = await Promise.all(portfoliosPromises);
+
+    // Flatten the array and filter out empty results
+    const allPortfolios = portfoliosByAccount.flat().filter(Boolean);
+
+    if (allPortfolios.length > 0) {
+      updatePortfolioUI(allPortfolios);
     } else {
       showNoPortfoliosMessage();
     }
