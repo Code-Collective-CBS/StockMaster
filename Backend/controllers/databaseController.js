@@ -98,17 +98,28 @@ const databaseController = {
         }
     },
 
-    // updateUserProfile: async (req, res) =>{
-    //     const userID = req.session.user_id;
+    updateUserProfile: async (req, res) => {
+        const userID = req.session.user_id;
 
-    //     if(!userID){
-    //         return res.status(401).json({message: "Fail by gathering id"})
-    //     }
+        if (!userID) {
+            return res.status(401).json({ message: "Fail by gathering id" })
+        }
 
-    //     try{
+        const {firstname, lastname, email, phone, newPassword} = req.body;
+        const body = req.body;
 
-    //     }
-    // },
+        try {
+            const result = await databaseServices.updateProfile(userID, body);
+
+            if(!result.success){
+                return res.status(400).json({message: result.message})
+            }
+            res.status(200).json({message: 'Profile updated'})
+        }catch(err){
+            console.log('Fail by updating profile', err);
+            res.status(500).json({message: 'Database fail'})
+        }
+      },
 
     createAccount: async (req, res) => {
         const { accountName, accountCurrency } = req.body;
