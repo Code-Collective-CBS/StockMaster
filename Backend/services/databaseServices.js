@@ -195,8 +195,8 @@ const databaseServices = {
                     FROM Currency
                     WHERE currency_name LIKE @query
                 `);
-                console.log("Currency search result:", result.recordset);
-                return result.recordset;
+            console.log("Currency search result:", result.recordset);
+            return result.recordset;
         } catch (err) {
             console.error(`Error querying Currency table with query "${query}":`, err);
             throw err;
@@ -243,20 +243,42 @@ const databaseServices = {
 
     getPortfoliosByAccount: async (accountId) => {
         try {
-          const pool = await poolPromise;
-          const result = await pool.request()
-            .input('accountId', sql.Int, accountId)
-            .query(`
+            const pool = await poolPromise;
+            const result = await pool.request()
+                .input('accountId', sql.Int, accountId)
+                .query(`
               SELECT id, name, account_id, create_date, balance
               FROM Portfolio
               WHERE account_id = @accountId
             `);
-          return result.recordset;
+            return result.recordset;
         } catch (err) {
-          console.error('Error getting portfolios for account:', err);
-          throw err;
+            console.error('Error getting portfolios for account:', err);
+            throw err;
         }
-      }
+    },
+
+    depositToAccount: async (userId, accountId, amount) => {
+        try {
+            const pool = await poolPromise;
+            const result = await pool.request()
+                .input('userId', sql.Int, userId)
+                .input('accountId', sql.Int, accountId)
+                .input('amount', sql.Decimal(18, 2), amount) // Use the same type as your DB column
+                .query(`
+                UPDATE Accounts
+                SET total_balance = total_balance + @amount
+                WHERE id = @accountId AND user_id = @userId
+
+                SELECT * FROM Accounts WHERE id = @accountId
+            `);
+
+            return result.recordset[0];
+        } catch (error) {
+            console.error('Failed to deposit to account', error);
+            throw error;
+        }
+    }
 };
 
 module.exports = databaseServices;

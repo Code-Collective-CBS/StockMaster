@@ -56,42 +56,42 @@ const databaseController = {
     },
 
     // In databaseController.js - modify userInfo to include accounts
-userInfo: async (req, res) => {
-    const userID = req.session.user_id;
+    userInfo: async (req, res) => {
+        const userID = req.session.user_id;
 
-    if (!userID) {
-      return res.status(401).json({ message: 'Not authenticated' });
-    }
+        if (!userID) {
+            return res.status(401).json({ message: 'Not authenticated' });
+        }
 
-    try {
-      // Get basic user info
-      const user = await databaseServices.userInfo(userID);
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
+        try {
+            // Get basic user info
+            const user = await databaseServices.userInfo(userID);
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
 
-      // Get accounts with portfolios
-      const accounts = await databaseServices.getAccountInfo(userID);
-      const accountsWithPortfolios = await Promise.all(
-        accounts.map(async account => ({
-          ...account,
-          portfolios: await databaseServices.getPortfoliosByAccount(account.id)
-        }))
-      );
+            // Get accounts with portfolios
+            const accounts = await databaseServices.getAccountInfo(userID);
+            const accountsWithPortfolios = await Promise.all(
+                accounts.map(async account => ({
+                    ...account,
+                    portfolios: await databaseServices.getPortfoliosByAccount(account.id)
+                }))
+            );
 
-      res.status(200).json({
-        user: {
-          firstname: user.firstname,
-          lastname: user.lastname,
-          email: user.email
-        },
-        accounts: accountsWithPortfolios
-      });
-    } catch (err) {
-      console.error('Error getting user info:', err);
-      res.status(500).json({ message: 'Server error' });
-    }
-  },
+            res.status(200).json({
+                user: {
+                    firstname: user.firstname,
+                    lastname: user.lastname,
+                    email: user.email
+                },
+                accounts: accountsWithPortfolios
+            });
+        } catch (err) {
+            console.error('Error getting user info:', err);
+            res.status(500).json({ message: 'Server error' });
+        }
+    },
 
     getUserProfile: async (req, res) => {
         const userID = req.session.user_id;
@@ -225,6 +225,23 @@ userInfo: async (req, res) => {
         } catch (err) {
             console.error('Error searching for stocks:', err);
             res.status(500).json({ error: 'Failed to search for stocks' }); // Handle errors
+        }
+    },
+
+    depositToAccount: async (req, res) => {
+        try {
+            const userID = req.session.user_id;
+            const { accountId } = req.params;
+            const { amount } = req.body; // { "amount": 500 }
+
+            if(!userID || !accountId) {
+                return res.status(400).json({ error: 'User Id or Accound Id is required' });
+            }
+
+            const result = await databaseServices.depositToAccount(userID, accountId, amount);
+            res.status(201).json(result);
+        } catch (error) {
+            console.error(`Error depositing users id ${userID} to account id: ${accountId}`, error);
         }
     }
 };

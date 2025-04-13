@@ -1,6 +1,7 @@
 export const popUps = {
     setupDepositPopup: () => {
         const button = document.getElementById("depositButton");
+
         if (!button) return console.log("Could not find #depositButton button");
 
         button.addEventListener("click", () => {
@@ -12,28 +13,28 @@ export const popUps = {
             modal.innerHTML = `
             <div class="modal-overlay"></div>
             <div class="modal-content">
-            <span class="modal-close">&times;</span>
-            <div class="modal-toggle">
-            <button class="toggle-btn active" data-type="deposit">Deposit</button>
-            <button class="toggle-btn" data-type="withdraw">Withdraw</button>
-            </div>
-            <div class="modal-form">
-            <p class="account-name"></p>
-            <p class="modal-instruction">Enter amount to deposit:</p>
-            <div class="input-group">
-            <input type="number" placeholder="Amount" />
-            <span class="currency-label" id="accountCurrency">USD</span>
-            </div>
-            <button id="confirmAction" class="btn btn-primary">Confirm</button>
-            </div>
+                <span class="modal-close">&times;</span>
+                <div class="modal-toggle">
+                    <button class="toggle-btn active" data-type="deposit">Deposit</button>
+                    <button class="toggle-btn" data-type="withdraw">Withdraw</button>
+                </div>
+                <div class="modal-form">
+                    <p class="account-name"></p>
+                    <p class="modal-instruction">Enter amount to deposit:</p>
+                    <div class="input-group">
+                        <input id="popup-amount" type="number" placeholder="Amount" />
+                        <span class="currency-label" id="accountCurrency">USD</span>
+                    </div>
+                    <button id="confirmAction" class="btn btn-primary">Confirm</button>
+                </div>
             </div>
             `;
             document.body.appendChild(modal);
 
             const selectedAccount = accountDetails();
-            
+
             const accountNamePara = modal.querySelector('.account-name');
-            accountNamePara.innerHTML = `Account: ${selectedAccount.account_name}`; 
+            accountNamePara.innerHTML = `Account: ${selectedAccount.account_name}`;
 
             const currencySpan = modal.querySelector("#accountCurrency");
             const userCurrency = selectedAccount.currency;
@@ -60,7 +61,14 @@ export const popUps = {
             // Confirm logic (you can expand this)
             modal.querySelector("#confirmAction").addEventListener("click", () => {
                 const activeType = modal.querySelector(".toggle-btn.active").dataset.type;
-                const amount = modal.querySelector("input").value;
+                const amount = modal.querySelector('#popup-amount');
+                
+                if (activeType == 'deposit') {
+                    depositToAccount(amount);
+                    amount.value = '';
+                }
+                // if(activeType == 'withdraw')
+
                 console.log(`User wants to ${activeType} ${amount}`);
                 modal.remove(); // Optional: auto-close after action
             });
@@ -71,6 +79,29 @@ export const popUps = {
             const accounts = window.cachedAccounts || [];
             return accounts.find(acc => acc.account_id == selectedAccountId) || null;
         };
+
+        const depositToAccount = async (amountInput) => {
+            const amount = amountInput.value;
+            const selectedAccountId = sessionStorage.getItem('selectedAccountId');
+
+            try {
+                const response = await fetch(`/api/database/deposit-to-account/${selectedAccountId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ amount }),
+                });
+
+                const result = await response.json();
+                if (response.status === 201) {
+                    alert("Deposit succesfull");
+                    modal.querySelector(".modal-close").click(); // Click close popup
+                } else {
+                    alert("Fail to deposit", result.message);
+                }
+            } catch (error) {
+                console.error("Fail to deposit: ", error);
+            }
+        }
     }
 };
 // >&times is an HTML entity and represents x 

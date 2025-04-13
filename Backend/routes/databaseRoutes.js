@@ -12,7 +12,7 @@ router.post('/users', databaseController.createUser);
 router.post('/login', databaseController.login);
 
 // User info routes
-router.get('/userInfo', databaseController.userInfo)
+router.get('/userInfo', databaseController.userInfo);
 
 // Create account route
 router.post('/create-account', databaseController.createAccount);
@@ -33,15 +33,16 @@ router.get('/search-currency', databaseController.searchCurrencies);
 // Update profile route
 router.put('/updateprofileInfo', databaseController.updateUserProfile);
 
-router.get('portfolio/user/:userId', portfolioController.getPortfolioSummary)
+router.get('portfolio/user/:userId', portfolioController.getPortfolioSummary);
 
 
 // Test to see if our API is working
 router.get('/test', (req, res) => {
     res.json({ message: 'API is working!' });
-  });
+});
+
 // Deposit to account
-//  router.put('/deposit-to-account/:accountId', )
+router.put('/deposit-to-account/:accountId', databaseController.depositToAccount);
 
 // Withdraw to account
 //  router.put('/withdraw-to-account/:accountId', )
