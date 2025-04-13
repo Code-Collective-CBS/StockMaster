@@ -158,6 +158,13 @@ const loadAccountDropdown = async (dropdown) => {
   try {
     const response = await fetch('/api/database/get-accounts');
     const { data: accounts } = await response.json();
+
+    const currentPath = window.location.pathname; // Used for if statement
+
+    if ((!accounts || accounts.length === 0) && !currentPath.includes('create-account.html')) {
+      alert("You need to create an account");
+      return window.location.href = `/src/pages/create-account.html`; 
+    }
     if (!dropdown) return;
 
     dropdown.innerHTML = ''; // Clear existing options
