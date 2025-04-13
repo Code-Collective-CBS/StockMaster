@@ -85,16 +85,17 @@ const databaseServices = {
         try {
             const pool = await poolPromise;
             const checkUser = await pool.request()
-            .input('user_id', sql.Int, id)
             .input('account_name', sql.VarChar(255), accountName)
             .input('currency', sql.VarChar(3), accountCurrency)
+            .input('user_id', sql.Int, id)
+            //.input('total_balance', sql.Decimal(18,2), 0)
             .query(`
-                INSERT INTO Accounts user_id, account_name, currency
-                VALUES @account_name, @currency, @total_balance, GETDATE(), @state, @user_id`
+                INSERT INTO Accounts (account_name, currency, user_id)
+                VALUES (@account_name, @currency, @user_id)`
             ) 
 
             return { accountName, accountCurrency }
-            
+
         } catch (err) {
             console.error('Error: Could not create account', err)
             throw err;

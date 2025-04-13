@@ -107,18 +107,18 @@ const databaseController = {
         }
 
         try {
-            const user = await databaseServices.createAccount(userID, accountName, accountCurrency)
+            const account = await databaseServices.createAccount(userID, accountName, accountCurrency)
 
-            if (!user) {
+            if (!account) {
                 return res.status(400).json({ message: 'Fail in databaseServices' })
             }
 
-            console.log(user)
+            console.log(account)
 
             res.status(201).json({
                 message: "Account created",
-                accountName: user.account_name,
-                accountCurrency: user.currency
+                accountName: account.accountName,
+                accountCurrency: account.accountCurrency
             });
         } catch (err) {
             res.status(500).json({ message: "Failed trying to create account", err });
