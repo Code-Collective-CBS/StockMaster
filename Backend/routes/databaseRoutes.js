@@ -26,4 +26,8 @@ router.get('/get-accounts/:id', databaseController.getAllAccountsForUser);
 // Profile info route
 router.get('/profileInfo', databaseController.getUserProfile);
 
+// Update profile route
+router.put('/updateprofileInfo', databaseController.updateUserProfile);
+
+
 module.exports = router;

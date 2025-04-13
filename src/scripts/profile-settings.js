@@ -68,6 +68,6 @@ document.getElementById('profileForm').addEventListener('submit', async (event) 
 });
 
 // Funktionalitet til annuler
-document.getElementById('cancelButton'), document.addEventListener('click', () => {
+document.getElementById('cancelButton').addEventListener('click', () => {
     window.location.href = '../pages/dashboard.html';
-}); 
+});
