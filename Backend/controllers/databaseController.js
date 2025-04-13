@@ -55,23 +55,43 @@ const databaseController = {
         }
     },
 
-    userInfo: async (req, res) => {
-        const userID = req.session.user_id;
+    // In databaseController.js - modify userInfo to include accounts
+userInfo: async (req, res) => {
+    const userID = req.session.user_id;
 
-        if (!userID) {
-            return res.status(401).json({ message: 'Fejl i database. Kunne ikke hente navn' });
-        }
+    if (!userID) {
+      return res.status(401).json({ message: 'Not authenticated' });
+    }
 
-        const user = await databaseServices.userInfo(userID);
-        if (!user) {
-            return res.status(404).json({ message: 'Fejl i database. Kunne ikke finde brugeren' });
-        }
+    try {
+      // Get basic user info
+      const user = await databaseServices.userInfo(userID);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
 
-        res.status(200).json({
-            fornavn: user.firstname,
-            efternavn: user.lastname
-        });
-    },
+      // Get accounts with portfolios
+      const accounts = await databaseServices.getAccountInfo(userID);
+      const accountsWithPortfolios = await Promise.all(
+        accounts.map(async account => ({
+          ...account,
+          portfolios: await databaseServices.getPortfoliosByAccount(account.id)
+        }))
+      );
+
+      res.status(200).json({
+        user: {
+          firstname: user.firstname,
+          lastname: user.lastname,
+          email: user.email
+        },
+        accounts: accountsWithPortfolios
+      });
+    } catch (err) {
+      console.error('Error getting user info:', err);
+      res.status(500).json({ message: 'Server error' });
+    }
+  },
 
     getUserProfile: async (req, res) => {
         const userID = req.session.user_id;

@@ -7,35 +7,41 @@ const portfolioController = {
     try {
       const userId = req.params.userId;
 
-      const portfolios = await databaseServices.getPortfoliosForUser(userId);
-
-      if (portfolios.length === 0) {
-        return res.status(404).json({ message: "No portfolios found" });
+      // Get user's accounts with portfolios in one query
+      const accounts = await databaseServices.getAccountInfo(userId);
+      if (!accounts || accounts.length === 0) {
+        return res.status(404).json({ message: "No accounts found" });
       }
 
-      // Now we take each portfolio and get their transactions
+      // Get detailed portfolio data for each account
       const portfolioData = await Promise.all(
-        portfolios.map(async (portfolio) => {
-          const transactions =
-            await databaseServices.getTransactionsForPortfolio(portfolio.id);
+        accounts.map(async (account) => {
+          const portfolios = await databaseServices.getPortfoliosForUser(account.id);
 
-          // Calculate holdings based on transactions
-          const holdings = calculateHoldings(transactions);
+          const portfoliosWithData = await Promise.all(
+            portfolios.map(async (portfolio) => {
+              const transactions = await databaseServices.getTransactionsForPortfolio(portfolio.id);
+              const holdings = calculateHoldings(transactions);
+              const securitiesData = await getSecuritiesData(holdings);
+              const metrics = await calculatePortfolioMetrics(
+                holdings,
+                securitiesData,
+                account.currency
+              );
 
-          // Get current prices for securities in the portfolio
-          const securitiesData = await getSecuritiesData(holdings);
-
-          // Calculate metrics like total value, unrealized gain/loss
-          const metrics = calculatePortfolioMetrics(
-            holdings,
-            securitiesData,
-            portfolio.currency
+              return {
+                ...portfolio,
+                account_name: account.account_name,
+                currency: account.currency,
+                holdings,
+                metrics
+              };
+            })
           );
 
           return {
-            ...portfolio,
-            holdings: holdings,
-            metrics: metrics,
+            ...account,
+            portfolios: portfoliosWithData
           };
         })
       );
@@ -45,7 +51,7 @@ const portfolioController = {
       console.error("Error in getPortfolioSummary", error);
       res.status(500).json({ error: "Failed to fetch portfolio data" });
     }
-  },
+  }
 };
 
 // Helper function to calculate holdings

@@ -3,73 +3,94 @@ import { stockAPI } from "./api.js";
 import { favoredStocks } from "../utilityFunctions/favoredStocks.js";
 import { portfolioChartService } from "../utilityFunctions/portfolioChartService.js";
 
+
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("Portfolio page loaded!");
 
   try {
-    // Correctly get user ID from sessionStorage
     const userId = sessionStorage.getItem('userId');
-    console.log('Logged in as user ', userId);
-
     if (!userId) {
-      console.error("No user found. Redirecting to login...");
       window.location.href = "/pages/login.html";
       return;
     }
 
-    // First fetch user accounts
-    const accounts = await stockAPI.getUserAccounts(userId);
+    // Fetch all portfolio data in one call
+    const portfolioData = await stockAPI.getPortfolioSummary(userId);
 
-    if (!accounts || accounts.length === 0) {
-      showNoAccountsMessage();
+    if (!portfolioData || portfolioData.length === 0) {
+      showNoPortfoliosMessage();
       return;
     }
 
-    // For each account, fetch its portfolios
-    const portfoliosPromises = accounts.map(account =>
-      stockAPI.getPortfoliosForAccount(account.id)
+    // Flatten all portfolios from all accounts
+    const allPortfolios = portfolioData.flatMap(account =>
+      account.portfolios.map(portfolio => ({
+        ...portfolio,
+        account_name: account.account_name
+      }))
     );
-    const portfoliosByAccount = await Promise.all(portfoliosPromises);
 
-    // Flatten the array and filter out empty results
-    const allPortfolios = portfoliosByAccount.flat().filter(Boolean);
-
-    if (allPortfolios.length > 0) {
-      updatePortfolioUI(allPortfolios);
-    } else {
-      showNoPortfoliosMessage();
-    }
+    updatePortfolioUI(allPortfolios);
   } catch (error) {
     console.error("Error loading portfolio data:", error);
     showErrorMessage("Failed to load portfolio data. Please try again later.");
   }
 });
 
-// Function to update the UI with portfolio data
 function updatePortfolioUI(portfolios) {
-  // Get DOM elements
   const totalValue = document.getElementById("totalValueDisplay");
   const performance7D = document.getElementById("performance7d");
   const performance1M = document.getElementById("performance1m");
   const performance6M = document.getElementById("performance6m");
-  const portfolioChartCanvas = document.getElementById(
-    "portfolioDistributionChart"
-  );
+  const portfolioChartCanvas = document.getElementById("portfolioDistributionChart");
   const portfolioList = document.getElementById("portfolioList");
-  const portfolioGrowthChartCanvas = document.getElementById(
-    "portfolioGrowthChart"
-  );
+  const portfolioGrowthChartCanvas = document.getElementById("portfolioGrowthChart");
 
-  // Calculate total portfolio value and performance
-  const totalPortfolioValue = portfolios.reduce((sum, portfolio) => {
-    return sum + portfolio.metrics.totalCurrentValue;
-  }, 0);
+  // Group by account for display
+  const accountsMap = portfolios.reduce((acc, portfolio) => {
+    if (!acc[portfolio.account_id]) {
+      acc[portfolio.account_id] = {
+        account_name: portfolio.account_name,
+        currency: portfolio.currency,
+        portfolios: []
+      };
+    }
+    acc[portfolio.account_id].portfolios.push(portfolio);
+    return acc;
+  }, {});
 
-  // Update total value display
+  // Display accounts and their portfolios
+  if (portfolioList) {
+    portfolioList.innerHTML = '';
+    Object.values(accountsMap).forEach(account => {
+      const accountElement = document.createElement('div');
+      accountElement.className = 'account-group';
+      accountElement.innerHTML = `
+        <h3>${account.account_name} (${account.currency})</h3>
+        <div class="portfolios-container" id="portfolios-${account.account_id}"></div>
+      `;
+      portfolioList.appendChild(accountElement);
+
+      const container = document.getElementById(`portfolios-${account.account_id}`);
+      account.portfolios.forEach(portfolio => {
+        const portfolioElement = document.createElement('div');
+        portfolioElement.className = 'portfolio-item';
+        portfolioElement.innerHTML = `
+          <h4>${portfolio.name}</h4>
+          <p>Value: ${formatCurrency(portfolio.metrics.totalCurrentValue, account.currency)}</p>
+          <p>Gain: ${portfolio.metrics.totalUnrealizedGainPercent.toFixed(2)}%</p>
+        `;
+        container.appendChild(portfolioElement);
+      });
+    });
+  }
+
+  // Calculate and display totals
+  const totalPortfolioValue = portfolios.reduce((sum, p) => sum + p.metrics.totalCurrentValue, 0);
+  const primaryCurrency = portfolios[0]?.currency || "DKK";
+
   if (totalValue) {
-    // Assuming the first portfolio's currency for display
-    const currency = portfolios[0]?.currency || "DKK";
-    totalValue.textContent = formatCurrency(totalPortfolioValue, currency);
+    totalValue.textContent = formatCurrency(totalPortfolioValue, primaryCurrency);
   }
 
   // Update performance indicators
