@@ -97,6 +97,19 @@ const databaseController = {
             res.status(500).json({ message: 'Fejl i database' })
         }
     },
+
+    updateUserProfile: async (req, res) =>{
+        const userID = req.session.user_id;
+
+        if(!userID){
+            return res.status(401).json({message: "Fail by gathering id"})
+        }
+
+        try{
+            
+        }
+    },
+
     createAccount: async (req, res) => {
         const { accountName, accountCurrency } = req.body;
         // Fetches the users id from the session
