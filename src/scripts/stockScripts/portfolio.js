@@ -193,7 +193,7 @@ function createPortfolioPieChart(canvas, portfolios) {
 // Helper functions you already have
 function formatCurrency(amount, currencyCode) {
   return (
-    new Intl.NumberFormat("en-US", {
+    new Intl.NumberFormat("da-DK", {
       style: "decimal",
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
@@ -206,7 +206,7 @@ function formatCurrency(amount, currencyCode) {
 function updatePerformanceDisplay(element, percentChange) {
   if (!element) return;
 
-  const formattedPercent = new Intl.NumberFormat("en-US", {
+  const formattedPercent = new Intl.NumberFormat("da-DK", {
     style: "decimal",
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
@@ -297,7 +297,7 @@ function createMockGrowthChart(canvas) {
   for (let i = 11; i >= 0; i--) {
     const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
     labels.push(
-      date.toLocaleDateString("en-US", { month: "short", year: "numeric" })
+      date.toLocaleDateString("da-DK", { month: "short", year: "numeric" })
     );
 
     // Generate a random value that trends upward

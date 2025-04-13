@@ -98,17 +98,17 @@ const databaseController = {
         }
     },
 
-    updateUserProfile: async (req, res) =>{
-        const userID = req.session.user_id;
+    // updateUserProfile: async (req, res) =>{
+    //     const userID = req.session.user_id;
 
-        if(!userID){
-            return res.status(401).json({message: "Fail by gathering id"})
-        }
+    //     if(!userID){
+    //         return res.status(401).json({message: "Fail by gathering id"})
+    //     }
 
-        try{
-            
-        }
-    },
+    //     try{
+
+    //     }
+    // },
 
     createAccount: async (req, res) => {
         const { accountName, accountCurrency } = req.body;
