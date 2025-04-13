@@ -271,11 +271,35 @@ const databaseServices = {
                 WHERE id = @accountId AND user_id = @userId
 
                 SELECT * FROM Accounts WHERE id = @accountId
-            `);
+            `); // USE OF SELECT FOR LATER USE TO DISPLAY NEW ACCOUNT INSTEAD OF GETTING NEW INFORMATION MAYBE NOT NEEDED
 
             return result.recordset[0];
         } catch (error) {
             console.error('Failed to deposit to account', error);
+            throw error;
+        }
+    },
+
+    withdrawFromAccount: async (userId, accountId, amount) => {
+        try {
+            const pool = await poolPromise;
+            const result = await pool.request()
+                .input('userId', sql.Int, userId)
+                .input('accountId', sql.Int, accountId)
+                .input('amount', sql.Decimal(18, 2), amount)
+                .query(`
+                UPDATE Accounts
+                SET total_balance = total_balance - @amount
+                WHERE id = @accountId AND user_id = @userId AND total_balance >= @amount
+                
+                SELECT * FROM Accounts WHERE id = @accountId
+            `);
+        
+            if(result.rowsAffected[0] === 0) throw new Error("Insufficient funds"); // Extra check if total_balance >= @amount in SQL fails
+
+            return result.recordset[0];
+        } catch (error) {
+            console.error('Failed to withdraw from account', error);
             throw error;
         }
     }

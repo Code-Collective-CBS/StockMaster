@@ -66,10 +66,12 @@ export const popUps = {
                 if (activeType == 'deposit') {
                     depositToAccount(amount);
                     amount.value = '';
+                } else if (activeType == 'withdraw') {
+                    withdrawingFromAccount(amount);
+                    amount.value = '';
                 }
-                // if(activeType == 'withdraw')
 
-                console.log(`User wants to ${activeType} ${amount}`);
+                console.log(`User wants to ${activeType} ${amount.value}`);
                 modal.remove(); // Optional: auto-close after action
             });
         });
@@ -96,10 +98,33 @@ export const popUps = {
                     alert("Deposit succesfull");
                     modal.querySelector(".modal-close").click(); // Click close popup
                 } else {
-                    alert("Fail to deposit", result.message);
+                    alert("Failed to deposit", result.message);
                 }
             } catch (error) {
-                console.error("Fail to deposit: ", error);
+                console.error("Failed to deposit: ", error);
+            }
+        };
+
+        const withdrawingFromAccount = async (amountInput) => {
+            const amount = amountInput.value;
+            const selectedAccountId = sessionStorage.getItem('selectedAccountId');
+
+            try {
+                const response = await fetch(`/api/database/withdraw-to-account/${selectedAccountId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ amount }),
+                });
+
+                const result = await response.json();
+                if(response.status === 201) {
+                    alert("Withdraw succesfull");
+                    modal.querySelector(".modal-close").click();
+                } else {
+                    alert("Failed to Withdraw", result.message);
+                }
+            } catch (error) {
+                console.error("Failed to Withdraw", error);
             }
         }
     }

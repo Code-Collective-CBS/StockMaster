@@ -230,18 +230,35 @@ const databaseController = {
 
     depositToAccount: async (req, res) => {
         try {
-            const userID = req.session.user_id;
+            const userId = req.session.user_id;
             const { accountId } = req.params;
             const { amount } = req.body; // { "amount": 500 }
 
-            if(!userID || !accountId) {
+            if(!userId || !accountId) {
                 return res.status(400).json({ error: 'User Id or Accound Id is required' });
             }
 
-            const result = await databaseServices.depositToAccount(userID, accountId, amount);
+            const result = await databaseServices.depositToAccount(userId, accountId, amount);
             res.status(201).json(result);
         } catch (error) {
-            console.error(`Error depositing users id ${userID} to account id: ${accountId}`, error);
+            console.error(`Error depositing users id ${userId} to account id: ${accountId}`, error);
+        }
+    },
+
+    withdrawFromAccount: async (req, res) => {
+        try {
+            const userId = req.session.user_id;
+            const { accountId } = req.params;
+            const { amount } = req.body;
+
+            if(!userId || !accountId) {
+                return res.status(400).json({ error: 'User Id or account Id is required' });
+            }
+
+            const result = await databaseServices.withdrawFromAccount(userId, accountId, amount);
+            res.status(201).json(result);
+        } catch (error) {
+            console.error(`Error withdrawing users id ${userId} from account id: ${accountId}`, error)
         }
     }
 };

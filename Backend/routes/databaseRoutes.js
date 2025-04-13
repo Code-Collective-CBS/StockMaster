@@ -45,6 +45,6 @@ router.get('/test', (req, res) => {
 router.put('/deposit-to-account/:accountId', databaseController.depositToAccount);
 
 // Withdraw to account
-//  router.put('/withdraw-to-account/:accountId', )
+router.put('/withdraw-to-account/:accountId', databaseController.withdrawFromAccount);
 
 module.exports = router;
