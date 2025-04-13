@@ -1,7 +1,7 @@
 import { searchFunction } from "./utilityFunctions/searchFunction.js";
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Search functions
+    // For currency-search function
     const deleteButton = document.querySelector(".delete-search");
     const searchContainer = document.querySelector(".displaySearch");
     // Account details
@@ -51,9 +51,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     //// CREATE ACCOUNT ////
     createAccBtn.addEventListener('click', async () => {
-        if (accountCurrency.value.trim() === 'chooseCurrency' && accountName === "") return alert('Udfyld begge felter')
-        if (accountCurrency.value.trim() === 'chooseCurrency') return alert('Du skal vælge en valuta')
-        if (accountName.value.trim() === "") return alert('Du skal indtaste et kontonavn')
+        const accCurrency = accountCurrency.value.trim()
+        const accName = accountName.value.trim()
+        
+        if (accCurrency === 'chooseCurrency' && accName === "") return alert('Udfyld begge felter')
+        if (accCurrency === 'chooseCurrency') return alert('Du skal vælge en valuta')
+        if (accName === "") return alert('Du skal indtaste et kontonavn')
 
         try {
             const response = await fetch("http://localhost:3000/api/database/create-account", {
@@ -62,8 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     "Content-Type": "application/json" // JSON data
                 },
                 body: JSON.stringify({
-                    accountName,
-                    accountCurrency,
+                    accName,
+                    accCurrency,
                 })
             });
 
