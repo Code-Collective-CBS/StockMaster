@@ -3,7 +3,7 @@ import { mockPortfolioData } from "./mockPortfolioData.js";
 // api.js (Frontend API Calls)
 const API_BASE_URL = "http://localhost:3000/api/stocks";
 const API_CURRENCY_URL = "http://localhost:3000/api/currency";
-const PORTFOLIO_URL = "http://localhost:3000/api/database/user";
+const PORTFOLIO_URL = "http://localhost:3000/api/database/portfolio/user";
 
 export const stockAPI = {
   // Get stock quote

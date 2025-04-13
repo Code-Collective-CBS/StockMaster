@@ -19,7 +19,7 @@ router.post('/create-account', databaseController.createAccount);
 // Search stocks from table stockNames
 router.get('/search-stocks', databaseController.searchStockNames);
 
-router.get('/user/:userId', portfolioController.getPortfolioSummary)
+router.get('portfolio/user/:userId', portfolioController.getPortfolioSummary)
 
 // Get accounts to show
 router.get('/get-accounts', databaseController.getAllAccountsForUser);
