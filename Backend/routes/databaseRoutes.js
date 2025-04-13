@@ -31,7 +31,7 @@ router.get('/profileInfo', databaseController.getUserProfile);
 router.get('/search-currency', databaseController.searchCurrencies);
 
 // Update profile route
-//router.put('/updateprofileInfo', databaseController.updateUserProfile);
+router.put('/updateprofileInfo', databaseController.updateUserProfile);
 
 
 module.exports = router;

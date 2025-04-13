@@ -46,7 +46,7 @@ document.getElementById('profileForm').addEventListener('submit', async (event) 
     }
 
     try {
-        const response = await fetch('http://localhost:3000/api/database/profileInfo', {
+        const response = await fetch('http://localhost:3000/api/database/updateprofileInfo', {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
