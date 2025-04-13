@@ -142,13 +142,13 @@ const databaseServices = {
             const getAccount = await pool.request()
                 .input('id', sql.Int, id)
                 .query(`
-                        SELECT 
-                            u.id AS user_id, 
-                            u.firstname, 
-                            u.lastname, 
-                            a.id AS account_id, 
-                            a.account_name, 
-                            a.currency, 
+                        SELECT
+                            u.id AS user_id,
+                            u.firstname,
+                            u.lastname,
+                            a.id AS account_id,
+                            a.account_name,
+                            a.currency,
                             a.total_balance
                         FROM Accounts a
                         JOIN Users u ON a.user_id = u.id
@@ -239,7 +239,24 @@ const databaseServices = {
             console.error('Error getting transactions for portfolio:', err);
             throw err;
         }
-    }
+    },
+
+    getPortfoliosByAccount: async (accountId) => {
+        try {
+          const pool = await poolPromise;
+          const result = await pool.request()
+            .input('accountId', sql.Int, accountId)
+            .query(`
+              SELECT id, name, account_id, create_date, balance
+              FROM Portfolio
+              WHERE account_id = @accountId
+            `);
+          return result.recordset;
+        } catch (err) {
+          console.error('Error getting portfolios for account:', err);
+          throw err;
+        }
+      }
 };
 
 module.exports = databaseServices;

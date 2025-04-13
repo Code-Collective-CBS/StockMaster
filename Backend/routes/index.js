@@ -43,9 +43,6 @@ router.use('/api/stocks', stockRoutes); // This is an bsulote path so it will al
 // Let app use our imported exchanges routes
 router.use('/api/currency', currencyRoutes);
 
-// Let app use our imported portfolio route
-router.use('api/portfolios', databaseRoutes);
-
 router.use('/api/database', databaseRoutes);
 
 module.exports = router;

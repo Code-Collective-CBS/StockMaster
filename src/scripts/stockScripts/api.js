@@ -98,6 +98,11 @@ export const stockAPI = {
 
   getPortfolioSummary: async (userId) => {
     try {
+
+      if (!userId) {
+        throw new Error('User ID is required');
+      }
+      
       const USE_MOCK_DATA = true;
 
       if (USE_MOCK_DATA) {
@@ -111,10 +116,7 @@ export const stockAPI = {
       const url = `${PORTFOLIO_URL}/${userId}`;
       const response = await fetch(url);
       if (!response.ok) {
-        throw new Error(
-          "HTTP error, could not get the portfolio url! Status:",
-          `${response.status}`
-        );
+        throw new Error(`HTTP error, could not get the portfolio url! Status: ${response.status}`);
       }
       return await response.json();
     } catch (error) {

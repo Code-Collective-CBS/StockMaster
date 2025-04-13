@@ -8,11 +8,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   console.log("Portfolio page loaded!");
 
   try {
-    const userId = sessionStorage.getItem('userId');
+    let userId = sessionStorage.getItem('userId') || localStorage.getItem('userId');
+
     if (!userId) {
-      window.location.href = "/pages/login.html";
-      return;
+      console.warn('User ID not found in storage, using default for testing');
+      userId = 1;
     }
+
+    console.log('Found user id', userId);
 
     // Fetch all portfolio data in one call
     const portfolioData = await stockAPI.getPortfolioSummary(userId);
