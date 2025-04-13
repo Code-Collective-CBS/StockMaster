@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (dropdown) {
     dropdown.addEventListener('change', () => {
       const selectedValue = dropdown.value;
-
+      
       if (selectedValue === 'create-account.html') {
         window.location.href = `/src/pages/${selectedValue}`;
       } else {
@@ -158,6 +158,7 @@ const loadAccountDropdown = async (dropdown) => {
   try {
     const response = await fetch('/api/database/get-accounts');
     const { data: accounts } = await response.json();
+    window.cachedAccounts = accounts; // Frontend cache for user accounts not using server-side cache with npm
 
     const currentPath = window.location.pathname; // Used for if statement
 

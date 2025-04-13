@@ -2,10 +2,10 @@ export const popUps = {
     setupDepositPopup: () => {
         const button = document.getElementById("depositButton");
         if (!button) return console.log("Could not find #depositButton button");
-        
+
         button.addEventListener("click", () => {
             if (document.getElementById("depositModal")) return;
-            
+
             const modal = document.createElement("div");
             modal.id = "depositModal";
             modal.classList.add("modal-wrapper");
@@ -18,6 +18,7 @@ export const popUps = {
             <button class="toggle-btn" data-type="withdraw">Withdraw</button>
             </div>
             <div class="modal-form">
+            <p class="account-name"></p>
             <p class="modal-instruction">Enter amount to deposit:</p>
             <div class="input-group">
             <input type="number" placeholder="Amount" />
@@ -27,10 +28,15 @@ export const popUps = {
             </div>
             </div>
             `;
-            
             document.body.appendChild(modal);
+
+            const selectedAccount = accountDetails();
+            
+            const accountNamePara = modal.querySelector('.account-name');
+            accountNamePara.innerHTML = `Account: ${selectedAccount.account_name}`; 
+
             const currencySpan = modal.querySelector("#accountCurrency");
-            const userCurrency = "USD"; // or fetched later
+            const userCurrency = selectedAccount.currency;
             currencySpan.textContent = userCurrency;
 
             // Close modal
@@ -59,7 +65,12 @@ export const popUps = {
                 modal.remove(); // Optional: auto-close after action
             });
         });
-    },
-};
 
+        const accountDetails = () => {
+            const selectedAccountId = sessionStorage.getItem('selectedAccountId');
+            const accounts = window.cachedAccounts || [];
+            return accounts.find(acc => acc.account_id == selectedAccountId) || null;
+        };
+    }
+};
 // >&times is an HTML entity and represents x 
