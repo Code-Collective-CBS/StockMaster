@@ -34,3 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+document.getElementById('cancel').addEventListener('click', () => {
+    window.location.href = '../pages/dashboard.html';
+});
