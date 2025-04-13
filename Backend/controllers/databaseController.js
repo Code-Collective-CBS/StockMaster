@@ -102,12 +102,17 @@ const databaseController = {
         // Fetches the users id from the session
         const userID = req.session.user_id;
 
-        if (!userID) {
-            return res.status(401).json({ message: 'User not found or logged in' });
-        }
 
         try {
             const account = await databaseServices.createAccount(userID, accountName, accountCurrency)
+
+            if (!userID) {
+                return res.status(401).json({ message: 'User not found or logged in' });
+            }
+
+            // Deletes existing cache for accounts-user_id (sets new cache automatically afterwards)
+            const cacheKey = `accounts-user_id-${userID}`;
+            cache.del(cacheKey);
 
             if (!account) {
                 return res.status(400).json({ message: 'Fail in databaseServices' })
