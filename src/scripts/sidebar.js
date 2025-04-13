@@ -140,6 +140,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 });
+
 const getUserInfo = async () => {
   try {
       const response = await fetch('http://localhost:3000/api/database/userInfo')
@@ -155,6 +156,14 @@ const getUserInfo = async () => {
       throw err;
   }
 };
+
+const loadAccountDropdown = async () => {
+  try {
+    const userId = req
+  }
+}
+
+
 window.addEventListener('DOMContentLoaded', getUserInfo);
 
 // Add account from sidebar

@@ -14,14 +14,14 @@ router.post('/login', databaseController.login);
 router.get('/userInfo', databaseController.userInfo)
 
 // Create account route
-//router.post('/create-account', databaseController.createAccount);
+router.post('/create-account', databaseController.createAccount);
 
 // Search stocks from table stockNames
 router.get('/search-stocks', databaseController.searchStockNames);
 
 router.get('/user/:userId', portfolioController.getPortfolioSummary)
 
-router.get('/get-accounts/:id', databaseController.getAllAccountsForUser);
+router.get('/get-accounts', databaseController.getAllAccountsForUser);
 
 // Profile info route
 router.get('/profileInfo', databaseController.getUserProfile);
