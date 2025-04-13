@@ -28,7 +28,7 @@ router.get('/get-accounts', databaseController.getAllAccountsForUser);
 router.get('/profileInfo', databaseController.getUserProfile);
 
 // Search currencies from tables currency
-//router.get('/search-currency', databaseController.searchCurrencies);
+router.get('/search-currency', databaseController.searchCurrencies);
 
 // Update profile route
 //router.put('/updateprofileInfo', databaseController.updateUserProfile);

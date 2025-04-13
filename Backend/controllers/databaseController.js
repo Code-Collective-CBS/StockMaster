@@ -105,21 +105,21 @@ const databaseController = {
             return res.status(401).json({ message: "Fail by gathering id" })
         }
 
-        const {firstname, lastname, email, phone, newPassword} = req.body;
+        const { firstname, lastname, email, phone_number, newPassword } = req.body;
         const body = req.body;
 
         try {
             const result = await databaseServices.updateProfile(userID, body);
 
-            if(!result.success){
-                return res.status(400).json({message: result.message})
+            if (!result.success) {
+                return res.status(400).json({ message: result.message })
             }
-            res.status(200).json({message: 'Profile updated'})
-        }catch(err){
+            res.status(200).json({ message: 'Profile updated' })
+        } catch (err) {
             console.log('Fail by updating profile', err);
-            res.status(500).json({message: 'Database fail'})
+            res.status(500).json({ message: 'Database fail' })
         }
-      },
+    },
 
     createAccount: async (req, res) => {
         const { accountName, accountCurrency } = req.body;
@@ -175,6 +175,21 @@ const databaseController = {
         } catch (err) {
             console.error("Error fetching user accounts:", err);
             res.status(500).json({ error: "Internal server error" });
+        }
+    },
+
+    searchCurrencies: async (req, res) => {
+        try {
+            const { query } = req.query; // Extract the query parameter from the requesr
+
+            if (!query) {
+                return res.status(400).json({ error: 'Search query is required' }); // Handle missing query
+            }
+            const result = await databaseServices.searchCurrencies(query); // Call the service function
+            res.json(result); // Send the result back to the client
+        } catch (err) {
+            console.error('Error searching for currencies:', err);
+            res.status(500).json({ error: 'Failed to search for currencies' }); // Handle errors
         }
     },
 

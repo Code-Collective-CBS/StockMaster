@@ -40,12 +40,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         searchResults.forEach((stock) => {
-            const stockElement = document.createElement('div');
-            stockElement.classList.add('stock-result-div');
-            stockElement.innerHTML = `
-            <p class="stock-result-p"><a href="/src/pages/security.html?symbol=${stock.symbol}">${stock.symbol} - ${stock.name}</a></p>
+            const currencyElement = document.createElement('div');
+            currencyElement.classList.add('currency-result-div');
+            currencyElement.innerHTML = `
+            <p class="currency-result-p"></p>
         `;
-            searchContainer.appendChild(stockElement);
+            searchContainer.appendChild(currencyElement);
         });
     };
 
