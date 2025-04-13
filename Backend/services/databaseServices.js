@@ -88,7 +88,6 @@ const databaseServices = {
             .input('account_name', sql.VarChar(255), accountName)
             .input('currency', sql.VarChar(3), accountCurrency)
             .input('user_id', sql.Int, id)
-            //.input('total_balance', sql.Decimal(18,2), 0)
             .query(`
                 INSERT INTO Accounts (account_name, currency, user_id)
                 VALUES (@account_name, @currency, @user_id)`

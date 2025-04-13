@@ -113,8 +113,6 @@ const databaseController = {
                 return res.status(400).json({ message: 'Fail in databaseServices' })
             }
 
-            console.log(account)
-
             res.status(201).json({
                 message: "Account created",
                 accountName: account.accountName,
