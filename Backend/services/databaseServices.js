@@ -81,17 +81,52 @@ const databaseServices = {
             throw err;
         }
     },
+
+    updateProfile: async (id, body) => {
+        const { firstname, lastname, email, phone_number, newPassword } = body;
+
+        try {
+            const pool = await poolPromise;
+            const updateUser = await pool.request()
+                .input('id', sql.Int, id)
+                .input("firstname", sql.NVarChar(50), firstname)
+                .input("lastname", sql.NVarChar(50), lastname)
+                .input("email", sql.NVarChar(100), email)
+                .input("phone_number", sql.NVarChar(20), phone);
+            // Checks if password is changed
+            if (newPassword !== "") {
+                request.input("newpassword", sql.NVarChar(255), newPassword);
+            }
+            // Creates query
+            const query = 'UPDATE Users SET firstname = @firstname, lastname = @lastname, email = @email, phone_number = @phone_number'
+
+            // Adds newpassword to query if neccesary
+            if (newPassword !== '') query += 'newpassword = @newpassword';
+
+            // Search by user-id
+            query += 'WHERE id = @id';
+
+            await request.query(query);
+
+            return { success: true };
+
+        } catch (err) {
+            console.error("Error in updateProfile:", err);
+            return { success: false, message: "Database error" };
+        }
+    },
+
     createAccount: async (id, accountName, accountCurrency) => {
         try {
             const pool = await poolPromise;
             const checkUser = await pool.request()
-            .input('account_name', sql.VarChar(255), accountName)
-            .input('currency', sql.VarChar(3), accountCurrency)
-            .input('user_id', sql.Int, id)
-            .query(`
+                .input('account_name', sql.VarChar(255), accountName)
+                .input('currency', sql.VarChar(3), accountCurrency)
+                .input('user_id', sql.Int, id)
+                .query(`
                 INSERT INTO Accounts (account_name, currency, user_id)
                 VALUES (@account_name, @currency, @user_id)`
-            ) 
+                )
 
             return { accountName, accountCurrency }
 
