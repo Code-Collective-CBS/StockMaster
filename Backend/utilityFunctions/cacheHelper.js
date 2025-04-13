@@ -9,7 +9,7 @@ async function getOrSetCache(key, fetchFunction, ttl = 600) {
 
     const freshData = await fetchFunction();
     cache.set(key, freshData, ttl);
-    return { data: freshData, source: "api" };
+    return { data: freshData, source: "fresh" };
 }
 
 /*
