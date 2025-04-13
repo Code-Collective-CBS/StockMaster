@@ -101,7 +101,7 @@ const databaseServices = {
             throw err;
         }
     },
-
+/*
     createAccount: async (id) => {
         try {
             const pool = await poolPromise;
@@ -110,7 +110,7 @@ const databaseServices = {
             .query(('SELECT '))
         }
     },
-    
+    */
     getAccountInfo: async (id) => {
         try {
             const pool = await poolPromise;

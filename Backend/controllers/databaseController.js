@@ -97,7 +97,7 @@ const databaseController = {
             res.status(500).json({ message: 'Fejl i database' })
         }
     },
-
+/*
     createAccount: async (req, res) => {
         // Fetches the users id from the session
         const userID = req.session.user_id;
@@ -109,10 +109,10 @@ const databaseController = {
             const result = await databaseServices.createAccount(body)
         }
     },
-
+*/
     getAllAccountsForUser: async (req, res) => {
         try {
-            const userId = req.params.id;
+            const userId = req.session.user_id
 
             if (!userId) {
                 return res.status(400).json({ error: "User ID is required" });
