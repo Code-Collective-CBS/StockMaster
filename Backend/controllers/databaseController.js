@@ -97,19 +97,34 @@ const databaseController = {
             res.status(500).json({ message: 'Fejl i database' })
         }
     },
-/*
     createAccount: async (req, res) => {
+        const { accountName, accountCurrency } = req.body;
         // Fetches the users id from the session
         const userID = req.session.user_id;
 
         if (!userID) {
-            return res.status(400).json({ message: 'User not found or logged in' })
+            return res.status(401).json({ message: 'User not found or logged in' });
         }
+
         try {
-            const result = await databaseServices.createAccount(body)
+            const user = await databaseServices.createAccount(userID, accountName, accountCurrency)
+
+            if (!user) {
+                return res.status(400).json({ message: 'Fail in databaseServices' })
+            }
+
+            console.log(user)
+
+            res.status(201).json({
+                message: "Account created",
+                accountName: user.account_name,
+                accountCurrency: user.currency
+            });
+        } catch (err) {
+            res.status(500).json({ message: "Failed trying to create account", err });
         }
     },
-*/
+
     getAllAccountsForUser: async (req, res) => {
         try {
             const userId = req.session.user_id

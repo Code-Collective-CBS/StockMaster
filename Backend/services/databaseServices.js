@@ -1,6 +1,5 @@
 const sql = require('mssql');
 const config = require('../config/config');
-const { createAccount } = require('../controllers/databaseController');
 
 // Creates connection to our MSSQL database through our login in config.database
 // Creates a pool of connections. More reusable and effective
@@ -82,15 +81,26 @@ const databaseServices = {
             throw err;
         }
     },
-    createAccount: async (id) => {
+    createAccount: async (id, accountName, accountCurrency) => {
         try {
             const pool = await poolPromise;
             const checkUser = await pool.request()
-            .input('id', sql.Int, id)
-            .query(('SELECT '))
+            .input('user_id', sql.Int, id)
+            .input('account_name', sql.VarChar(255), accountName)
+            .input('currency', sql.VarChar(3), accountCurrency)
+            .query(`
+                INSERT INTO Accounts user_id, account_name, currency
+                VALUES @account_name, @currency, @total_balance, GETDATE(), @state, @user_id`
+            ) 
+
+            return { accountName, accountCurrency }
+            
+        } catch (err) {
+            console.error('Error: Could not create account', err)
+            throw err;
         }
     },
-    
+
     getAccountInfo: async (id) => {
         try {
             const pool = await poolPromise;
