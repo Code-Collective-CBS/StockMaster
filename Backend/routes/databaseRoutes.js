@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const databaseController = require('../controllers/databaseController');
 const { database } = require('../config/config');
-const portfolioController = require('../controllers/portfolioController')
+const portfolioController = require('../controllers/portfolioController');
+const databaseServices = require('../services/databaseServices');
 
 // User routes
 router.post('/users', databaseController.createUser);
@@ -33,5 +34,10 @@ router.get('/search-currency', databaseController.searchCurrencies);
 // Update profile route
 router.put('/updateprofileInfo', databaseController.updateUserProfile);
 
+// Deposit to account
+//  router.put('/deposit-to-account/:accountId', )
+
+// Withdraw to account
+//  router.put('/withdraw-to-account/:accountId', )
 
 module.exports = router;
