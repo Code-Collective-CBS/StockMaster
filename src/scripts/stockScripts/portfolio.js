@@ -77,7 +77,7 @@ function updatePortfolioUI(portfolios) {
 
   // Populate portfolio list
   if (portfolioList) {
-    favoredStocks.populatePortfolioList(portfolioList, portfolios, formatCurrency);
+    favoredStocks.populateStocksList(portfolioList, portfolios, formatCurrency);
   }
 
   // Create pie chart

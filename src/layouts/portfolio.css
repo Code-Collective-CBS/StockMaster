@@ -172,38 +172,47 @@ header{
     gap: 15px;
 }
 
-/* Add to your CSS file */
-.stocks-list-container {
-    margin-top: 10px;
-    margin-bottom: 20px;
-    background-color: rgba(23, 37, 64, 0.5);
-    border-radius: 8px;
-    padding: 12px;
-  }
-
-  .stocks-header-row, .stock-row {
+.portfolio-row {
     display: grid;
-    grid-template-columns: 0.8fr 2fr 0.8fr 1fr 0.8fr;
+    grid-template-columns: 2fr 1fr 2fr 1fr; /* Four columns with different widths (fractions) */
     align-items: center;
-    padding: 8px 0;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--grey);
+}
+
+/* Stock list styling */
+.portfolio-header {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 15px 0 10px 0;
+    color: var(--highlight);
   }
 
-  .stocks-header-row {
-    border-bottom: 1px solid var(--grey);
+  .stock-header-row, .stock-row {
+    display: grid;
+    grid-template-columns: 0.7fr 2fr 1fr 1fr 1fr 0.7fr 1fr 0.7fr;
+    align-items: center;
+    padding: 8px 5px;
+  }
+
+  .stock-header-row {
     font-weight: bold;
-    color: var(--highlight);
+    color: var(--secondary-text);
+    border-bottom: 1px solid var(--grey);
+    margin-bottom: 5px;
   }
 
   .stock-row {
     border-bottom: 1px solid rgba(69, 69, 69, 0.3);
   }
 
-  .stock-row:last-child {
-    border-bottom: none;
+  .stock-row:hover {
+    background-color: rgba(0, 218, 145, 0.05);
   }
 
   .stock-cell {
-    padding: 4px;
+    padding: 5px;
+    font-size: 14px;
   }
 
   .stock-name {
@@ -212,13 +221,18 @@ header{
     text-overflow: ellipsis;
   }
 
-.portfolio-row {
-    display: grid;
-    grid-template-columns: 2fr 1fr 2fr 1fr; /* Four columns with different widths (fractions) */
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--grey);
-}
+  .portfolio-spacer {
+    height: 20px;
+  }
+
+  .positive-change {
+    color: var(--highlight);
+  }
+
+  .negative-change {
+    color: #FF4D4F; /* Red color for negative values */
+  }
+
 
 .portfolio-row:last-child {
     border-bottom: none;

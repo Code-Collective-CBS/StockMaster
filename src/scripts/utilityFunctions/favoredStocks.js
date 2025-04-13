@@ -1,64 +1,18 @@
 export const favoredStocks = {
-  populatePortfolioList: (listElement, portfolios, formatCurrencyFn) => {
+  populateStocksList: (listElement, portfolios, formatCurrencyFn) => {
     listElement.innerHTML = ""; // Clear existing content
 
+    // Since we're in a portfolio view, we'll show all stocks from all portfolios
     portfolios.forEach((portfolio) => {
-      // Create portfolio row
-      const row = document.createElement("div");
-      row.className = "portfolio-row";
+      // Add a portfolio header
+      const portfolioHeader = document.createElement("div");
+      portfolioHeader.className = "portfolio-header";
+      portfolioHeader.textContent = portfolio.name;
+      listElement.appendChild(portfolioHeader);
 
-      // Portfolio name
-      const nameDiv = document.createElement("div");
-      nameDiv.className = "portfolio-name";
-      nameDiv.textContent = portfolio.name;
-
-      // Portfolio change percentage
-      const changeDiv = document.createElement("div");
-      changeDiv.className = "portfolio-change";
-      const changePercent = portfolio.metrics.totalUnrealizedGainPercent;
-      changeDiv.classList.add(
-        changePercent >= 0 ? "positive-change" : "negative-change"
-      );
-      changeDiv.textContent = `${changePercent.toFixed(2)}%`;
-
-      // Portfolio value
-      const valueDiv = document.createElement("div");
-      valueDiv.className = "portfolio-value";
-      valueDiv.textContent = formatCurrencyFn(
-        portfolio.metrics.totalCurrentValue,
-        portfolio.currency
-      );
-
-      // Portfolio link
-      const linkDiv = document.createElement("div");
-      linkDiv.className = "portfolio-link";
-      const link = document.createElement("a");
-      link.href = `#`; // add the portfolio link here
-      link.textContent = "View";
-      link.addEventListener("click", (e) => {
-        e.preventDefault();
-        toggleStocksList(portfolio.id);
-      });
-      linkDiv.appendChild(link);
-
-      // Add elements to row
-      row.appendChild(nameDiv);
-      row.appendChild(changeDiv);
-      row.appendChild(valueDiv);
-      row.appendChild(linkDiv);
-
-      // Add row to list
-      listElement.appendChild(row);
-
-      // Create a hidden stocks list container for this portfolio
-      const stocksContainer = document.createElement("div");
-      stocksContainer.id = `stocks-list-${portfolio.id}`;
-      stocksContainer.className = "stocks-list-container";
-      stocksContainer.style.display = "none";
-
-      // Add header row for stocks
+      // Add stock list header row
       const headerRow = document.createElement("div");
-      headerRow.className = "stocks-header-row";
+      headerRow.className = "stock-header-row";
 
       const symbolHeader = document.createElement("div");
       symbolHeader.className = "stock-cell";
@@ -68,25 +22,40 @@ export const favoredStocks = {
       nameHeader.className = "stock-cell stock-name";
       nameHeader.textContent = "Name";
 
+      const boughtHeader = document.createElement("div");
+      boughtHeader.className = "stock-cell";
+      boughtHeader.textContent = "Bought Price";
+
+      const currentHeader = document.createElement("div");
+      currentHeader.className = "stock-cell";
+      currentHeader.textContent = "Current Price";
+
+      const gakHeader = document.createElement("div");
+      gakHeader.className = "stock-cell";
+      gakHeader.textContent = "GAK";
+
       const quantityHeader = document.createElement("div");
       quantityHeader.className = "stock-cell";
       quantityHeader.textContent = "Quantity";
 
       const valueHeader = document.createElement("div");
       valueHeader.className = "stock-cell";
-      valueHeader.textContent = "Value";
+      valueHeader.textContent = "Total Value";
 
       const changeHeader = document.createElement("div");
       changeHeader.className = "stock-cell";
-      changeHeader.textContent = "Change";
+      changeHeader.textContent = "Change %";
 
       headerRow.appendChild(symbolHeader);
       headerRow.appendChild(nameHeader);
+      headerRow.appendChild(boughtHeader);
+      headerRow.appendChild(currentHeader);
+      headerRow.appendChild(gakHeader);
       headerRow.appendChild(quantityHeader);
       headerRow.appendChild(valueHeader);
       headerRow.appendChild(changeHeader);
 
-      stocksContainer.appendChild(headerRow);
+      listElement.appendChild(headerRow);
 
       // Add each stock in the portfolio
       if (portfolio.metrics && portfolio.metrics.holdings) {
@@ -102,16 +71,29 @@ export const favoredStocks = {
           nameCell.className = "stock-cell stock-name";
           nameCell.textContent = holding.security_name;
 
+          const boughtCell = document.createElement("div");
+          boughtCell.className = "stock-cell";
+          // Get price per share from first transaction or fallback to GAK
+          const boughtPrice = holding.transactions && holding.transactions.length > 0
+            ? holding.transactions[0].price_per_share
+            : holding.gak;
+          boughtCell.textContent = formatCurrencyFn(boughtPrice, portfolio.currency);
+
+          const currentPriceCell = document.createElement("div");
+          currentPriceCell.className = "stock-cell";
+          currentPriceCell.textContent = formatCurrencyFn(holding.currentPrice, portfolio.currency);
+
+          const gakCell = document.createElement("div");
+          gakCell.className = "stock-cell";
+          gakCell.textContent = formatCurrencyFn(holding.gak, portfolio.currency);
+
           const quantityCell = document.createElement("div");
           quantityCell.className = "stock-cell";
           quantityCell.textContent = holding.quantity;
 
           const valueCell = document.createElement("div");
           valueCell.className = "stock-cell";
-          valueCell.textContent = formatCurrencyFn(
-            holding.currentValue,
-            portfolio.currency
-          );
+          valueCell.textContent = formatCurrencyFn(holding.currentValue, portfolio.currency);
 
           const changeCell = document.createElement("div");
           changeCell.className = "stock-cell";
@@ -120,30 +102,25 @@ export const favoredStocks = {
               ? "positive-change"
               : "negative-change"
           );
-          changeCell.textContent = `${holding.unrealizedGainPercent.toFixed(
-            2
-          )}%`;
+          changeCell.textContent = `${holding.unrealizedGainPercent.toFixed(2)}%`;
 
           stockRow.appendChild(symbolCell);
           stockRow.appendChild(nameCell);
+          stockRow.appendChild(boughtCell);
+          stockRow.appendChild(currentPriceCell);
+          stockRow.appendChild(gakCell);
           stockRow.appendChild(quantityCell);
           stockRow.appendChild(valueCell);
           stockRow.appendChild(changeCell);
 
-          stocksContainer.appendChild(stockRow);
+          listElement.appendChild(stockRow);
         });
       }
 
-      listElement.appendChild(stocksContainer);
+      // Add a spacer after each portfolio's stocks
+      const spacer = document.createElement("div");
+      spacer.className = "portfolio-spacer";
+      listElement.appendChild(spacer);
     });
-  },
-
-  // Function to toggle display of stocks list
-  toggleStocksList: (portfolioId) => {
-    const stocksList = document.getElementById(`stocks-list-${portfolioId}`);
-    if (stocksList) {
-      stocksList.style.display =
-        stocksList.style.display === "none" ? "block" : "none";
-    }
-  },
+  }
 };
