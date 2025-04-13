@@ -160,12 +160,11 @@
 
             <div class="form-group">
               <label for="accountCurrency">Valuta</label>
-              <select name="accountCurrency" id="accountCurrency">
-                <option value="chooseCurrency">-- Vælg valuta her --</option>
-                <option value="DKK">DKK</option>
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-              </select>
+              <div class="search-container">
+                <input id="accountCurrency" type="text" placeholder="Søg efter valuta">
+                <button type="button" class="delete-search">&times;</button>
+              </div>
+              <div class="displaySearch"></div>
             </div>
           </div>
 
@@ -179,6 +178,6 @@
     </main>
 
     <script src="/src/scripts/sidebar.js"></script>
-    <script type="module" src="/Src/scripts/create-account.js"></script>
+    <script type="module" src="/src/scripts/create-account.js"></script>
   </body>
 </html>

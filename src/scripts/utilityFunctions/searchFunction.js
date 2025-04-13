@@ -16,4 +16,18 @@ export const searchFunction = {
             console.error('Error fetching search results:', err);
         }
     },
+
+    // SEARCH CURRENCIES IN DATABASE
+    searchCurrencies: async (searchQuery) => {
+        try {
+            const response = await fetch(`${DATABASE_BASE_URL}/search-currency?query=${encodeURIComponent(searchQuery)}`);
+            if (!response.ok) {
+                throw new Error('HTTP error! Status: ', response.status)
+            }
+
+            return await response.json()
+        } catch (err) {
+            console.error('Error fetching search results: ', err)
+        }
+    }
 };

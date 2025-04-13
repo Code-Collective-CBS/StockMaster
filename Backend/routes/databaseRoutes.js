@@ -21,10 +21,14 @@ router.get('/search-stocks', databaseController.searchStockNames);
 
 router.get('/user/:userId', portfolioController.getPortfolioSummary)
 
+// Get accounts to show
 router.get('/get-accounts', databaseController.getAllAccountsForUser);
 
 // Profile info route
 router.get('/profileInfo', databaseController.getUserProfile);
+
+// Search currencies from tables currency
+//router.get('/search-currency', databaseController.searchCurrencies);
 
 // Update profile route
 //router.put('/updateprofileInfo', databaseController.updateUserProfile);
