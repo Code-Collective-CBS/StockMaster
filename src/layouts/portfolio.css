@@ -172,6 +172,46 @@ header{
     gap: 15px;
 }
 
+/* Add to your CSS file */
+.stocks-list-container {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    background-color: rgba(23, 37, 64, 0.5);
+    border-radius: 8px;
+    padding: 12px;
+  }
+
+  .stocks-header-row, .stock-row {
+    display: grid;
+    grid-template-columns: 0.8fr 2fr 0.8fr 1fr 0.8fr;
+    align-items: center;
+    padding: 8px 0;
+  }
+
+  .stocks-header-row {
+    border-bottom: 1px solid var(--grey);
+    font-weight: bold;
+    color: var(--highlight);
+  }
+
+  .stock-row {
+    border-bottom: 1px solid rgba(69, 69, 69, 0.3);
+  }
+
+  .stock-row:last-child {
+    border-bottom: none;
+  }
+
+  .stock-cell {
+    padding: 4px;
+  }
+
+  .stock-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
 .portfolio-row {
     display: grid;
     grid-template-columns: 2fr 1fr 2fr 1fr; /* Four columns with different widths (fractions) */

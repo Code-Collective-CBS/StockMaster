@@ -1,5 +1,6 @@
 // portfolio.js - Update to fetch real data
 import { stockAPI } from "./api.js";
+import { favoredStocks } from "../utilityFunctions/favoredStocks.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("Portfolio page loaded!");
@@ -76,7 +77,7 @@ function updatePortfolioUI(portfolios) {
 
   // Populate portfolio list
   if (portfolioList) {
-    populatePortfolioList(portfolioList, portfolios);
+    favoredStocks.populatePortfolioList(portfolioList, portfolios, formatCurrency);
   }
 
   // Create pie chart
@@ -89,56 +90,6 @@ function updatePortfolioUI(portfolios) {
     // For now, we'll use a mock growth chart since we don't have historical data
     createMockGrowthChart(portfolioGrowthChartCanvas);
   }
-}
-
-// Function to populate the portfolio list
-function populatePortfolioList(listElement, portfolios) {
-  listElement.innerHTML = ""; // Clear existing content
-
-  portfolios.forEach((portfolio) => {
-    // Create portfolio row
-    const row = document.createElement("div");
-    row.className = "portfolio-row";
-
-    // Portfolio name
-    const nameDiv = document.createElement("div");
-    nameDiv.className = "portfolio-name";
-    nameDiv.textContent = portfolio.name;
-
-    // Portfolio change percentage
-    const changeDiv = document.createElement("div");
-    changeDiv.className = "portfolio-change";
-    const changePercent = portfolio.metrics.totalUnrealizedGainPercent;
-    changeDiv.classList.add(
-      changePercent >= 0 ? "positive-change" : "negative-change"
-    );
-    changeDiv.textContent = `${changePercent.toFixed(2)}%`;
-
-    // Portfolio value
-    const valueDiv = document.createElement("div");
-    valueDiv.className = "portfolio-value";
-    valueDiv.textContent = formatCurrency(
-      portfolio.metrics.totalCurrentValue,
-      portfolio.currency
-    );
-
-    // Portfolio link
-    const linkDiv = document.createElement("div");
-    linkDiv.className = "portfolio-link";
-    const link = document.createElement("a");
-    link.href = `/portfolio/${portfolio.id}`;
-    link.textContent = "View";
-    linkDiv.appendChild(link);
-
-    // Add elements to row
-    row.appendChild(nameDiv);
-    row.appendChild(changeDiv);
-    row.appendChild(valueDiv);
-    row.appendChild(linkDiv);
-
-    // Add row to list
-    listElement.appendChild(row);
-  });
 }
 
 // Function to create pie chart
