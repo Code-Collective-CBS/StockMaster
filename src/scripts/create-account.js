@@ -5,8 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const deleteButton = document.querySelector(".delete-search");
     const searchContainer = document.querySelector(".displaySearch");
     // Account details
-    const accountCurrency = document.getElementById('accountCurrency');
-    const accountName = document.getElementById('accountName');
+    const accountCurrency = document.getElementById('accountCurrency').value.trim();
+    const accountName = document.getElementById('accountName').value.trim();
     const createAccBtn = document.getElementById('createAcc')
 
     //// BUTTONS ////
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     //// SEARCH CURRENCIES ////
     accountCurrency.addEventListener('input', async () => {
-        const searchQuery = accountCurrency.value.trim();
+        const searchQuery = accountCurrency;
 
         if (searchQuery.length === 0) searchContainer.innerHTML = '';
         if (searchQuery.length < 2) return
@@ -51,12 +51,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     //// CREATE ACCOUNT ////
     createAccBtn.addEventListener('click', async () => {
-        const accCurrency = accountCurrency.value.trim()
-        const accName = accountName.value.trim()
         
-        if (accCurrency === 'chooseCurrency' && accName === "") return alert('Udfyld begge felter')
-        if (accCurrency === 'chooseCurrency') return alert('Du skal vælge en valuta')
-        if (accName === "") return alert('Du skal indtaste et kontonavn')
+        if (accountCurrency === 'chooseCurrency' && accountName === "") return alert('Udfyld begge felter')
+        if (accountCurrency === 'chooseCurrency') return alert('Du skal vælge en valuta')
+        if (accountName === "") return alert('Du skal indtaste et kontonavn')
 
         try {
             const response = await fetch("http://localhost:3000/api/database/create-account", {
@@ -65,8 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     "Content-Type": "application/json" // JSON data
                 },
                 body: JSON.stringify({
-                    accName,
-                    accCurrency,
+                    accountName,
+                    accountCurrency,
                 })
             });
 
