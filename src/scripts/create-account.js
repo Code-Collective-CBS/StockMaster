@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const searchQuery = accountCurrency.value.trim();
 
         if (searchQuery.length === 0) searchContainer.innerHTML = '';
-        if (searchQuery.length < 2) return
+        if (searchQuery.length < 1) return
 
         try {
             const data = await searchFunction.searchCurrencies(searchQuery);
@@ -34,37 +34,46 @@ document.addEventListener('DOMContentLoaded', () => {
     const displaySearchResults = function (searchResults) {
         searchContainer.innerHTML = ""; // Clear previous results
 
-        if (searchResults.length === 0) {
+        if (!searchResults || searchResults.length === 0) {
             searchContainer.innerHTML = '<p>No results</p>';
             return;
         }
 
-        searchResults.forEach((stock) => {
+        searchResults.forEach((currency) => {
             const currencyElement = document.createElement('div');
-            currencyElement.classList.add('stock-result-div');
+            currencyElement.classList.add('currency-result-div');
+
             currencyElement.innerHTML = `
-            <p class="stock-result-p"></p>
+            <p class="currency-result-p">${currency.currency_name}</p>
         `;
+            currencyElement.addEventListener('click', () => {
+                accountCurrency.value = currency.currency_name;
+                searchContainer.innerHTML = '';
+            });
             searchContainer.appendChild(currencyElement);
         });
     };
 
     //// CREATE ACCOUNT ////
     createAccBtn.addEventListener('click', async () => {
-        
-        if (accountCurrency.value.trim() === 'chooseCurrency' && accountName === "") return alert('Udfyld begge felter')
+
+        const name = accountName.value.trim();
+        const currency = accountCurrency.value.trim();
+
+        if (accountCurrency.value.trim() === 'chooseCurrency' && name === "") return alert('Udfyld begge felter')
         if (accountCurrency.value.trim() === 'chooseCurrency') return alert('Du skal vælge en valuta')
-        if (accountName.value.trim() === "") return alert('Du skal indtaste et kontonavn')
+        if (name === "") return alert('Du skal indtaste et kontonavn')
 
         try {
+
             const response = await fetch("http://localhost:3000/api/database/create-account", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json" // JSON data
                 },
                 body: JSON.stringify({
-                    accountName,
-                    accountCurrency,
+                    accountName: name,
+                    accountCurrency: currency,
                 })
             });
 

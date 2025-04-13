@@ -31,14 +31,14 @@ document.getElementById('profileForm').addEventListener('submit', async (event) 
     const firstname = document.getElementById('firstname').value;
     const lastname = document.getElementById('lastname').value;
     const email = document.getElementById('email').value;
-    const phone = document.getElementById('phone').value;
+    const phone_number = document.getElementById('phone').value;
     const newPassword = document.getElementById('new-password').value;
 
     const profilData = {
         firstname,
         lastname,
         email,
-        phone,
+        phone_number,
     };
 
     if (newPassword !== "") {

@@ -28,6 +28,7 @@ export const searchFunction = {
             return await response.json()
         } catch (err) {
             console.error('Error fetching search results: ', err)
+            return null;
         }
     }
 };
