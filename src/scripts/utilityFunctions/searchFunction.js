@@ -22,7 +22,7 @@ export const searchFunction = {
         try {
             const response = await fetch(`${DATABASE_BASE_URL}/search-currency?query=${encodeURIComponent(searchQuery)}`);
             if (!response.ok) {
-                throw new Error('HTTP error! Status: ', response.status)
+                throw new Error(`HTTP error! Status: : ${response.status}`)
             }
 
             return await response.json()
