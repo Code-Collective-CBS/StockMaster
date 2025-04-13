@@ -13,11 +13,27 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = `/src/pages/${selectedValue}`;
       } else {
         sessionStorage.setItem('selectedAccountId', selectedValue);
-        console.log("Account switched to:", selectedValue);
+        console.log("Account switched to:", selectedValue); // Maybe delete later?
       }
     });
   }
 });
+
+const CONFIG = {
+  paths: {
+    dashboard: ["dashboard", "index.html"],
+    portfolio: ["portfolio"],
+    securities: ["security", "securities-news"],
+    transactions: ["transactions"],
+    settings: ["profile-settings", "account-settings"]
+  },
+  selectors: {
+    navItems: ".nav-item",
+    settingItem: ".setting-item",
+    sidebarLinks: ".sideBar a",
+    signOutButton: ".signOut"
+  }
+};
 
 // Initialize sidebar functionality
 initializeSidebar();
@@ -125,22 +141,6 @@ function handleSignOut() {
   }
 }
 
-const CONFIG = {
-  paths: {
-    dashboard: ["dashboard", "index.html"],
-    portfolio: ["portfolio"],
-    securities: ["security", "securities-news"],
-    transactions: ["transactions"],
-    settings: ["profile-settings", "account-settings"]
-  },
-  selectors: {
-    navItems: ".nav-item",
-    settingItem: ".setting-item",
-    sidebarLinks: ".sideBar a",
-    signOutButton: ".signOut"
-  }
-};
-
 const getUserInfo = async () => {
   try {
     const response = await fetch('http://localhost:3000/api/database/userInfo');
@@ -168,6 +168,7 @@ const loadAccountDropdown = async (dropdown) => {
       option.value = account.account_id;
       option.textContent = `${account.account_name} (${account.currency})`;
 
+      // (!storedId && index === 0) if the user has not selected and account the first accounts get selected
       if ((storedId && storedId == account.account_id) || (!storedId && index === 0)) {
         option.selected = true;
         sessionStorage.setItem('selectedAccountId', account.account_id);
