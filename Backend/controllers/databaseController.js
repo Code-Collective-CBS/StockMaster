@@ -99,9 +99,15 @@ const databaseController = {
     },
 
     createAccount: async (req, res) => {
-        const { accountName, accountCurrency } = req.body;
-        const body = req.body;
-        // Implementation for creating an account can go here
+        // Fetches the users id from the session
+        const userID = req.session.user_id;
+
+        if (!userID) {
+            return res.status(400).json({ message: 'User not found or logged in' })
+        }
+        try {
+            const result = await databaseServices.createAccount(body)
+        }
     },
 
     getAllAccountsForUser: async (req, res) => {

@@ -1,5 +1,6 @@
 const sql = require('mssql');
 const config = require('../config/config');
+const { createAccount } = require('../controllers/databaseController');
 
 // Creates connection to our MSSQL database through our login in config.database
 // Creates a pool of connections. More reusable and effective
@@ -41,7 +42,6 @@ const databaseServices = {
             `);
 
         const insertedID = userCreated.recordset[0].id;
-        console.log('Inserted ID: ', insertedID);
         return { status: 201, userID: insertedID };
     },
 
@@ -71,7 +71,7 @@ const databaseServices = {
             const pool = await poolPromise;
             const getUser = await pool.request()
                 .input('id', sql.Int, id)
-                .query('SELECT firstname, lastname FROM Users WHERE id = @id');
+                .query('SELECT firstname, lastname, email, phone_number FROM Users WHERE id = @id');
             if (getUser.recordset.length > 0) {
                 return getUser.recordset[0];
             } else {
@@ -99,6 +99,15 @@ const databaseServices = {
         } catch (err) {
             console.error('Fejl i at hente profil oplysninger med id', err);
             throw err;
+        }
+    },
+
+    createAccount: async (id) => {
+        try {
+            const pool = await poolPromise;
+            const checkUser = await pool.request()
+            .input('id', sql.Int, id)
+            .query(('SELECT '))
         }
     },
     
