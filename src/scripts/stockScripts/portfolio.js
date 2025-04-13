@@ -7,10 +7,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Instead of using mock data, fetch real data
   try {
     // Get the user ID from localStorage or session
-    // const userId = localStorage.getItem('userId') || 1;
+    const userId = localStorage.getItem('userId') || 1;
 
     // For now, use a fixed userId
-    const userId = 1;
+    // const userId = 1;
 
     if (!userId) {
       console.error("No user found. Redirecting to login...");
