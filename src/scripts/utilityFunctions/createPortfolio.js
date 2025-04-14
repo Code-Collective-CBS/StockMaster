@@ -1,9 +1,7 @@
 export const portfolio = {
     
     createPortfolio: async () => {
-        console.log("Scriptet er indlæst");
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("DOM er indlæst");
             const portfolioPopup = document.getElementById('portfolioPopup');
 
             // Self-note: Link this script to all html-pages
