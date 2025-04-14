@@ -86,106 +86,139 @@ function calculateHoldings(transactions) {
     }));
 }
 
-// Helper function to get current securities data
+// // Helper function to get current securities data
+// async function getSecuritiesData(holdings) {
+//   // Get current prices and data for all securities in the portfolio
+//   const securitiesData = {};
+
+//   // For each security in holdings, fetch current price data
+//   await Promise.all(
+//     holdings.map(async (holding) => {
+//       try {
+//         // Get company overview for more details (optional)
+//         const companyData = await alphaVantageService.getCompanyOverview(
+//           holding.symbol
+//         );
+
+//         // Get current quote
+//         const quoteData = await alphaVantageService.getStockQuote(
+//           holding.symbol
+//         );
+
+//         // Extract current price from quote
+//         const currentPrice = quoteData["Global Quote"]
+//           ? parseFloat(quoteData["Global Quote"]["05. price"])
+//           : 0;
+
+//         securitiesData[holding.securityId] = {
+//           currentPrice,
+//           companyData,
+//         };
+//       } catch (error) {
+//         console.error(`Error fetching data for ${holding.symbol}:`, error);
+//         securitiesData[holding.securityId] = { currentPrice: 0 };
+//       }
+//     })
+//   );
+
+//   return securitiesData;
+// }
+
+
+// I have commented the function above so we now only use database data and now apiCalls
 async function getSecuritiesData(holdings) {
-  // Get current prices and data for all securities in the portfolio
-  const securitiesData = {};
-
-  // For each security in holdings, fetch current price data
-  await Promise.all(
-    holdings.map(async (holding) => {
-      try {
-        // Get company overview for more details (optional)
-        const companyData = await alphaVantageService.getCompanyOverview(
-          holding.symbol
-        );
-
-        // Get current quote
-        const quoteData = await alphaVantageService.getStockQuote(
-          holding.symbol
-        );
-
-        // Extract current price from quote
-        const currentPrice = quoteData["Global Quote"]
-          ? parseFloat(quoteData["Global Quote"]["05. price"])
-          : 0;
-
-        securitiesData[holding.securityId] = {
-          currentPrice,
-          companyData,
-        };
-      } catch (error) {
-        console.error(`Error fetching data for ${holding.symbol}:`, error);
-        securitiesData[holding.securityId] = { currentPrice: 0 };
-      }
-    })
-  );
-
-  return securitiesData;
+  // Simply return GAK (average cost) as the "current price"
+  return holdings.reduce((acc, holding) => {
+    acc[holding.securityId] = {
+      currentPrice: holding.gak // Use average purchase price
+    };
+    return acc;
+  }, {});
 }
 
 // Helper function to calculate portfolio metrics
-async function calculatePortfolioMetrics(holdings, securitiesData, portfolioCurrency) {
-    // Get exchange rates for the portfolio currency
-    const exchangeRates = await exchangeRateService.getCurrency(portfolioCurrency);
+// async function calculatePortfolioMetrics(holdings, securitiesData, portfolioCurrency) {
+//     // Get exchange rates for the portfolio currency
+//     const exchangeRates = await exchangeRateService.getCurrency(portfolioCurrency);
 
-    let totalCost = 0;
-    let totalCurrentValue = 0;
+//     let totalCost = 0;
+//     let totalCurrentValue = 0;
 
-    // Calculate values for each holding with currency conversion
-    const holdingsWithMetrics = await Promise.all(holdings.map(async holding => {
-        const securityData = securitiesData[holding.securityId] || { currentPrice: 0 };
-        const stockCurrency = securityData.companyData?.Currency || 'DKK'; // Default to DKK
+//     // Calculate values for each holding with currency conversion
+//     const holdingsWithMetrics = await Promise.all(holdings.map(async holding => {
+//         const securityData = securitiesData[holding.securityId] || { currentPrice: 0 };
+//         const stockCurrency = securityData.companyData?.Currency || 'DKK'; // Default to DKK
 
-        // Convert currentValue to portfolio currency
-        const valueInStockCurrency = holding.quantity * securityData.currentPrice;
-        const currentValue = convertCurrency(
-            valueInStockCurrency,
-            stockCurrency,
-            portfolioCurrency,
-            exchangeRates.conversion_rates
-        );
+//         // Convert currentValue to portfolio currency
+//         const valueInStockCurrency = holding.quantity * securityData.currentPrice;
+//         const currentValue = convertCurrency(
+//             valueInStockCurrency,
+//             stockCurrency,
+//             portfolioCurrency,
+//             exchangeRates.conversion_rates
+//         );
 
-        // Convert cost to portfolio currency if needed
-        // (costs were recorded in the stock's currency)
-        const costInPortfolioCurrency = convertCurrency(
-            holding.totalCost,
-            stockCurrency, // totalCost is in the stock's currency
-            portfolioCurrency,
-            exchangeRates.conversion_rates
-        );
+//         // Convert cost to portfolio currency if needed
+//         // (costs were recorded in the stock's currency)
+//         const costInPortfolioCurrency = convertCurrency(
+//             holding.totalCost,
+//             stockCurrency, // totalCost is in the stock's currency
+//             portfolioCurrency,
+//             exchangeRates.conversion_rates
+//         );
 
-        const unrealizedGain = currentValue - costInPortfolioCurrency;
-        const unrealizedGainPercent = costInPortfolioCurrency > 0 ?
-            (unrealizedGain / costInPortfolioCurrency) * 100 : 0;
+//         const unrealizedGain = currentValue - costInPortfolioCurrency;
+//         const unrealizedGainPercent = costInPortfolioCurrency > 0 ?
+//             (unrealizedGain / costInPortfolioCurrency) * 100 : 0;
 
-        totalCost += costInPortfolioCurrency;
-        totalCurrentValue += currentValue;
+//         totalCost += costInPortfolioCurrency;
+//         totalCurrentValue += currentValue;
 
-        return {
-            ...holding,
-            stockCurrency,
-            currentPrice: securityData.currentPrice,
-            currentValue,
-            costInPortfolioCurrency,
-            unrealizedGain,
-            unrealizedGainPercent
-        };
-    }));
+//         return {
+//             ...holding,
+//             stockCurrency,
+//             currentPrice: securityData.currentPrice,
+//             currentValue,
+//             costInPortfolioCurrency,
+//             unrealizedGain,
+//             unrealizedGainPercent
+//         };
+//     }));
 
-    // Calculate overall portfolio metrics
-    const totalUnrealizedGain = totalCurrentValue - totalCost;
-    const totalUnrealizedGainPercent = totalCost > 0 ?
-        (totalUnrealizedGain / totalCost) * 100 : 0;
+//     // Calculate overall portfolio metrics
+//     const totalUnrealizedGain = totalCurrentValue - totalCost;
+//     const totalUnrealizedGainPercent = totalCost > 0 ?
+//         (totalUnrealizedGain / totalCost) * 100 : 0;
 
-    return {
-        holdings: holdingsWithMetrics,
-        totalCost,
-        totalCurrentValue,
-        totalUnrealizedGain,
-        totalUnrealizedGainPercent
-    };
+//     return {
+//         holdings: holdingsWithMetrics,
+//         totalCost,
+//         totalCurrentValue,
+//         totalUnrealizedGain,
+//         totalUnrealizedGainPercent
+//     };
+// }
+
+
+// simplified calculate fuction to not use api calls
+// Simplify calculatePortfolioMetrics
+async function calculatePortfolioMetrics(holdings) {
+  const totalCost = holdings.reduce((sum, h) => sum + h.totalCost, 0);
+
+  return {
+    holdings: holdings.map(h => ({
+      ...h,
+      currentValue: h.totalCost, // Value = cost since no live price
+      unrealizedGain: 0, // No gain/loss calculation
+      unrealizedGainPercent: 0
+    })),
+    totalCost,
+    totalCurrentValue: totalCost,
+    totalUnrealizedGain: 0,
+    totalUnrealizedGainPercent: 0
+  };
 }
+
 
 
 function convertCurrency(amount, fromCurrency, toCurrency, ratesData) {

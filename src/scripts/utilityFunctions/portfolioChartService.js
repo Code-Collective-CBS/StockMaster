@@ -2,61 +2,69 @@ export const portfolioChartService = {
   // Function to create pie chart
   createPortfolioPieChart: (canvas, portfolios) => {
     try {
-      console.log("Creating pie chart with portfolios:", portfolios);
+      
+      const data = portfolios.map(p => ({
+        label: p.name,
+        value: p.metrics.totalCost // Use invested amount
+      }));
 
-      if (!canvas) {
-        console.error("Canvas element is null or undefined");
-        return;
-      }
 
-      // Create a distribution by individual stock symbol
-      const stockDistribution = {};
-      let totalValue = 0;
 
-      // Aggregate by stock symbol
-      portfolios.forEach((portfolio) => {
-        if (!portfolio.metrics || !portfolio.metrics.holdings) {
-          console.error(
-            "Portfolio doesn't have metrics or holdings",
-            portfolio
-          );
-          return;
-        }
+      // console.log("Creating pie chart with portfolios:", portfolios);
 
-        portfolio.metrics.holdings.forEach((holding) => {
-          const symbol = holding.symbol;
+      // if (!canvas) {
+      //   console.error("Canvas element is null or undefined");
+      //   return;
+      // }
 
-          if (!stockDistribution[symbol]) {
-            stockDistribution[symbol] = {
-              value: 0,
-              name: holding.security_name,
-            };
-          }
+      // // Create a distribution by individual stock symbol
+      // const stockDistribution = {};
+      // let totalValue = 0;
 
-          // Using currentValue which is price × quantity
-          stockDistribution[symbol].value += holding.currentValue;
-          totalValue += holding.currentValue;
-        });
-      });
+      // // Aggregate by stock symbol
+      // portfolios.forEach((portfolio) => {
+      //   if (!portfolio.metrics || !portfolio.metrics.holdings) {
+      //     console.error(
+      //       "Portfolio doesn't have metrics or holdings",
+      //       portfolio
+      //     );
+      //     return;
+      //   }
 
-      if (totalValue === 0) {
-        console.error("No value to display in pie chart");
-        return;
-      }
+      //   portfolio.metrics.holdings.forEach((holding) => {
+      //     const symbol = holding.symbol;
 
-      // Convert to arrays for Chart.js with percentages in labels
-      const labels = Object.keys(stockDistribution).map((symbol) => {
-        const percentage = (
-          (stockDistribution[symbol].value / totalValue) *
-          100
-        ).toFixed(1);
-        return `${symbol} (${percentage}%)`;
-      });
+      //     if (!stockDistribution[symbol]) {
+      //       stockDistribution[symbol] = {
+      //         value: 0,
+      //         name: holding.security_name,
+      //       };
+      //     }
 
-      const data = Object.values(stockDistribution).map((item) => item.value);
-      const percentages = data.map((value) => (value / totalValue) * 100);
+      //     // Using currentValue which is price × quantity
+      //     stockDistribution[symbol].value += holding.currentValue;
+      //     totalValue += holding.currentValue;
+      //   });
+      // });
 
-      console.log("Chart data:", { labels, data, percentages });
+      // if (totalValue === 0) {
+      //   console.error("No value to display in pie chart");
+      //   return;
+      // }
+
+      // // Convert to arrays for Chart.js with percentages in labels
+      // const labels = Object.keys(stockDistribution).map((symbol) => {
+      //   const percentage = (
+      //     (stockDistribution[symbol].value / totalValue) *
+      //     100
+      //   ).toFixed(1);
+      //   return `${symbol} (${percentage}%)`;
+      // });
+
+      // const data = Object.values(stockDistribution).map((item) => item.value);
+      // const percentages = data.map((value) => (value / totalValue) * 100);
+
+      // console.log("Chart data:", { labels, data, percentages });
 
       // Generate colors
       const colors = generateChartColors(labels.length);
