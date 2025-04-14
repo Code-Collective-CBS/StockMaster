@@ -137,19 +137,20 @@ export const popUps = {
 
             const tradeModal = document.createElement('div');
             tradeModal.id = 'tradeModal';
+            tradeModal.classList.add('modal-wrapper');
             tradeModal.innerHTML = `
-            <div class="modal-overlay></div>
-            <div class="modal-content>
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
                 <span class="modal-close">&times;</span>
                 <div class="modal-form">
                     <p class="account-name"></p>
                     <p class="modal-instruction">Enter ammount to buy</p>
+                    <select id="popup-portfolios"></select>
                     <div class="input-group">
                         <input id="buy-amount" type="number" placeholder="Amount" />
-                        <span class="currency-label id="security-currency"></span>
+                        <span class="currency-label" id="security-currency"></span>
                     </div>
-                    <button id=confirmAction class="btn btn-primary">Confirm</button>
-                    <select id="popup-portfolios"></select>
+                    <button id="confirmAction" class="btn btn-primary">Confirm</button>
                 </div>
             </div>
             `;
@@ -168,7 +169,7 @@ export const popUps = {
             tradeModal.querySelector('.modal-close').addEventListener('click', () => tradeModal.remove());
             tradeModal.querySelector('.modal-overlay').addEventListener('click', () => tradeModal.remove());
 
-            tradeModal.querySelector('#confirmAction').addEventListener('clikc', () => {
+            tradeModal.querySelector('#confirmAction').addEventListener('click', () => {
                 const amount = tradeModal.querySelector('#pop-amount');
 
                 console.log(`User wants to buy: STOCKNAME, Amunt: AMOUNT`)
@@ -186,18 +187,19 @@ export const popUps = {
 
             const tradeModal = document.createElement('div');
             tradeModal.id = 'tradeModal';
+            tradeModal.classList.add('modal-wrapper');
             tradeModal.innerHTML = `
-            <div class="modal-overlay></div>
-            <div class="modal-content>
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
                 <span class="modal-close">&times;</span>
                 <div class="modal-form">
                     <p class="account-name"></p>
                     <p class="modal-instruction">Enter ammount to sell</p>
                     <div class="input-group">
                         <input id="buy-amount" type="number" placeholder="Amount" />
-                        <span class="currency-label id="security-currency"></span>
+                        <span class="currency-label" id="security-currency"></span>
                     </div>
-                    <button id=confirmAction class="btn btn-primary">Confirm</button>
+                    <button id="confirmAction" class="btn btn-primary">Confirm</button>
                     <select id="popup-portfolios"></select>
                 </div>
             </div>
@@ -217,7 +219,7 @@ export const popUps = {
             tradeModal.querySelector('.modal-close').addEventListener('click', () => tradeModal.remove());
             tradeModal.querySelector('.modal-overlay').addEventListener('click', () => tradeModal.remove());
 
-            tradeModal.querySelector('#confirmAction').addEventListener('clikc', () => {
+            tradeModal.querySelector('#confirmAction').addEventListener('click', () => {
                 const amount = tradeModal.querySelector('#pop-amount');
 
                 console.log(`User wants to sell`)
