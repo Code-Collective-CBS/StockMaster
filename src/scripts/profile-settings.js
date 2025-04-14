@@ -17,11 +17,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('email').value = user.email;
             document.getElementById('phone').value = user.phone;
 
+            // Sæt avatar-billede
             if (user.avatar) {
                 const avatarURL = `https://api.dicebear.com/7.x/adventurer/svg?seed=${user.avatar}`;
                 document.getElementById('profile-avatar').src = avatarURL;
             }
-            
+
+            // Checks if an avatar is selected
+            const avatars = document.querySelectorAll('.avatar-option');
+            avatars.forEach((avatarElement) => {
+                if (avatarElement.dataset.avatar === user.avatar) {
+                    avatarElement.classList.add('selected');
+                }
+            });
+
         } else {
             console.error('Kunne ikke hente user');
         }
@@ -40,11 +49,23 @@ document.getElementById('profileForm').addEventListener('submit', async (event) 
     const phone_number = document.getElementById('phone').value;
     const newPassword = document.getElementById('new-password').value;
 
+    const selectedAvatar = document.querySelector('.avatar-option.selected');
+
+    // Checks for selected avatar
+    let avatar;
+    if (selectedAvatar) {
+        avatar = selectedAvatar.dataset.avatar;
+    } else {
+        avatar = null;
+    }
+
+
     const profilData = {
         firstname,
         lastname,
         email,
         phone_number,
+        avatar
     };
 
     if (newPassword !== '') {
@@ -72,6 +93,23 @@ document.getElementById('profileForm').addEventListener('submit', async (event) 
         console.log('Fejl ved ved opdatering', err);
         alert('Fejl i respons')
     }
+});
+
+// Avatar choosing. 
+document.addEventListener('DOMContentLoaded', () => {
+    const avatarOptions = document.querySelectorAll('.avatar-option');
+
+    avatarOptions.forEach((avatar) => {
+        avatar.addEventListener('click', () => {
+            avatarOptions.forEach((avatarElement) => avatarElement.classList.remove('selected'));
+            avatar.classList.add('selected');
+
+            // Opdater preview
+            const avatarSeed = avatar.dataset.avatar;
+            const avatarURL = `https://api.dicebear.com/7.x/adventurer/svg?seed=${avatarSeed}`;
+            document.getElementById('profile-avatar').src = avatarURL;
+        });
+    });
 });
 
 // Funktionalitet til annuler
