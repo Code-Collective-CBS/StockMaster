@@ -85,7 +85,7 @@ const databaseServices = {
     },
 
     updateProfile: async (id, body) => {
-        const { firstname, lastname, email, phone_number, newPassword } = body;
+        const { firstname, lastname, email, phone_number, newPassword, avatar } = body;
 
         try {
             const pool = await poolPromise;

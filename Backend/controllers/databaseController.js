@@ -117,11 +117,13 @@ const databaseController = {
             if (!user) {
                 return res.status(401).json({ message: 'Brugeren findes ikke' })
             }
+
             res.status(200).json({
                 firstname: user.firstname,
                 lastname: user.lastname,
                 email: user.email,
-                phone: user.phone_number
+                phone: user.phone_number,
+                avatar: user.avatar
             })
         } catch (err) {
             console.log('Fejl ved hentning af profil', err);
