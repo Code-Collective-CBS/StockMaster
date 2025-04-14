@@ -8,11 +8,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   console.log("Portfolio page loaded!");
 
   try {
-    let userId = sessionStorage.getItem('userId') || localStorage.getItem('userId');
+    const userIdFromSession = sessionStorage.getItem('userId');
+    const userIdFromLocal = localStorage.getItem('userId');
+    const userId = userIdFromSession || userIdFromLocal;
+
+    console.log("Storage check:", {
+      sessionStorage: userIdFromSession,
+      localStorage: userIdFromLocal,
+      finalUserId: userId
+    });
 
     if (!userId) {
-      console.warn('User ID not found in storage, using default for testing');
-      userId = 1;
+      throw new Error('User ID not found in session storage');
     }
 
     console.log('Found user id', userId);

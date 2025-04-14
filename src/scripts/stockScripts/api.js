@@ -102,7 +102,7 @@ export const stockAPI = {
       if (!userId) {
         throw new Error('User ID is required');
       }
-      
+
       const USE_MOCK_DATA = true;
 
       if (USE_MOCK_DATA) {

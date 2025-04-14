@@ -26,12 +26,15 @@ document.addEventListener("DOMContentLoaded", function () {
       const result = await response.json();
       if (response.ok) {
         // Store user data in localStorage
-        localStorage.setItem("userId", result.id);
-        localStorage.setItem("userFirstname", result.firstname);
-        localStorage.setItem("userLastname", result.lastname);
+        sessionStorage.setItem("userId", result.id);
+        localStorage.setItem('userId', result.id)
+
+        // store name for display
+        sessionStorage.setItem("userFirstname", result.firstname);
+        sessionStorage.setItem("userLastname", result.lastname);
 
         alert("Login successful");
-        
+
         window.location.href = "../pages/dashboard.html";
       } else {
         alert("Login failed: " + result.message);
