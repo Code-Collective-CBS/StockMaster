@@ -78,16 +78,31 @@ function updatePortfolioUI(portfolios) {
       account.portfolios.forEach((portfolio) => {
         const portfolioElement = document.createElement("div");
         portfolioElement.className = "portfolio-item";
+
+        // Change "Value" to "Invested Value"
         portfolioElement.innerHTML = `
-          <h4>${portfolio.name}</h4>
-          <p>Value: ${formatCurrency(
-            portfolio.metrics.totalCurrentValue,
-            account.currency
-          )}</p>
-          <p>Gain: ${portfolio.metrics.totalUnrealizedGainPercent.toFixed(
-            2
-          )}%</p>
-        `;
+              <h4>${portfolio.name}</h4>
+              <p>Invested Value: ${formatCurrency(
+                        portfolio.metrics.totalCost,
+                        account.currency
+                      )}</p>
+              <p>Shares: ${portfolio.metrics.holdings.reduce(
+                        (sum, h) => sum + h.quantity,
+                        0
+                      )}</p>
+              `;
+
+        // portfolioElement.innerHTML = `
+        //   <h4>${portfolio.name}</h4>
+        //   <p>Value: ${formatCurrency(
+        //     portfolio.metrics.totalCurrentValue,
+        //     account.currency
+        //   )}</p>
+        //   <p>Gain: ${portfolio.metrics.totalUnrealizedGainPercent.toFixed(
+        //     2
+        //   )}%</p>
+        // `;
+
         container.appendChild(portfolioElement);
       });
     });

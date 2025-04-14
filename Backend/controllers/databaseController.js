@@ -280,15 +280,15 @@ const databaseController = {
 
     createPortfolio: async (req, res) => {
         // Saves the user- and account id from the session in a variable.
-        //const userID = req.session.user_id
-        const accountID = req.session.account_id
+        const userId = req.session.user_id
+        const accountId = parseInt(req.params.accountId); 
         const { portfolioName } = req.body;
 
         try {
-            const newPortfolio = await databaseServices.createPortfolio(accountID, portfolioName)
-
+            const newPortfolio = await databaseServices.createPortfolio(accountId, portfolioName)
+            
             // Checks if the user has an existing account
-            if (!accountID) {
+            if (!accountId) {
                 return res.status(401).json({ message: 'User not found or logged in' });
             }
 
@@ -297,7 +297,7 @@ const databaseController = {
             }
 
             res.status(201).json({
-                message: "Portfolio created",
+                message: `Portfolio created on account: ${accountId}`,
                 portfolioName: newPortfolio.portfolioName
             });
         } catch (err) {

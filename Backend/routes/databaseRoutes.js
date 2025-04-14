@@ -20,7 +20,6 @@ router.post('/create-account', databaseController.createAccount);
 // Search stocks from table stockNames
 router.get('/search-stocks', databaseController.searchStockNames);
 
-
 // Get accounts to show
 router.get('/get-accounts', databaseController.getAllAccountsForUser);
 
@@ -36,7 +35,7 @@ router.put('/updateprofileInfo', databaseController.updateUserProfile);
 router.get('/portfolio/account/:accountId', portfolioController.getPortfolioSummary);
 
 // Create portfolio
-//router.post('createPortfolio', databaseController.createPortfolio);
+router.post('/createPortfolio/:accountId', databaseController.createPortfolio);
 
 // Test to see if our API is working
 router.get('/test', (req, res) => {
