@@ -11,7 +11,7 @@ export const popUps = {
         try {
             const response = await fetch(`api/database`)
         } catch (error) {
-            
+
         }
 
         const accountPortfolios = null;
@@ -80,7 +80,7 @@ export const popUps = {
             modal.querySelector("#confirmAction").addEventListener("click", () => {
                 const activeType = modal.querySelector(".toggle-btn.active").dataset.type;
                 const amount = modal.querySelector('#popup-amount');
-                
+
                 if (activeType == 'deposit') {
                     depositToAccount(amount);
                     amount.value = '';
@@ -129,7 +129,7 @@ export const popUps = {
                 });
 
                 const result = await response.json();
-                if(response.status === 201) {
+                if (response.status === 201) {
                     alert("Withdraw succesfull");
                 } else {
                     alert("Failed to withdraw: " + result.message);
@@ -143,10 +143,10 @@ export const popUps = {
     buySecurity: () => {
         const buyButton = document.getElementById('buyButton');
 
-        if(!buyButton) return console.log('Could not find #buyButton');
-        
+        if (!buyButton) return console.log('Could not find #buyButton');
+
         buyButton.addEventListener('click', () => {
-            if(document.getElementById('tradeModal')) return;
+            if (document.getElementById('tradeModal')) return;
 
             const tradeModal = document.createElement('div');
             tradeModal.id = 'tradeModal';
@@ -189,14 +189,14 @@ export const popUps = {
             })
         });
     },
-    
+
     sellSecurity: () => {
         const sellButton = document.getElementById('sellButton');
 
-        if(!sellButton) return console.log('Could not find #sellButton');
-        
+        if (!sellButton) return console.log('Could not find #sellButton');
+
         sellButton.addEventListener('click', () => {
-            if(document.getElementById('tradeModal')) return;
+            if (document.getElementById('tradeModal')) return;
 
             const tradeModal = document.createElement('div');
             tradeModal.id = 'tradeModal';
@@ -238,6 +238,73 @@ export const popUps = {
                 console.log(`User wants to sell`)
                 console.log(`User wants to sell: STOCKNAME, Amunt: ${amount.value}`)
             })
+        });
+    },
+
+    createPortfolio: () => {
+        const addPortfolioButton = document.getElementById('addPortfolioButton');
+
+        if (!addPortfolioButton) return console.log('Could not find #addPortfolioButton');
+
+        addPortfolioButton.addEventListener('click', () => {
+            // If pop-up already exists - do nothing.
+            if (document.getElementById('portfolioPopupModal')) return;
+
+            // Otherwise - build modal
+            const modal = document.createElement('div');
+            modal.id = 'portfolioPopupModal';
+            modal.classList.add('modal-wrapper');
+
+            modal.innerHTML = `
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+              <span class="modal-close">&times;</span>
+              <div class="modal-form">
+                <h2>Add portfolio</h2>
+                <input type="text" id="portfolioNameInput" placeholder="Portfolio name" />
+                <button id="savePortfolioButton" class="btn btn-primary">Save</button>
+              </div>
+            </div>
+          `;
+
+            document.body.appendChild(modal);
+
+            // Close pop-up
+            modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
+            modal.querySelector('.modal-overlay').addEventListener('click', () => modal.remove());
+
+            // Save portfolio
+            modal.querySelector('#savePortfolioButton').addEventListener('click', async () => {
+                const nameInput = modal.querySelector('#portfolioNameInput');
+                const portfolioName = nameInput.value.trim();
+
+                if (portfolioName === '') {
+                    alert('Please enter a portfolio name');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('http://localhost:3000/api/database/createPortfolio', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ portfolioName })
+                    });
+
+                    const result = await response.json();
+
+                    if (response.status === 200) {
+                        alert('Portfolio successfully created');
+                        modal.remove();
+                    } else {
+                        alert('Failed: ' + result.message);
+                    }
+                } catch (err) {
+                    console.error('Failed to create portfolio:', err);
+                    alert('Failed to create portfolio');
+                }
+            });
         });
     }
 };

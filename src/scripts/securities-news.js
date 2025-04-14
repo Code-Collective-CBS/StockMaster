@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // POP UP
   popUps.setupDepositPopup()
+  popUps.createPortfolio();
 
   //// BUTTONS ////
 
