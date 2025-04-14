@@ -15,13 +15,11 @@ const poolPromise = new sql.ConnectionPool(config.database)
 
 const databaseServices = {
     createUser: async (body) => {
-        const { firstname, lastname, email, password, phone_number, country_code } =
-            body;
+        const { firstname, lastname, email, password, phone_number, country_code, avatar } = body;
 
         const pool = await poolPromise;
 
-        const userExists = await pool
-            .request()
+        const userExists = await pool.request()
             .input("email", sql.NVarChar(100), email)
             .query("SELECT COUNT(*) AS count FROM Users WHERE email = @email");
 
@@ -29,17 +27,19 @@ const databaseServices = {
             return { status: 400, message: "E-mail already exists" };
         }
 
-        const userCreated = await pool
-            .request()
+        const userCreated = await pool.request()
             .input("firstname", sql.NVarChar(50), firstname)
             .input("lastname", sql.NVarChar(50), lastname)
             .input("email", sql.NVarChar(100), email)
             .input("password", sql.NVarChar(255), password)
             .input("phone_number", sql.NVarChar(20), phone_number)
-            .input("country_code", sql.NVarChar(5), country_code).query(`
-                INSERT INTO Users (firstname, lastname, email, password, phone_number, country_code, create_date)
+            .input("country_code", sql.NVarChar(5), country_code)
+            .input("avatar", sql.NVarChar(50), avatar)
+
+            .query(`
+                INSERT INTO Users (firstname, lastname, email, password, phone_number, country_code, avatar, create_date)
                 OUTPUT INSERTED.id
-                VALUES (@firstname, @lastname, @email, @password, @phone_number, @country_code, GETDATE())
+                VALUES (@firstname, @lastname, @email, @password, @phone_number, @country_code, @avatar, GETDATE())
             `);
 
         const insertedID = userCreated.recordset[0].id;
@@ -51,13 +51,10 @@ const databaseServices = {
 
         try {
             const pool = await poolPromise;
-            const checkLogin = await pool
-                .request()
-                .input("email", sql.NVarChar(100), email)
-                .input("password", sql.NVarChar(255), password)
-                .query(
-                    `SELECT * FROM Users WHERE email = @email AND password = @password`
-                );
+            const checkLogin = await pool.request()
+                .input('email', sql.NVarChar(100), email)
+                .input('password', sql.NVarChar(255), password)
+                .query(`SELECT id, firstname, lastname, email, avatar FROM Users WHERE email = @email AND password = @password`);
 
             if (checkLogin.recordset.length > 0) {
                 return checkLogin.recordset[0];
@@ -73,19 +70,16 @@ const databaseServices = {
     userInfo: async (id) => {
         try {
             const pool = await poolPromise;
-            const getUser = await pool
-                .request()
-                .input("id", sql.Int, id)
-                .query(
-                    "SELECT firstname, lastname, email, phone_number FROM Users WHERE id = @id"
-                );
+            const getUser = await pool.request()
+                .input('id', sql.Int, id)
+                .query('SELECT firstname, lastname, email, phone_number, avatar FROM Users WHERE id = @id');
             if (getUser.recordset.length > 0) {
                 return getUser.recordset[0];
             } else {
                 return null;
             }
         } catch (err) {
-            console.error("Error: Could not find user by ID", err);
+            console.error('Error: Could not find user by ID', err);
             throw err;
         }
     },

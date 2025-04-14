@@ -146,14 +146,20 @@ const getUserInfo = async () => {
     const response = await fetch('http://localhost:3000/api/database/userInfo');
     const data = await response.ok ? await response.json() : null;
 
-    if (data) {
-      // Set name
-      document.getElementById('profile-name').textContent = `${data.fornavn} ${data.efternavn}`;
-
+    if (data && data.user) {
       // Sets avatar picture
-      const avatarSeed = data.avatar;
+      const firstname = data.user.firstname;
+      const lastname = data.user.lastname;
+      const avatarSeed = data.user.avatar;
+
       const avatarURL = `https://api.dicebear.com/7.x/adventurer/svg?seed=${avatarSeed}`;
-      document.getElementById('profile-avatar').src = avatarURL;
+      const avatarElement = document.getElementById('profile-avatar');
+
+      if (avatarElement) avatarElement.src = avatarURL;
+
+      // Set name
+      document.getElementById('profile-name').textContent = `${firstname} ${lastname}`;
+
     } else {
       document.getElementById('profile-name').textContent = 'N/A';
     }
