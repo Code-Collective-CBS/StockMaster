@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert("Fail: " + result.message)
             }
         } catch (error) {
-            console.log("Failed to create account: " + error) // WHY NOT console.error?
+            console.log("Failed to create account: " + error)
             alert("Failed to create account")
         }
     });

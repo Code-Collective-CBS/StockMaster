@@ -214,7 +214,17 @@
     </section>
   </main>
 
+  <div id="portfolioPopup" class="popup">
+    <div class="popup-content">
+      <span id="closePopup">&times;</span>
+      <h2>Add portfolio</h2>
+      <input type="text" id="portfolioNameInput" placeholder="Portfolio name">
+      <button id="savePortfolioButton"></button>
+    </div>
+  </div>
+
   <script src="/src/scripts/sidebar.js"></script>
+  <script type="module" src="/src/scripts/utilityFunctions/createPortfolio.js"></script>
   <script type="module" src="/src/scripts/dashboard.js"></script>
 </body>
 

@@ -36,7 +36,7 @@ router.put('/updateprofileInfo', databaseController.updateUserProfile);
 router.get('/portfolio/user/:userId', portfolioController.getPortfolioSummary);
 
 // Create portfolio
-router.get('createPortfolio', databaseController.createPortfolio);
+//router.get('createPortfolio', databaseController.createPortfolio);
 
 
 // Test to see if our API is working
