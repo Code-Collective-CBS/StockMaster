@@ -127,6 +127,105 @@ export const popUps = {
                 console.error("Failed to Withdraw", error);
             }
         }
+    },
+
+    buySecurity: () => {
+        const buyButton = document.getElementById('buyButton');
+
+        if(!button) return console.log('Could not find #buyButton');
+        
+        buyButton.addEventListener('click', () => {
+            if(document.getElementById('tradeModal')) return;
+
+            const tradeModal = document.createElement('div');
+            tradeModal.id = 'tradeModal';
+            tradeModal.innerHTML = `
+            <div class="modal-overlay></div>
+            <div class="modal-content>
+                <span class="modal-close">&times;</span>
+                <div class="modal-form">
+                    <p class="account-name"></p>
+                    <p class="modal-instruction">Enter ammount to buy</p>
+                    <div class="input-group">
+                        <input id="buy-amount" type="number" placeholder="Amount" />
+                        <span class="currency-label id="security-currency"></span>
+                    </div>
+                    <button id=confirmAction class="btn btn-primary">Confirm</button>
+                    <select id="popup-portfolios"></select>
+                </div>
+            </div>
+            `;
+            document.body.appendChild(tradeModal);
+
+            const selectedAccount = accountDetails(); // NEEED TO CHECK SCOPE
+
+            const accountNamePara = tradeModal.querySelector('.account-name');
+            accountNamePara.innerHTML = `Account: ${selectedAccount.account_name}`;
+
+            const currencySpan = tradeModal.querySelector('#security-currency');
+            const securityCurrency = null; // FIND SECURITY CURRENCY
+            currencySpan.textContent = securityCurrency;
+
+            // Close modal
+            tradeModal.querySelector('modal-close').addEventListener('click', () => tradeModal.remove());
+            tradeModal.querySelector('modal-overlay').addEventListener('click', () => tradeModal.remove());
+
+            tradeModal.querySelector('#confirmAction').addEventListener('clikc', () => {
+                const amount = tradeModal.querySelector('#pop-amount');
+
+                console.log(`User wants to buy: STOCKNAME, Amunt: AMOUNT`)
+            })
+        });
+    },
+    
+    sellSecurity: () => {
+        const sellButton = document.getElementById('sellButton');
+
+        if(!button) return console.log('Could not find #sellButton');
+        
+        buyButton.addEventListener('click', () => {
+            if(document.getElementById('tradeModal')) return;
+
+            const tradeModal = document.createElement('div');
+            tradeModal.id = 'tradeModal';
+            tradeModal.innerHTML = `
+            <div class="modal-overlay></div>
+            <div class="modal-content>
+                <span class="modal-close">&times;</span>
+                <div class="modal-form">
+                    <p class="account-name"></p>
+                    <p class="modal-instruction">Enter ammount to buy</p>
+                    <div class="input-group">
+                        <input id="buy-amount" type="number" placeholder="Amount" />
+                        <span class="currency-label id="security-currency"></span>
+                    </div>
+                    <button id=confirmAction class="btn btn-primary">Confirm</button>
+                    <select id="popup-portfolios"></select>
+                </div>
+            </div>
+            `;
+            document.body.appendChild(tradeModal);
+
+            const selectedAccount = accountDetails(); // NEEED TO CHECK SCOPE
+
+            const accountNamePara = tradeModal.querySelector('.account-name');
+            accountNamePara.innerHTML = `Account: ${selectedAccount.account_name}`;
+
+            const currencySpan = tradeModal.querySelector('#security-currency');
+            const securityCurrency = null; // FIND SECURITY CURRENCY
+            currencySpan.textContent = securityCurrency;
+
+            // Close modal
+            tradeModal.querySelector('modal-close').addEventListener('click', () => tradeModal.remove());
+            tradeModal.querySelector('modal-overlay').addEventListener('click', () => tradeModal.remove());
+
+            tradeModal.querySelector('#confirmAction').addEventListener('clikc', () => {
+                const amount = tradeModal.querySelector('#pop-amount');
+
+                console.log(`User wants to sell`)
+                console.log(`User wants to sell: STOCKNAME, Amunt: AMOUNT`)
+            })
+        });
     }
 };
 // >&times is an HTML entity and represents x 

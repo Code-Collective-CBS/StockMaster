@@ -302,6 +302,15 @@ const databaseServices = {
             console.error('Failed to withdraw from account', error);
             throw error;
         }
+    },
+
+    buySecurityToPortfolio: async (userId, accountId, portfolioId, symbol, market_price, amount) => {
+        try {
+            // CODE HERE
+        } catch (error) {
+            console.error('Failed to buy security to portfolio', error);
+            throw error;
+        } 
     }
 };
 
