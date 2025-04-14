@@ -201,3 +201,53 @@ body {
       font-size: var(--h4-size);
     }
   }
+
+  /* Profil billede */ 
+  .profile-picture-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .profile-picture img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid white;
+  }
+  
+  /* Titlen over avatarerne */
+  .avatar-title {
+    font-weight: bold;
+    margin-top: 5px;
+    color: white;
+  }
+  
+  /* Avatar vælgere */
+  .avatar-selection {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .avatar-option {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+  }
+  
+  .avatar-option.selected {
+    border: 2px solid limegreen;
+  }
+  
+  .avatar-option:hover {
+    transform: translateY(-2px);
+  }
+  
+  .avatar-option:not(.selected):hover {
+    border: 2px solid var(--highlight);
+  }

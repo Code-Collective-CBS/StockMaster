@@ -16,6 +16,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('lastname').value = user.lastname;
             document.getElementById('email').value = user.email;
             document.getElementById('phone').value = user.phone;
+
+            if (user.avatar) {
+                const avatarURL = `https://api.dicebear.com/7.x/adventurer/svg?seed=${user.avatar}`;
+                document.getElementById('profile-avatar').src = avatarURL;
+            }
+            
         } else {
             console.error('Kunne ikke hente user');
         }

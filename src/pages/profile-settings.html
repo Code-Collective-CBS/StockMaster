@@ -149,14 +149,22 @@
       <div class="profile-settings-container">
         <div class="profile-header">
           <h1>Profilindstillinger</h1>
+    
           <div class="profile-picture-section">
             <div class="profile-picture">
-              <img src="/src/assets/storm-profile.jpeg" alt="Profile picture" />
+              <img id="profile-avatar" src="" alt="Profile picture" />
             </div>
-            <p class="skift-profil-billede"><a href="#">Skift profil billede</a></p>
+    
+            <p class="avatar-title">Change avatar</p>
+            <div class="avatar-selection">
+              <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=Alex" class="avatar-option" data-avatar="Alex" />
+              <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=Milo" class="avatar-option" data-avatar="Milo" />
+              <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=Zoe" class="avatar-option" data-avatar="Zoe" />
+              <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=Finn" class="avatar-option" data-avatar="Finn" />
+            </div>
           </div>
         </div>
-
+    
         <form id="profileForm" class="profile-form">
           <div class="name-row">
             <div class="form-group">
@@ -189,6 +197,7 @@
             />
           </div>
     
+          <!-- Gem/annuller knapper -->
           <div class="form-actions">
             <button type="button" class="cancel-btn" id="cancelButton">Annuller</button>
             <button type="submit" class="save-btn" id="saveButton">Gem</button>
@@ -196,6 +205,8 @@
         </form>
       </div>
     </main>
+    
+    
     
 
     <script src="/src/scripts/sidebar.js"></script>

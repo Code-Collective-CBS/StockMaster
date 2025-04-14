@@ -95,10 +95,11 @@ const databaseServices = {
                 .input("firstname", sql.NVarChar(50), firstname)
                 .input("lastname", sql.NVarChar(50), lastname)
                 .input("email", sql.NVarChar(100), email)
-                .input("phone_number", sql.NVarChar(20), phone_number);
+                .input("phone_number", sql.NVarChar(20), phone_number)
+                .input("avatar", sql.NVarChar(50), avatar);
 
             let query =
-                "UPDATE Users SET firstname = @firstname, lastname = @lastname, email = @email, phone_number = @phone_number";
+                "UPDATE Users SET firstname = @firstname, lastname = @lastname, email = @email, phone_number = @phone_number, avatar = @avatar";
 
             // Checks if password is changed
             if (newPassword && newPassword !== "") {

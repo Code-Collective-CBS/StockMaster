@@ -136,7 +136,7 @@ const databaseController = {
             return res.status(401).json({ message: "Fail by gathering id" })
         }
 
-        const { firstname, lastname, email, phone_number, newPassword } = req.body;
+        const { firstname, lastname, email, phone_number, newPassword, avatar } = req.body;
         const body = req.body;
 
         try {
