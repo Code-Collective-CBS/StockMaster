@@ -195,7 +195,6 @@ const databaseServices = {
                     FROM Currency
                     WHERE currency_name LIKE @query
                 `);
-            console.log("Currency search result:", result.recordset);
             return result.recordset;
         } catch (err) {
             console.error(`Error querying Currency table with query "${query}":`, err);
