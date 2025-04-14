@@ -175,9 +175,8 @@ export const popUps = {
             const dropdown = document.getElementById('popup-portfolios');
 
             const selectedAccount = popUps.accountDetails(); // NEEED TO CHECK SCOPE
-            console.log(selectedAccount);
 
-            const allPortfolioDetails = await popUps.allPortfolioDetails(selectedAccount);
+            const allPortfolioDetails = await popUps.allPortfolioDetails(selectedAccount.account_id);
 
             allPortfolioDetails.forEach(portfolio => {
                 const option = document.createElement('option');
@@ -188,10 +187,10 @@ export const popUps = {
             });
 
             const accountNamePara = tradeModal.querySelector('.account-name');
-            // accountNamePara.innerHTML = `Account: ${selectedAccount.account_name}`;
+            accountNamePara.innerHTML = `Account: ${selectedAccount.account_name}`;
 
-            const currencySpan = tradeModal.querySelector('#security-currency');
-            const securityCurrency = null; // FIND SECURITY CURRENCY
+            // const currencySpan = tradeModal.querySelector('#security-currency');
+            // const securityCurrency = selectedAccount.currency;
             // currencySpan.textContent = securityCurrency;
 
             // Close modal
@@ -238,15 +237,22 @@ export const popUps = {
             const dropdown = document.getElementById('popup-portfolios');
 
             const selectedAccount = popUps.accountDetails(); // NEEED TO CHECK SCOPE
-            console.log(selectedAccount);
 
-            const allPortfolioDetails = await popUps.allPortfolioDetails(selectedAccount);
+            const allPortfolioDetails = await popUps.allPortfolioDetails(selectedAccount.account_id);
+
+            allPortfolioDetails.forEach(portfolio => {
+                const option = document.createElement('option');
+                option.value = portfolio.id
+                option.textContent = portfolio.name;
+
+                dropdown.appendChild(option);
+            });
 
             const accountNamePara = tradeModal.querySelector('.account-name');
-            // accountNamePara.innerHTML = `Account: ${selectedAccount.account_name}`;
+            accountNamePara.innerHTML = `Account: ${selectedAccount.account_name}`;
 
-            const currencySpan = tradeModal.querySelector('#security-currency');
-            const securityCurrency = null; // FIND SECURITY CURRENCY
+            // const currencySpan = tradeModal.querySelector('#security-currency');
+            // const securityCurrency = selectedAccount.currency;
             // currencySpan.textContent = securityCurrency;
 
             // Close modal
@@ -256,7 +262,6 @@ export const popUps = {
             tradeModal.querySelector('#confirmAction').addEventListener('click', () => {
                 const amount = tradeModal.querySelector('#pop-amount');
 
-                console.log(`User wants to sell`)
                 console.log(`User wants to sell: STOCKNAME, Amunt: ${amount.value}`)
             })
         });
