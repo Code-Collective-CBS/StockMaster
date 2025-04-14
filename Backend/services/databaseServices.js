@@ -1,5 +1,7 @@
 const sql = require("mssql");
 const config = require("../config/config");
+const exchangeRateService = require("../services/exchangeRateService");
+const currencyUtils = require("../utilityFunctions/currencyUtils");
 
 // Creates connection to our MSSQL database through our login in config.database
 // Creates a pool of connections. More reusable and effective
@@ -310,7 +312,7 @@ const databaseServices = {
             throw error;
         }
     },
-    // NEED TO ADD CHECK ACCOUN BALANCE
+    // NEED TO ADD CHECK ACCOUN BALANCE (MADE exchangeRateService and currencyUtils for Exchange currencies and conversion)
     buyOrSellSecurity: async ({
         userId,
         accountId,
