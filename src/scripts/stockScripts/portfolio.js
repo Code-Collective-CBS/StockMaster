@@ -28,24 +28,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Fetch all portfolio data in one call
     const portfolioData = await stockAPI.getPortfolioSummary(effectiveUserId);
 
-    if (!portfolioData || portfolioData.length === 0) {
-      showNoPortfoliosMessage();
-      return;
-    }
-
-    // Flatten all portfolios from all accounts
-    const allPortfolios = portfolioData.flatMap(account =>
-      account.portfolios.map(portfolio => ({
-        ...portfolio,
-        account_name: account.account_name
-      }))
-    );
-
-    updatePortfolioUI(allPortfolios);
-  } catch (error) {
-    console.error("Error loading portfolio data:", error);
-    showErrorMessage("Failed to load portfolio data. Please try again later.");
-  }
+// Update UI
+if (portfolioData &&
+  (Array.isArray(portfolioData) && portfolioData.length > 0) ||
+  (portfolioData.accounts && portfolioData.accounts.length > 0)) {
+ updatePortfolioUI(portfolioData);
+} else {
+ showNoPortfoliosMessage();
+}
+} catch (error) {
+console.error("Error loading portfolio data:", error);
+showErrorMessage("Failed to load portfolio data. Please try again later.");
+}
 });
 
 function updatePortfolioUI(portfolios) {
