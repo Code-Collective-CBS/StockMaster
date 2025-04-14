@@ -41,9 +41,10 @@ document.getElementById('profileForm').addEventListener('submit', async (event) 
         phone_number,
     };
 
-    if (newPassword !== "") {
+    if (newPassword !== '') {
         profilData.newPassword = newPassword;
     }
+
 
     try {
         const response = await fetch('http://localhost:3000/api/database/updateprofileInfo', {

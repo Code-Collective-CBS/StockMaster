@@ -93,18 +93,18 @@ const databaseServices = {
                 .input("lastname", sql.NVarChar(50), lastname)
                 .input("email", sql.NVarChar(100), email)
                 .input("phone_number", sql.NVarChar(20), phone_number);
-            // Checks if password is changed
-            if (newPassword !== "") {
-                updateUser.input("newpassword", sql.NVarChar(255), newPassword);
-            }
-            // Creates query
-            const query = 'UPDATE Users SET firstname = @firstname, lastname = @lastname, email = @email, phone_number = @phone_number'
 
-            // Adds newpassword to query if neccesary
-            if (newPassword !== '') query += 'newpassword = @newpassword';
+            let query = 'UPDATE Users SET firstname = @firstname, lastname = @lastname, email = @email, phone_number = @phone_number'
+
+            // Checks if password is changed
+            if (newPassword && newPassword !== '') {
+                updateUser.input("password", sql.NVarChar(255), newPassword);
+                query += ', password = @password';
+                console.log('Checks for password')
+            }
 
             // Search by user-id
-            query += 'WHERE id = @id';
+            query += ' WHERE id = @id';
 
             await updateUser.query(query);
 
@@ -294,8 +294,8 @@ const databaseServices = {
                 
                 SELECT * FROM Accounts WHERE id = @accountId
             `);
-        
-            if(result.rowsAffected[0] === 0) throw new Error("Insufficient funds"); // Extra check if total_balance >= @amount in SQL fails
+
+            if (result.rowsAffected[0] === 0) throw new Error("Insufficient funds"); // Extra check if total_balance >= @amount in SQL fails
 
             return result.recordset[0];
         } catch (error) {
@@ -310,7 +310,7 @@ const databaseServices = {
         } catch (error) {
             console.error('Failed to buy security to portfolio', error);
             throw error;
-        } 
+        }
     }
 };
 
