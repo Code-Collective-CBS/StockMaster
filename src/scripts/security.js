@@ -1,6 +1,7 @@
 import { stockAPI } from "./stockScripts/api.js";
 import { stockMetrics } from "./stockScripts/stockMetrics.js";
 import { chartService } from "./utilityFunctions/chartService.js";
+import { popUps } from "./utilityFunctions/popup.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("Security page loaded!");
@@ -13,6 +14,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Storing time series globally so we can use it again
   let globalTimeSeriesData;
   let globalCompanyOverview;
+
+  // POP UP
+  popUps.buySecurity();
+  popUps.sellSecurity();
 
   try {
     // Get company overview data
