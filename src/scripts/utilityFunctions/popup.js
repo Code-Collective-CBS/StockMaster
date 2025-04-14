@@ -9,7 +9,9 @@ export const popUps = {
         const selectedAccountId = accountId;
 
         try {
-            const response = await fetch(`api/database`)
+            const response = await fetch(`api/database/portfolio/account/${selectedAccountId}`);
+
+            const result = await response;
         } catch (error) {
 
         }
@@ -208,12 +210,12 @@ export const popUps = {
                 <div class="modal-form">
                     <p class="account-name"></p>
                     <p class="modal-instruction">Enter ammount to sell</p>
+                    <select id="popup-portfolios"></select>
                     <div class="input-group">
                         <input id="buy-amount" type="number" placeholder="Amount" />
                         <span class="currency-label" id="security-currency"></span>
                     </div>
                     <button id="confirmAction" class="btn btn-primary">Confirm</button>
-                    <select id="popup-portfolios"></select>
                 </div>
             </div>
             `;
