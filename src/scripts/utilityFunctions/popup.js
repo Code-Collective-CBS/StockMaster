@@ -285,8 +285,10 @@ export const popUps = {
                     return;
                 }
 
+                const selectedAccountId = sessionStorage.getItem('selectedAccountId');
+
                 try {
-                    const response = await fetch('http://localhost:3000/api/database/createPortfolio', {
+                    const response = await fetch(`/api/database/createPortfolio/${selectedAccountId}`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -296,7 +298,7 @@ export const popUps = {
 
                     const result = await response.json();
 
-                    if (response.status === 200) {
+                    if (response.status === 201) {
                         alert('Portfolio successfully created');
                         modal.remove();
                     } else {
