@@ -1,4 +1,22 @@
 export const popUps = {
+    accountDetails: () => {
+        const selectedAccountId = sessionStorage.getItem('selectedAccountId');
+        const accounts = window.cachedAccounts || [];
+        return accounts.find(acc => acc.account_id == selectedAccountId) || null;
+    },
+
+    portfolioDetails: async (accountId) => {
+        const selectedAccountId = accountId;
+
+        try {
+            const response = await fetch(`api/database`)
+        } catch (error) {
+            
+        }
+
+        const accountPortfolios = null;
+    },
+
     setupDepositPopup: () => {
         const button = document.getElementById("depositButton");
 
@@ -31,7 +49,7 @@ export const popUps = {
             `;
             document.body.appendChild(modal);
 
-            const selectedAccount = accountDetails();
+            const selectedAccount = popUps.accountDetails();
 
             const accountNamePara = modal.querySelector('.account-name');
             accountNamePara.innerHTML = `Account: ${selectedAccount.account_name}`;
@@ -76,11 +94,6 @@ export const popUps = {
             });
         });
 
-        const accountDetails = () => {
-            const selectedAccountId = sessionStorage.getItem('selectedAccountId');
-            const accounts = window.cachedAccounts || [];
-            return accounts.find(acc => acc.account_id == selectedAccountId) || null;
-        };
 
         const depositToAccount = async (amountInput) => {
             const amount = amountInput.value;
