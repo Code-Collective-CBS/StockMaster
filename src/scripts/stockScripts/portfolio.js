@@ -18,14 +18,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       finalUserId: userId
     });
 
+    // for development we use a fallback ID if needed
+    const effectiveUserId = userId || 1;
+
     if (!userId) {
-      throw new Error('User ID not found in session storage');
+      console.warn('User ID not found in session storage');
     }
 
-    console.log('Found user id', userId);
-
     // Fetch all portfolio data in one call
-    const portfolioData = await stockAPI.getPortfolioSummary(userId);
+    const portfolioData = await stockAPI.getPortfolioSummary(effectiveUserId);
 
     if (!portfolioData || portfolioData.length === 0) {
       showNoPortfoliosMessage();
