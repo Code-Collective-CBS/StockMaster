@@ -3,7 +3,7 @@ import { mockPortfolioData } from "./mockPortfolioData.js";
 // api.js (Frontend API Calls)
 const API_BASE_URL = "http://localhost:3000/api/stocks";
 const API_CURRENCY_URL = "http://localhost:3000/api/currency";
-const PORTFOLIO_URL = "http://localhost:3000/api/database/portfolio/user";
+const PORTFOLIO_URL = "http://localhost:3000/api/database/portfolio/account";
 
 export const stockAPI = {
   // Get stock quote
@@ -103,7 +103,7 @@ export const stockAPI = {
         throw new Error('User ID is required');
       }
 
-      const USE_MOCK_DATA = true;
+      const USE_MOCK_DATA = false;
 
       if (USE_MOCK_DATA) {
         console.log("Using mock portfolio data for user:", userId);

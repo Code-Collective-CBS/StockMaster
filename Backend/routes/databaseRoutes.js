@@ -33,7 +33,7 @@ router.get('/search-currency', databaseController.searchCurrencies);
 // Update profile route
 router.put('/updateprofileInfo', databaseController.updateUserProfile);
 
-router.get('/portfolio/user/:userId', portfolioController.getPortfolioSummary);
+router.get('/portfolio/account/:accountId', portfolioController.getPortfolioSummary);
 
 // Create portfolio
 //router.post('createPortfolio', databaseController.createPortfolio);

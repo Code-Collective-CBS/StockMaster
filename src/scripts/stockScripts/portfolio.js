@@ -3,43 +3,36 @@ import { stockAPI } from "./api.js";
 import { favoredStocks } from "../utilityFunctions/favoredStocks.js";
 import { portfolioChartService } from "../utilityFunctions/portfolioChartService.js";
 
-
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("Portfolio page loaded!");
 
   try {
-    const userIdFromSession = sessionStorage.getItem('userId');
-    const userIdFromLocal = localStorage.getItem('userId');
-    const userId = userIdFromSession || userIdFromLocal;
+    const accountId = sessionStorage.getItem("selectedAccountId");
 
-    console.log("Storage check:", {
-      sessionStorage: userIdFromSession,
-      localStorage: userIdFromLocal,
-      finalUserId: userId
-    });
-
-    // for development we use a fallback ID if needed
-    const effectiveUserId = userId || 1;
-
-    if (!userId) {
-      console.warn('User ID not found in session storage');
+    if (!accountId) {
+      console.warn("No account selected");
+      showErrorMessage("Please select an account first");
+      return;
     }
 
     // Fetch all portfolio data in one call
-    const portfolioData = await stockAPI.getPortfolioSummary(effectiveUserId);
+    const portfolioData = await stockAPI.getPortfolioSummary(accountId);
 
-// Update UI
-if (portfolioData &&
-  (Array.isArray(portfolioData) && portfolioData.length > 0) ||
-  (portfolioData.accounts && portfolioData.accounts.length > 0)) {
- updatePortfolioUI(portfolioData);
-} else {
- showNoPortfoliosMessage();
-}
-} catch (error) {
-console.error("Error loading portfolio data:", error);
-showErrorMessage("Failed to load portfolio data. Please try again later.");
-}
+    // Update UI
+    if (
+      (portfolioData &&
+        Array.isArray(portfolioData) &&
+        portfolioData.length > 0) ||
+      (portfolioData.accounts && portfolioData.accounts.length > 0)
+    ) {
+      updatePortfolioUI(portfolioData);
+    } else {
+      showNoPortfoliosMessage();
+    }
+  } catch (error) {
+    console.error("Error loading portfolio data:", error);
+    showErrorMessage("Failed to load portfolio data. Please try again later.");
+  }
 });
 
 function updatePortfolioUI(portfolios) {
@@ -47,9 +40,13 @@ function updatePortfolioUI(portfolios) {
   const performance7D = document.getElementById("performance7d");
   const performance1M = document.getElementById("performance1m");
   const performance6M = document.getElementById("performance6m");
-  const portfolioChartCanvas = document.getElementById("portfolioDistributionChart");
+  const portfolioChartCanvas = document.getElementById(
+    "portfolioDistributionChart"
+  );
   const portfolioList = document.getElementById("portfolioList");
-  const portfolioGrowthChartCanvas = document.getElementById("portfolioGrowthChart");
+  const portfolioGrowthChartCanvas = document.getElementById(
+    "portfolioGrowthChart"
+  );
 
   // Group by account for display
   const accountsMap = portfolios.reduce((acc, portfolio) => {
@@ -57,7 +54,7 @@ function updatePortfolioUI(portfolios) {
       acc[portfolio.account_id] = {
         account_name: portfolio.account_name,
         currency: portfolio.currency,
-        portfolios: []
+        portfolios: [],
       };
     }
     acc[portfolio.account_id].portfolios.push(portfolio);
@@ -66,24 +63,31 @@ function updatePortfolioUI(portfolios) {
 
   // Display accounts and their portfolios
   if (portfolioList) {
-    portfolioList.innerHTML = '';
-    Object.values(accountsMap).forEach(account => {
-      const accountElement = document.createElement('div');
-      accountElement.className = 'account-group';
+    portfolioList.innerHTML = "";
+    Object.values(accountsMap).forEach((account) => {
+      const accountElement = document.createElement("div");
+      accountElement.className = "account-group";
       accountElement.innerHTML = `
         <h3>${account.account_name} (${account.currency})</h3>
         <div class="portfolios-container" id="portfolios-${account.account_id}"></div>
       `;
       portfolioList.appendChild(accountElement);
 
-      const container = document.getElementById(`portfolios-${account.account_id}`);
-      account.portfolios.forEach(portfolio => {
-        const portfolioElement = document.createElement('div');
-        portfolioElement.className = 'portfolio-item';
+      const container = document.getElementById(
+        `portfolios-${account.account_id}`
+      );
+      account.portfolios.forEach((portfolio) => {
+        const portfolioElement = document.createElement("div");
+        portfolioElement.className = "portfolio-item";
         portfolioElement.innerHTML = `
           <h4>${portfolio.name}</h4>
-          <p>Value: ${formatCurrency(portfolio.metrics.totalCurrentValue, account.currency)}</p>
-          <p>Gain: ${portfolio.metrics.totalUnrealizedGainPercent.toFixed(2)}%</p>
+          <p>Value: ${formatCurrency(
+            portfolio.metrics.totalCurrentValue,
+            account.currency
+          )}</p>
+          <p>Gain: ${portfolio.metrics.totalUnrealizedGainPercent.toFixed(
+            2
+          )}%</p>
         `;
         container.appendChild(portfolioElement);
       });
@@ -91,11 +95,17 @@ function updatePortfolioUI(portfolios) {
   }
 
   // Calculate and display totals
-  const totalPortfolioValue = portfolios.reduce((sum, p) => sum + p.metrics.totalCurrentValue, 0);
+  const totalPortfolioValue = portfolios.reduce(
+    (sum, p) => sum + p.metrics.totalCurrentValue,
+    0
+  );
   const primaryCurrency = portfolios[0]?.currency || "DKK";
 
   if (totalValue) {
-    totalValue.textContent = formatCurrency(totalPortfolioValue, primaryCurrency);
+    totalValue.textContent = formatCurrency(
+      totalPortfolioValue,
+      primaryCurrency
+    );
   }
 
   // Update performance indicators
@@ -118,7 +128,10 @@ function updatePortfolioUI(portfolios) {
 
   // Create pie chart
   if (portfolioChartCanvas) {
-    portfolioChartService.createPortfolioPieChart(portfolioChartCanvas, portfolios);
+    portfolioChartService.createPortfolioPieChart(
+      portfolioChartCanvas,
+      portfolios
+    );
   }
 
   // Create growth chart
@@ -128,8 +141,7 @@ function updatePortfolioUI(portfolios) {
   }
 }
 
-
-// Helper functions you already have
+// Helper functions
 function formatCurrency(amount, currencyCode) {
   return (
     new Intl.NumberFormat("da-DK", {
@@ -157,7 +169,6 @@ function updatePerformanceDisplay(element, percentChange) {
     percentChange >= 0 ? "positive-change" : "negative-change"
   );
 }
-
 
 // Other display functions
 function showNoPortfoliosMessage() {

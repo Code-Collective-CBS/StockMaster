@@ -16,7 +16,7 @@ const portfolioController = {
       // Get detailed portfolio data for each account
       const portfolioData = await Promise.all(
         accounts.map(async (account) => {
-          const portfolios = await databaseServices.getPortfoliosForUser(account.id);
+          const portfolios = await databaseServices.getPortfoliosByAccount(account.id);
 
           const portfoliosWithData = await Promise.all(
             portfolios.map(async (portfolio) => {
