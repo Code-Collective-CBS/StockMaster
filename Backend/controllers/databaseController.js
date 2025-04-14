@@ -150,7 +150,7 @@ const databaseController = {
             const account = await databaseServices.createAccount(userID, accountName, accountCurrency)
 
             if (!userID) {
-                return res.status(401).json({ message: 'User not found or logged in' });
+                return res.status(401).json({ message: 'User not found' });
             }
 
             // Deletes existing cache for accounts-user_id (sets new cache automatically afterwards)
@@ -265,6 +265,33 @@ const databaseController = {
             }
 
             return res.status(500).json({ message: "Something went wrong during withdrawal" });
+        }
+    },
+
+    createPortfolio: async (req, res) => {
+        // Saves the user- and account id from the session in a variable.
+        //const userID = req.session.user_id
+        const accountID = req.session.account_id
+        const { portfolioName } = req.body;
+
+        try {
+            const newPortfolio = await databaseServices.createPortfolio(accountID, portfolioName)
+
+            // Checks if the user has an existing account
+            if (!accountID) {
+                return res.status(401).json({ message: 'User not found or logged in' });
+            }
+
+            if (!newPortfolio) {
+                return res.status(400).json({ message: 'Fail in databaseServices' })
+            }
+
+            res.status(201).json({
+                message: "Portfolio created",
+                portfolioName: newPortfolio.portfolioName
+            });
+        } catch (err) {
+            res.status(500).json({ message: "Failed trying to create portfolio", err });
         }
     }
 };
