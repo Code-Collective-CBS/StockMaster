@@ -211,7 +211,7 @@ export const popUps = {
 
         if (!sellButton) return console.log('Could not find #sellButton');
 
-        sellButton.addEventListener('click', () => {
+        sellButton.addEventListener('click', async () => {
             if (document.getElementById('tradeModal')) return;
 
             const tradeModal = document.createElement('div');
