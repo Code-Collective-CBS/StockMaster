@@ -5,47 +5,38 @@ const exchangeRateService = require("../services/exchangeRateService");
 const portfolioController = {
   getPortfolioSummary: async (req, res) => {
     try {
-      const userId = req.params.userId;
+      const accountId = req.params.accountId;
 
       // Get user's accounts with portfolios in one query
-      const accounts = await databaseServices.getAccountInfo(userId);
-      if (!accounts || accounts.length === 0) {
-        return res.status(404).json({ message: "No accounts found" });
+      const portfolios = await databaseServices.getPortfoliosByAccount(accountId);
+      if (!portfolios || portfolios.length === 0) {
+        return res.status(200).json([]);
       }
+
+      const accountCurrency = portfolios[0].currency;
+      const accountName = portfolios[0].account_name;
 
       // Get detailed portfolio data for each account
       const portfolioData = await Promise.all(
-        accounts.map(async (account) => {
-          const portfolios = await databaseServices.getPortfoliosByAccount(account.id);
+        portfolios.map(async (portfolio) => {
+          const transactions = await databaseServices.getTransactionsForPortfolio(portfolio.id);
 
-          const portfoliosWithData = await Promise.all(
-            portfolios.map(async (portfolio) => {
-              const transactions = await databaseServices.getTransactionsForPortfolio(portfolio.id);
-              const holdings = calculateHoldings(transactions);
-              const securitiesData = await getSecuritiesData(holdings);
-              const metrics = await calculatePortfolioMetrics(
-                holdings,
-                securitiesData,
-                account.currency
-              );
-
+          const holdings = calculateHoldings(transactions);
+          const securitiesData = await getSecuritiesData(holdings);
+          const metrics = await calculatePortfolioMetrics(
+            holdings,
+            securitiesData,
+            accountCurrency
+          );
               return {
                 ...portfolio,
-                account_name: account.account_name,
-                currency: account.currency,
+                account_name: accountName,
+                currency: accountCurrency,
                 holdings,
                 metrics
               };
             })
           );
-
-          return {
-            ...account,
-            portfolios: portfoliosWithData
-          };
-        })
-      );
-
       res.json(portfolioData);
     } catch (error) {
       console.error("Error in getPortfolioSummary", error);

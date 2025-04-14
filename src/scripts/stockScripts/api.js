@@ -96,24 +96,24 @@ export const stockAPI = {
     }
   },
 
-  getPortfolioSummary: async (userId) => {
+  getPortfolioSummary: async (accountId) => {
     try {
 
-      if (!userId) {
+      if (!accountId) {
         throw new Error('User ID is required');
       }
 
       const USE_MOCK_DATA = false;
 
       if (USE_MOCK_DATA) {
-        console.log("Using mock portfolio data for user:", userId);
+        console.log("Using mock portfolio data for user:", accountId);
         // Simulate network delay for realistic testing
         await new Promise((resolve) => setTimeout(resolve, 300));
         return mockPortfolioData;
       }
 
       // our actual api call (when USE_MOCK_DATA is not true)
-      const url = `${PORTFOLIO_URL}/${userId}`;
+      const url = `${PORTFOLIO_URL}/${accountId}`;
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`HTTP error, could not get the portfolio url! Status: ${response.status}`);

@@ -10,7 +10,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const accountId = sessionStorage.getItem("selectedAccountId");
 
     if (!accountId) {
-      console.warn("No account selected");
       showErrorMessage("Please select an account first");
       return;
     }
