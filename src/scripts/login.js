@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // store name for display
         sessionStorage.setItem("userFirstname", result.firstname);
         sessionStorage.setItem("userLastname", result.lastname);
+        sessionStorage.setItem("userAvatar", result.avatar);
 
         alert("Login successful");
 

@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (dropdown) {
     dropdown.addEventListener('change', () => {
       const selectedValue = dropdown.value;
-      
+
       if (selectedValue === 'create-account.html') {
         window.location.href = `/src/pages/${selectedValue}`;
       } else {
@@ -145,12 +145,21 @@ const getUserInfo = async () => {
   try {
     const response = await fetch('http://localhost:3000/api/database/userInfo');
     const data = await response.ok ? await response.json() : null;
-    document.getElementById('profile-name').textContent = data
-      ? `${data.fornavn} ${data.efternavn}`
-      : 'N/A';
+
+    if (data) {
+      // Set name
+      document.getElementById('profile-name').textContent = `${data.fornavn} ${data.efternavn}`;
+
+      // Sets avatar picture
+      const avatarSeed = data.avatar;
+      const avatarURL = `https://api.dicebear.com/7.x/adventurer/svg?seed=${avatarSeed}`;
+      document.getElementById('profile-avatar').src = avatarURL;
+    } else {
+      document.getElementById('profile-name').textContent = 'N/A';
+    }
   } catch (err) {
-    console.error('Kunne ikke hente brugeren', err);
-    document.getElementById('profile-name').textContent = 'Bruger ikke fundet';
+    console.error('Could not get user data', err);
+    document.getElementById('profile-name').textContent = 'User not found';
   }
 };
 
@@ -164,7 +173,7 @@ const loadAccountDropdown = async (dropdown) => {
 
     if ((!accounts || accounts.length === 0) && !currentPath.includes('create-account.html')) {
       alert("You need to create an account");
-      return window.location.href = `/src/pages/create-account.html`; 
+      return window.location.href = `/src/pages/create-account.html`;
     }
     if (!dropdown) return;
 

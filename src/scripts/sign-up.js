@@ -1,3 +1,18 @@
+// Chooses avatar
+document.addEventListener('DOMContentLoaded', () =>{
+    const avatarOptions = document.querySelectorAll('.avatar-option');
+    const avatarInput = document.getElementById('selectedAvatar');
+
+    // Enable to choose between avatar before creating user
+    avatarOptions.forEach((avatar) => {
+        avatar.addEventListener('click', () => {
+            avatarOptions.forEach((avatarElement) => avatarElement.classList.remove('selected'));
+            avatar.classList.add('selected');
+            avatarInput.value = avatar.dataset.avatar;
+        })
+    })
+})
+
 document.getElementById("registerForm").addEventListener("submit", async function (event) {
     event.preventDefault(); // Prevents standard form-handling
 
@@ -8,6 +23,7 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     const phone_number = document.getElementById("telefon").value;
     const password = document.getElementById("password").value;
     const country_code = "DK"; // Evt. hardcode eller hent fra dropdown senere
+    const avatar = document.getElementById('selectedAvatar').value;
 
 
     // Sends sign-up data to backend via fetch
@@ -23,7 +39,8 @@ document.getElementById("registerForm").addEventListener("submit", async functio
                 email,
                 password,
                 phone_number,
-                country_code
+                country_code,
+                avatar
             })
         });
 

@@ -1,11 +1,11 @@
-
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
     background-color: var(--primary-color);
     font-family: var(--font-primary);
     height: 100%;
@@ -24,7 +24,8 @@ html, body {
     color: var(--primary-text);
     display: flex;
     flex-direction: column;
-    padding: 20px 0; /* top and bottom */
+    padding: 20px 0;
+    /* top and bottom */
     position: fixed;
     height: 100vh;
     box-sizing: border-box;
@@ -33,7 +34,8 @@ html, body {
 
 /* Logo section */
 .logo-section {
-    padding: 20px 25px; /* top and bottom and left and right */
+    padding: 20px 25px;
+    /* top and bottom and left and right */
     margin-bottom: 20px;
 }
 
@@ -83,13 +85,15 @@ html, body {
 .login-button:hover {
     background-color: var(--highlight);
     color: var(--secondary-color);
-    transform: translateY(-2px); /* lift the button slightly on hover*/
+    transform: translateY(-2px);
+    /* lift the button slightly on hover*/
 }
 
 /*Right Column (Registration Area) */
 .right-column {
     flex: 1;
-    margin-left: 250px; /*same as sidebar width*/
+    margin-left: 250px;
+    /*same as sidebar width*/
     padding: 30px;
     box-sizing: border-box;
     background-color: var(--primary-color);
@@ -187,7 +191,8 @@ html, body {
 
 .cancel-button:hover,
 .save-button:hover {
-    transform: translateY(-2px); /* lift the button slightly on hover*/
+    transform: translateY(-2px);
+    /* lift the button slightly on hover*/
 }
 
 /* Responsive adjustments for mobile */
@@ -222,4 +227,33 @@ html, body {
     .save-button {
         width: 100%;
     }
+}
+
+/* Avatars */
+.avatar-selection {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.avatar-option {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+}
+
+.avatar-option.selected {
+    border: 2px solid limegreen;
+}
+
+.avatar-option:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+
+.avatar-option:not(.selected):hover {
+    border: 2px solid var(--highlight);
 }
