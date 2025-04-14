@@ -48,7 +48,13 @@ const databaseController = {
             if (user) {
                 req.session.user_id = user.id;
 
-                res.status(201).json({ message: 'Login succesfull' });
+                res.status(201).json({
+                    message: "Login succesfull",
+                    id: user.id,
+                    firstname: user.firstname,
+                    lastname: user.lastname,
+                    avatar: user.avatar
+                });
             } else {
                 res.status(401).json({ message: 'Wrong username or password' });
             }
@@ -86,7 +92,8 @@ const databaseController = {
                 user: {
                     firstname: user.firstname,
                     lastname: user.lastname,
-                    email: user.email
+                    email: user.email,
+                    avatar: user.avatar
                 },
                 accounts: accountsWithPortfolios
             });
