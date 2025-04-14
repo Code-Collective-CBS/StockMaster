@@ -96,7 +96,6 @@ export const popUps = {
                 const result = await response.json();
                 if (response.status === 201) {
                     alert("Deposit succesfull");
-                    modal.querySelector(".modal-close").click(); // Click close popup
                 } else {
                     alert("Failed to deposit", result.message);
                 }
@@ -119,9 +118,8 @@ export const popUps = {
                 const result = await response.json();
                 if(response.status === 201) {
                     alert("Withdraw succesfull");
-                    modal.querySelector(".modal-close").click();
                 } else {
-                    alert("Failed to Withdraw", result.message);
+                    alert("Failed to withdraw: " + result.message);
                 }
             } catch (error) {
                 console.error("Failed to Withdraw", error);

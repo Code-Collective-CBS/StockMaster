@@ -234,7 +234,7 @@ const databaseController = {
             const { accountId } = req.params;
             const { amount } = req.body; // { "amount": 500 }
 
-            if(!userId || !accountId) {
+            if (!userId || !accountId) {
                 return res.status(400).json({ error: 'User Id or Accound Id is required' });
             }
 
@@ -251,14 +251,20 @@ const databaseController = {
             const { accountId } = req.params;
             const { amount } = req.body;
 
-            if(!userId || !accountId) {
+            if (!userId || !accountId) {
                 return res.status(400).json({ error: 'User Id or account Id is required' });
             }
 
             const result = await databaseServices.withdrawFromAccount(userId, accountId, amount);
             res.status(201).json(result);
         } catch (error) {
-            console.error(`Error withdrawing users id ${userId} from account id: ${accountId}`, error)
+            console.error(`Error withdrawing user's id ${req.session?.user_id} from account id: ${req.params?.accountId}`, error);
+
+            if (error.message === "Insufficient funds") {
+                return res.status(400).json({ message: "Insufficient funds" });
+            }
+
+            return res.status(500).json({ message: "Something went wrong during withdrawal" });
         }
     }
 };
