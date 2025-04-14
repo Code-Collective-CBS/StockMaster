@@ -5,11 +5,12 @@ const { getOrSetCache } = require('../utilityFunctions/cacheHelper');
 
 const databaseController = {
     createUser: async (req, res) => {
-        const { firstname, lastname, email, password, phone_number, country_code } = req.body;
+        const { firstname, lastname, email, password, phone_number, country_code, avatar } = req.body;
         const body = req.body;
-        if (!firstname || !lastname || !email || !password) {
+        if (!firstname || !lastname || !email || !password || !avatar) {
             return res.status(400).json({ message: "Manglende information" });
         }
+
         try {
             const result = await databaseServices.createUser(body);
 
@@ -28,7 +29,8 @@ const databaseController = {
             res.status(201).json({
                 message: "User created",
                 fornavn: user.firstname,
-                efternavn: user.lastname
+                efternavn: user.lastname,
+                avatar: user.avatar
             });
         } catch (err) {
             console.log(err);
@@ -45,6 +47,7 @@ const databaseController = {
 
             if (user) {
                 req.session.user_id = user.id;
+
                 res.status(201).json({ message: 'Login succesfull' });
             } else {
                 res.status(401).json({ message: 'Wrong username or password' });
