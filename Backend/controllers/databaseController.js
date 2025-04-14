@@ -1,3 +1,4 @@
+const { Transaction } = require('mssql');
 const databaseServices = require('../services/databaseServices');
 // CACHE
 const cache = require("../utilityFunctions/cache");
@@ -281,12 +282,12 @@ const databaseController = {
     createPortfolio: async (req, res) => {
         // Saves the user- and account id from the session in a variable.
         const userId = req.session.user_id
-        const accountId = parseInt(req.params.accountId); 
+        const accountId = parseInt(req.params.accountId);
         const { portfolioName } = req.body;
 
         try {
             const newPortfolio = await databaseServices.createPortfolio(accountId, portfolioName)
-            
+
             // Checks if the user has an existing account
             if (!accountId) {
                 return res.status(401).json({ message: 'User not found or logged in' });
@@ -302,6 +303,66 @@ const databaseController = {
             });
         } catch (err) {
             res.status(500).json({ message: "Failed trying to create portfolio", err });
+        }
+    },
+
+    buySecurity: async (req, res) => {
+        try {
+            const user_id = req.session.user_id;
+            const { portfolioId } = req.params;
+
+            const { accountId, symbol, amount, price_per_share } = req.body;
+
+            if (!user_id || !portfolioId || !accountId || !symbol || !amount || !price_per_share) {
+                return res.status(400).json({ message: "Missing required fields" });
+            }
+
+            const result = await databaseServices.buyOrSellSecurity({
+                userId: user_id,
+                accountId,
+                portfolioId,
+                symbol,
+                amount,
+                price_per_share,
+                transaction_type: 'buy'
+            });
+
+            res.status(201).json({
+                message: "Security bought",
+                transaction_id: result.transaction_id
+            });
+
+        } catch (error) {
+            console.error('Error buying security', error);
+            res.status(500).json({ message: "Something went wrong trying to buy security" });
+        }
+    },
+    // NOT DONE YET (MIMIC BUY)
+    sellSecurity: async (req, res) => {
+        try {
+            const user_id = req.session.user_id;
+            const { portfolioId } = req.params;
+
+            const { accountId, symbol, amount, price_per_share } = req.body;
+
+            if (!user_id || !portfolioId || !accountId || !symbol || !amount || !price_per_share) {
+                return res.status(400).json({ message: "Missing required fields" });
+            }
+
+            const result = await databaseServices.buyOrSellSecurity({
+                user_id,
+                accountId,
+                portfolioId,
+                symbol,
+                amount,
+                price_per_share,
+                transaction_type: 'sell'
+            });
+
+            res.status(201).json({ message: "Security sold: ", result });
+        } catch (error) {
+            console.error('Error selling security', error);
+            res.status(500).json({ message: "Something went wrong trying to sell security" });
         }
     }
 };

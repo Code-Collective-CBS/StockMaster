@@ -49,9 +49,9 @@ router.put('/deposit-to-account/:accountId', databaseController.depositToAccount
 router.put('/withdraw-to-account/:accountId', databaseController.withdrawFromAccount);
 
 // Buy stocks to portfolio
-router.put('/buy-security/:portfolioId', )
+router.put('/buy-security/:portfolioId', databaseController.buySecurity);
 
 // Sell stocks to portfolio
-router.put('/sell-security/:portfolioId', )
+router.put('/sell-security/:portfolioId', databaseController.sellSecurity);
 
 module.exports = router;

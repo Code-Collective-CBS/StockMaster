@@ -8,16 +8,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const urlParams = new URLSearchParams(window.location.search);
   const symbol = urlParams.get("symbol");
+  window.urlParams = urlParams; // Use for buy/sell
+  
   //   const symbol = IBMStockData.companyOverview.Symbol;
   //   console.log(`Stock symbol: ${symbol}`);
 
   // Storing time series globally so we can use it again
   let globalTimeSeriesData;
   let globalCompanyOverview;
-
-  // POP UP
-  popUps.buySecurity();
-  popUps.sellSecurity();
 
   try {
     // Get company overview data
@@ -36,6 +34,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     const fullTimeSeriesData = timeSeriesResponse.data; // unwrap it first
     globalTimeSeriesData = fullTimeSeriesData?.["Time Series (Daily)"];
     chartService.createPriceChart(globalTimeSeriesData, globalCompanyOverview);
+
+    // Set closePrice for use in buy/sell feature
+    const latestPrice = parseFloat(Object.entries(globalTimeSeriesData)[0][1]["4. close"]); // Extract the most recent closing price from the first entry in the time series data
+    window.latestStockPrice = latestPrice;
+    // Set currency for use in buy/sell feature
+    const securityCurrency = globalCompanyOverview.Currency;
+    window.securityCurrency = securityCurrency;
+
+    // POP UP NEED ACCESS TO globalTimeSeriesData
+    popUps.buySecurity();
+    popUps.sellSecurity();
 
     // Displaying all stock metrics from the stockMetrics module
     stockMetrics.displayStockData(globalCompanyOverview, 251.25);

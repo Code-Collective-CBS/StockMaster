@@ -292,7 +292,8 @@ const databaseServices = {
                 .request()
                 .input("userId", sql.Int, userId)
                 .input("accountId", sql.Int, accountId)
-                .input("amount", sql.Decimal(18, 2), amount).query(`
+                .input("amount", sql.Decimal(18, 2), amount)
+                .query(`
                 UPDATE Accounts
                 SET total_balance = total_balance - @amount
                 WHERE id = @accountId AND user_id = @userId AND total_balance >= @amount
@@ -308,17 +309,74 @@ const databaseServices = {
             throw error;
         }
     },
-
-    buySecurityToPortfolio: async (
+    // NEED TO ADD CHECK ACCOUN BALANCE
+    buyOrSellSecurity: async ({
         userId,
         accountId,
         portfolioId,
         symbol,
-        market_price,
-        amount
-    ) => {
+        amount,
+        price_per_share,
+        transaction_type }) => {
         try {
-            // CODE HERE
+            const pool = await poolPromise;
+
+            // 0. Validate portfolio belongs to account and user
+            const validatePortfolio = await pool
+                .request()
+                .input("userId", sql.Int, userId)
+                .input("accountId", sql.Int, accountId)
+                .input("portfolioId", sql.Int, portfolioId)
+                .query(`
+                    SELECT p.id
+                    FROM Portfolio p
+                    JOIN Accounts a ON p.account_id = a.id
+                    WHERE p.id = @portfolioId AND a.id = @accountId AND a.user_id = @userId
+            `);
+
+            if(validatePortfolio.recordset.length === 0) {
+                throw new Error("Unauthorized: Portfolio does not belong to this account or user");
+            }
+
+            // 1. Get current account balance
+
+            // 2. Get security ID from DB table Securities
+            const securityQuery = await pool
+                .request()
+                .input("symbol", sql.VarChar(10), symbol)
+                .query(`
+                SELECT id FROM Securities
+                WHERE symbol = @symbol
+            `);
+            
+            if(securityQuery.recordset.length === 0) {
+                throw new Error('Security not found'); // MAYBE ADD FUNCTION TO ADD SECURITY
+            }
+
+            const securities_id = securityQuery.recordset[0].id;
+
+            // 3. Calculate total price
+            const total_price = amount * price_per_share;
+
+            // 4. Insert into Transactions table
+            const insertQuery = await pool
+                .request()
+                .input("portfolio_id", sql.Int, portfolioId)
+                .input("securities_id", sql.Int, securities_id)
+                .input("transaction_type", sql.VarChar(10), transaction_type)
+                .input("amount", sql.Decimal(37, 2), amount)
+                .input("price_per_share", sql.Decimal(18, 2), price_per_share)
+                .input("total_price", sql.Decimal(37, 2), total_price)
+                .query(`
+                    INSERT INTO Transactions
+                    (portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price)
+                    OUTPUT INSERTED.id
+                    VALUES (@portfolio_id, @securities_id, @transaction_type, @amount, @price_per_share, @total_price)
+            `);
+
+            const transaction_id = insertQuery.recordset[0].id; // OUTPUT from "OUTPUT INSERTED.id"
+
+            return { success: true, transaction_id}
         } catch (error) {
             console.error("Failed to buy security to portfolio", error);
             throw error;
@@ -337,7 +395,7 @@ const databaseServices = {
             VALUES (@account_id, @name)
             `)
 
-            return {accountId, portfolioName }
+            return { accountId, portfolioName }
         } catch (err) {
             console.error("Error: Could not create account", err);
             throw err;

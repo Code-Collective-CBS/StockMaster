@@ -10,7 +10,7 @@ export const popUps = {
 
         try {
             const response = await fetch(`/api/database/portfolio/account/${selectedAccountId}`);
-            if(!response.ok) throw new Error('Failed to fetch account portfolios');
+            if (!response.ok) throw new Error('Failed to fetch account portfolios');
 
             const data = await response.json();
             return data;
@@ -99,7 +99,7 @@ export const popUps = {
 
 
         const depositToAccount = async (amountInput) => {
-            const amount = amountInput.value;
+            const amount = parseFloat(amountInput.value);
             const selectedAccountId = sessionStorage.getItem('selectedAccountId');
 
             try {
@@ -121,7 +121,7 @@ export const popUps = {
         };
 
         const withdrawingFromAccount = async (amountInput) => {
-            const amount = amountInput.value;
+            const amount = parseFloat(amountInput.value);
             const selectedAccountId = sessionStorage.getItem('selectedAccountId');
 
             try {
@@ -161,20 +161,40 @@ export const popUps = {
                 <div class="modal-form">
                     <p class="account-name"></p>
                     <p class="modal-instruction">Enter ammount to buy</p>
-                    <select id="popup-portfolios"></select>
+                    <select id="popup-portfolios-select"></select>
                     <div class="input-group">
                         <input id="buy-amount" type="number" placeholder="Amount" />
-                        <span class="currency-label" id="security-currency"></span>
                     </div>
+                    <p class="stock-price-info">Price per share: <span id="stock-price"></span></p>
+                    <p class="account-balance-info">Available balance: <span id="account-balance"></span></p>
+                    <p class="total-price-info">Total price: <span id="total-price">0</span></p>
                     <button id="confirmAction" class="btn btn-primary">Confirm</button>
                 </div>
             </div>
             `;
             document.body.appendChild(tradeModal);
 
-            const dropdown = document.getElementById('popup-portfolios');
+            const dropdown = document.getElementById('popup-portfolios-select');
+            const amountInput = tradeModal.querySelector('#buy-amount');
+            const totalPriceSpan = tradeModal.querySelector('#total-price')
+            
+            const selectedAccount = popUps.accountDetails();
+            const stockPriceSpan = tradeModal.querySelector("#stock-price");
+            const accountBalanceSpan = tradeModal.querySelector("#account-balance");
+            
+            amountInput.addEventListener("input", () => { // MAYBE ADD CURRENCY CHANGE?
+                const amount = parseFloat(amountInput.value);
+                const total = amount * window.latestStockPrice;
 
-            const selectedAccount = popUps.accountDetails(); // NEEED TO CHECK SCOPE
+                if (!isNaN(total)) {
+                    totalPriceSpan.textContent = `${total.toFixed(2)} ${window.securityCurrency}`;
+                } else {
+                    totalPriceSpan.textContent = `0 ${window.securityCurrency}`;
+                }
+            });
+
+            stockPriceSpan.textContent = `${window.latestStockPrice} ${window.securityCurrency}`;
+            accountBalanceSpan.textContent = `${selectedAccount.total_balance} ${selectedAccount.currency}`;
 
             const allPortfolioDetails = await popUps.allPortfolioDetails(selectedAccount.account_id);
 
@@ -189,7 +209,7 @@ export const popUps = {
             const accountNamePara = tradeModal.querySelector('.account-name');
             accountNamePara.innerHTML = `Account: ${selectedAccount.account_name}`;
 
-            // const currencySpan = tradeModal.querySelector('#security-currency');
+            const currencySpan = tradeModal.querySelector('.security-currency');
             // const securityCurrency = selectedAccount.currency;
             // currencySpan.textContent = securityCurrency;
 
@@ -197,14 +217,51 @@ export const popUps = {
             tradeModal.querySelector('.modal-close').addEventListener('click', () => tradeModal.remove());
             tradeModal.querySelector('.modal-overlay').addEventListener('click', () => tradeModal.remove());
 
-            tradeModal.querySelector('#confirmAction').addEventListener('click', () => {
-                const amount = tradeModal.querySelector('#pop-amount');
+            tradeModal.querySelector('#confirmAction').addEventListener('click', async () => {
+                const amount = parseFloat(amountInput.value);
+                const latestPrice = window.latestStockPrice; // Saved in security.js
 
-                console.log(`User wants to buy: STOCKNAME, Amunt: AMOUNT`)
-            })
+                const selectedPortfolio = tradeModal.querySelector('#popup-portfolios-select').value;
+                const symbol = window.urlParams.get("symbol");
+
+                if (!amount || isNaN(latestPrice) || !selectedPortfolio || !symbol) {
+                    alert('Missing or invalid input');
+                }
+
+                // HELPER VARIABLE TO SEND BODY AS OBJECT
+                const payload = {
+                    accountId: selectedAccount.account_id,
+                    symbol,
+                    amount,
+                    price_per_share: latestPrice
+                };
+
+                try {
+                    const response = await fetch(`/api/database/buy-security/${selectedPortfolio}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const result = await response.json();
+                    console.log("Transaction ID: ", result.transaction_id)
+
+
+                    if (response.status === 201) {
+                        alert(`Successfully bought ${amount} shares of ${symbol} at ${latestPrice} per share.`);
+                    } else {
+                        alert('Transaction failed: ', result.message);
+                    }
+                } catch (error) {
+                    console.error('Buy request failed: ', result.message);
+                }
+
+                tradeModal.remove();
+                console.log(`User wants to buy paylod: `, payload);
+            });
         });
     },
-
+    // NOT DONE YET (MIMIC BUY)
     sellSecurity: () => {
         const sellButton = document.getElementById('sellButton');
 
@@ -223,9 +280,9 @@ export const popUps = {
                 <div class="modal-form">
                     <p class="account-name"></p>
                     <p class="modal-instruction">Enter ammount to sell</p>
-                    <select id="popup-portfolios"></select>
+                    <select id="popup-portfolios-select"></select>
                     <div class="input-group">
-                        <input id="buy-amount" type="number" placeholder="Amount" />
+                        <input id="sell-amount" type="number" placeholder="Amount" />
                         <span class="currency-label" id="security-currency"></span>
                     </div>
                     <button id="confirmAction" class="btn btn-primary">Confirm</button>
@@ -234,19 +291,12 @@ export const popUps = {
             `;
             document.body.appendChild(tradeModal);
 
-            const dropdown = document.getElementById('popup-portfolios');
+            const dropdown = document.getElementById('popup-portfolios-select');
+            const amountInput = tradeModal.querySelector('#sell-amount');
 
-            const selectedAccount = popUps.accountDetails(); // NEEED TO CHECK SCOPE
+            const selectedAccount = popUps.accountDetails();
 
             const allPortfolioDetails = await popUps.allPortfolioDetails(selectedAccount.account_id);
-
-            allPortfolioDetails.forEach(portfolio => {
-                const option = document.createElement('option');
-                option.value = portfolio.id
-                option.textContent = portfolio.name;
-
-                dropdown.appendChild(option);
-            });
 
             const accountNamePara = tradeModal.querySelector('.account-name');
             accountNamePara.innerHTML = `Account: ${selectedAccount.account_name}`;
@@ -260,8 +310,8 @@ export const popUps = {
             tradeModal.querySelector('.modal-overlay').addEventListener('click', () => tradeModal.remove());
 
             tradeModal.querySelector('#confirmAction').addEventListener('click', () => {
-                const amount = tradeModal.querySelector('#pop-amount');
-
+                const amount = parseFloat(amountInput.value);
+                // HERE 
                 console.log(`User wants to sell: STOCKNAME, Amunt: ${amount.value}`)
             })
         });
