@@ -5,18 +5,19 @@ export const popUps = {
         return accounts.find(acc => acc.account_id == selectedAccountId) || null;
     },
 
-    portfolioDetails: async (accountId) => {
+    allPortfolioDetails: async (accountId) => {
         const selectedAccountId = accountId;
 
         try {
-            const response = await fetch(`api/database/portfolio/account/${selectedAccountId}`);
+            const response = await fetch(`/api/database/portfolio/account/${selectedAccountId}`);
+            if(!response.ok) throw new Error('Failed to fetch account portfolios');
 
-            const result = await response;
+            const data = await response.json();
+            return data;
         } catch (error) {
-
+            console.error('Error fetching portfolios', error);
+            return [];
         }
-
-        const accountPortfolios = null;
     },
 
     setupDepositPopup: () => {
@@ -147,7 +148,7 @@ export const popUps = {
 
         if (!buyButton) return console.log('Could not find #buyButton');
 
-        buyButton.addEventListener('click', () => {
+        buyButton.addEventListener('click', async () => {
             if (document.getElementById('tradeModal')) return;
 
             const tradeModal = document.createElement('div');
@@ -171,7 +172,20 @@ export const popUps = {
             `;
             document.body.appendChild(tradeModal);
 
-            // const selectedAccount = accountDetails(); // NEEED TO CHECK SCOPE
+            const dropdown = document.getElementById('popup-portfolios');
+
+            const selectedAccount = popUps.accountDetails(); // NEEED TO CHECK SCOPE
+            console.log(selectedAccount);
+
+            const allPortfolioDetails = await popUps.allPortfolioDetails(selectedAccount);
+
+            allPortfolioDetails.forEach(portfolio => {
+                const option = document.createElement('option');
+                option.value = portfolio.id
+                option.textContent = portfolio.name;
+
+                dropdown.appendChild(option);
+            });
 
             const accountNamePara = tradeModal.querySelector('.account-name');
             // accountNamePara.innerHTML = `Account: ${selectedAccount.account_name}`;
@@ -221,7 +235,12 @@ export const popUps = {
             `;
             document.body.appendChild(tradeModal);
 
-            // const selectedAccount = accountDetails(); // NEEED TO CHECK SCOPE
+            const dropdown = document.getElementById('popup-portfolios');
+
+            const selectedAccount = popUps.accountDetails(); // NEEED TO CHECK SCOPE
+            console.log(selectedAccount);
+
+            const allPortfolioDetails = await popUps.allPortfolioDetails(selectedAccount);
 
             const accountNamePara = tradeModal.querySelector('.account-name');
             // accountNamePara.innerHTML = `Account: ${selectedAccount.account_name}`;
