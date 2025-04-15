@@ -9,13 +9,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const symbol = urlParams.get("symbol");
   window.urlParams = urlParams; // Use for buy/sell
-  
+
   //   const symbol = IBMStockData.companyOverview.Symbol;
   //   console.log(`Stock symbol: ${symbol}`);
 
   // Storing time series globally so we can use it again
   let globalTimeSeriesData;
   let globalCompanyOverview;
+
+  const portfolioSummary = await checkHoldingForSecurity(symbol);
+  console.log(portfolioSummary);
 
   try {
     // Get company overview data
@@ -69,7 +72,7 @@ function updateStockHeader(text) {
     console.error("Could not find the stock");
   }
   stockHeader.textContent = text;
-}
+};
 
 function displayCompanyName(companyData, symbol) {
   console.log("Company data: ", companyData);
@@ -83,7 +86,7 @@ function displayCompanyName(companyData, symbol) {
     updateStockHeader(companyData.Name);
   }
   updateStockHeader(symbol);
-}
+};
 
 function displayCompanyOverview(companyData, symbol) {
   // Check if we have company data
@@ -108,7 +111,7 @@ function displayCompanyOverview(companyData, symbol) {
   // Display the description
   companyDescription.textContent = companyData.Description;
   console.log(`Successfully displayed ${symbol} details`);
-}
+};
 
 function updatePageTitle(stockName) {
   const pageTitle = document.querySelector(".page-title");
@@ -117,4 +120,46 @@ function updatePageTitle(stockName) {
     console.error("Could not find the stock");
   }
   pageTitle.textContent = stockName;
-}
+};
+
+/*
+  const portfolioSummary = await getPortfolioSummary();
+  console.log(portfolioSummary[0].holdings[0].symbol);
+
+*/
+
+async function checkHoldingForSecurity(symbol) {
+  try {
+    const selectedAccount = sessionStorage.getItem('selectedAccountId');
+    const portfolioSummary = await stockAPI.getPortfolioSummary(selectedAccount);
+
+    let matchedSecurities = [];
+
+    portfolioSummary.forEach((portfolio) => {
+      portfolio.holdings.forEach((holding) => {
+
+        if (holding.symbol === symbol) {
+          matchedSecurities.push({
+
+            portfolioName: portfolio.name,
+            portfolioId: portfolio.id,
+            holding
+
+          });
+        }
+
+      });
+    });
+
+    if (matchedSecurities.length === 0) {
+      console.log("Security not found in any holdings.");
+    } else {
+      console.log("Matched holdings:", matchedSecurities);
+    }
+
+    return matchedSecurities;
+
+  } catch (error) {
+    console.error('Error fetching portfolios', error);
+  }
+};
