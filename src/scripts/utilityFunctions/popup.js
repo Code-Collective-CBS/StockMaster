@@ -1,5 +1,9 @@
+import { loadAccounts } from './loadAccounts.js';
+
 export const popUps = {
-    accountDetails: () => {
+    accountDetails: async () => {
+        await loadAccounts(); // Refresh window.cachedAccounts
+
         const selectedAccountId = sessionStorage.getItem('selectedAccountId');
         const accounts = window.cachedAccounts || [];
         return accounts.find(acc => acc.account_id == selectedAccountId) || null;
@@ -20,12 +24,12 @@ export const popUps = {
         }
     },
 
-    setupDepositPopup: () => {
+    setupDepositPopup:  () => {
         const button = document.getElementById("depositButton");
 
         if (!button) return console.log("Could not find #depositButton button");
 
-        button.addEventListener("click", () => {
+        button.addEventListener("click", async () => {
             if (document.getElementById("depositModal")) return;
 
             const modal = document.createElement("div");
@@ -52,7 +56,7 @@ export const popUps = {
             `;
             document.body.appendChild(modal);
 
-            const selectedAccount = popUps.accountDetails();
+            const selectedAccount = await popUps.accountDetails();
 
             const accountNamePara = modal.querySelector('.account-name');
             accountNamePara.innerHTML = `Account: ${selectedAccount.account_name}`;
@@ -112,6 +116,8 @@ export const popUps = {
                 const result = await response.json();
                 if (response.status === 201) {
                     alert("Deposit succesfull");
+
+                    await popUps.accountDetails();
                 } else {
                     alert("Failed to deposit", result.message);
                 }
@@ -134,6 +140,8 @@ export const popUps = {
                 const result = await response.json();
                 if (response.status === 201) {
                     alert("Withdraw succesfull");
+
+                    await popUps.accountDetails();
                 } else {
                     alert("Failed to withdraw: " + result.message);
                 }
@@ -166,8 +174,8 @@ export const popUps = {
                         <input id="buy-amount" type="number" placeholder="Amount" />
                     </div>
                     <p class="stock-price-info">Price per share: <span id="stock-price"></span></p>
-                    <p class="account-balance-info">Available balance: <span id="account-balance"></span></p>
                     <p class="total-price-info">Total price: <span id="total-price">0</span></p>
+                    <p class="account-balance-info">Available balance: <span id="account-balance"></span></p>
                     <button id="confirmAction" class="btn btn-primary">Confirm</button>
                 </div>
             </div>
@@ -178,7 +186,7 @@ export const popUps = {
             const amountInput = tradeModal.querySelector('#buy-amount');
             const totalPriceSpan = tradeModal.querySelector('#total-price')
             
-            const selectedAccount = popUps.accountDetails();
+            const selectedAccount = await popUps.accountDetails();
             const stockPriceSpan = tradeModal.querySelector("#stock-price");
             const accountBalanceSpan = tradeModal.querySelector("#account-balance");
             
@@ -233,7 +241,8 @@ export const popUps = {
                     accountId: selectedAccount.account_id,
                     symbol,
                     amount,
-                    price_per_share: latestPrice
+                    price_per_share: latestPrice,
+                    security_currency: window.securityCurrency
                 };
 
                 try {
@@ -249,6 +258,9 @@ export const popUps = {
 
                     if (response.status === 201) {
                         alert(`Successfully bought ${amount} shares of ${symbol} at ${latestPrice} per share.`);
+
+                        const refreshedAccount = await popUps.accountDetails();
+                        accountBalanceSpan.textContent = `${refreshedAccount.total_balance} ${refreshedAccount.currency}`;
                     } else {
                         alert('Transaction failed: ', result.message);
                     }
@@ -294,7 +306,7 @@ export const popUps = {
             const dropdown = document.getElementById('popup-portfolios-select');
             const amountInput = tradeModal.querySelector('#sell-amount');
 
-            const selectedAccount = popUps.accountDetails();
+            const selectedAccount = await popUps.accountDetails();
 
             const allPortfolioDetails = await popUps.allPortfolioDetails(selectedAccount.account_id);
 

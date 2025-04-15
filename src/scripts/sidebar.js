@@ -1,4 +1,5 @@
-// Wait until the page is fully loaded
+import { loadAccounts } from '../scripts/utilityFunctions/loadAccounts.js';
+
 document.addEventListener("DOMContentLoaded", () => {
   const dropdown = document.getElementById('account-select');
 
@@ -171,9 +172,8 @@ const getUserInfo = async () => {
 
 const loadAccountDropdown = async (dropdown) => {
   try {
-    const response = await fetch('/api/database/get-accounts');
-    const { data: accounts } = await response.json();
-    window.cachedAccounts = accounts; // Frontend cache for user accounts not using server-side cache with npm
+    await loadAccounts(); // Frontend cache for user accounts not using server-side cache with npm
+    const accounts = window.cachedAccounts || [];
 
     const currentPath = window.location.pathname; // Used for if statement
 

@@ -251,6 +251,9 @@ const databaseController = {
                 return res.status(400).json({ error: 'User Id or Accound Id is required' });
             }
 
+            const cacheKey = `accounts-user_id-${userId}`;
+            cache.del(cacheKey);
+
             const result = await databaseServices.depositToAccount(userId, accountId, amount);
             res.status(201).json(result);
         } catch (error) {
@@ -267,6 +270,9 @@ const databaseController = {
             if (!userId || !accountId) {
                 return res.status(400).json({ error: 'User Id or account Id is required' });
             }
+
+            const cacheKey = `accounts-user_id-${userId}`;
+            cache.del(cacheKey);
 
             const result = await databaseServices.withdrawFromAccount(userId, accountId, amount);
             res.status(201).json(result);
@@ -313,7 +319,7 @@ const databaseController = {
             const user_id = req.session.user_id;
             const { portfolioId } = req.params;
 
-            const { accountId, symbol, amount, price_per_share } = req.body;
+            const { accountId, symbol, amount, price_per_share, security_currency } = req.body;
 
             if (!user_id || !portfolioId || !accountId || !symbol || !amount || !price_per_share) {
                 return res.status(400).json({ message: "Missing required fields" });
@@ -326,12 +332,17 @@ const databaseController = {
                 symbol,
                 amount,
                 price_per_share,
-                transaction_type: 'buy'
+                transaction_type: 'buy',
+                security_currency
             });
+
+            const cacheKey = `accounts-user_id-${user_id}`;
+            cache.del(cacheKey);
 
             res.status(201).json({
                 message: "Security bought",
                 transaction_id: result.transaction_id
+
             });
 
         } catch (error) {
@@ -347,7 +358,7 @@ const databaseController = {
 
             const { accountId, symbol, amount, price_per_share } = req.body;
 
-            if (!user_id || !portfolioId || !accountId || !symbol || !amount || !price_per_share) {
+            if (!user_id || !portfolioId || !accountId || !symbol || !amount || !price_per_share || !security_currency) {
                 return res.status(400).json({ message: "Missing required fields" });
             }
 
@@ -358,8 +369,12 @@ const databaseController = {
                 symbol,
                 amount,
                 price_per_share,
-                transaction_type: 'sell'
+                transaction_type: 'sell',
+                security_currency
             });
+
+            const cacheKey = `accounts-user_id-${user_id}`;
+            cache.del(cacheKey);
 
             res.status(201).json({ message: "Security sold: ", result });
         } catch (error) {

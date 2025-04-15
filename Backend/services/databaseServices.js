@@ -1,5 +1,7 @@
 const sql = require("mssql");
 const config = require("../config/config");
+const exchangeRateService = require("../services/exchangeRateService");
+const currencyUtils = require("../utilityFunctions/currencyUtils");
 
 // Creates connection to our MSSQL database through our login in config.database
 // Creates a pool of connections. More reusable and effective
@@ -168,7 +170,7 @@ const databaseServices = {
     },
 
     getAccountBalanceAndCurrency: async (accounId) => {
-        try{
+        try {
             const pool = await poolPromise;
             const result = await pool
                 .request()
@@ -178,7 +180,7 @@ const databaseServices = {
                 FROM Accounts
                 WHERE id = @accountId
             `);
-            
+
             return result.recordset[0]; // { total_balance, currency }
         } catch (error) {
             console.error("Error getting account balance and currency", error);
@@ -329,7 +331,7 @@ const databaseServices = {
             throw error;
         }
     },
-    // NEED TO ADD CHECK ACCOUN BALANCE
+
     buyOrSellSecurity: async ({
         userId,
         accountId,
@@ -337,7 +339,9 @@ const databaseServices = {
         symbol,
         amount,
         price_per_share,
-        transaction_type }) => {
+        transaction_type,
+        security_currency
+    }) => {
         try {
             const pool = await poolPromise;
 
@@ -354,12 +358,12 @@ const databaseServices = {
                     WHERE p.id = @portfolioId AND a.id = @accountId AND a.user_id = @userId
             `);
 
-            if(validatePortfolio.recordset.length === 0) {
+            if (validatePortfolio.recordset.length === 0) {
                 throw new Error("Unauthorized: Portfolio does not belong to this account or user");
             }
 
             // 1. Get current account balance
-            const { total_balance, currency: accountCurrency } = await this.getAccountBalanceAndCurrency(accountId);
+            const { total_balance, currency: accountCurrency } = await databaseServices.getAccountBalanceAndCurrency(accountId);
 
 
             // 2. Get security ID from DB table Securities
@@ -370,8 +374,8 @@ const databaseServices = {
                 SELECT id FROM Securities
                 WHERE symbol = @symbol
             `);
-            
-            if(securityQuery.recordset.length === 0) {
+
+            if (securityQuery.recordset.length === 0) {
                 throw new Error('Security not found'); // MAYBE ADD FUNCTION TO ADD SECURITY
             }
 
@@ -379,12 +383,21 @@ const databaseServices = {
 
             // 3. Calculate total price
             const total_price = amount * price_per_share;
-            let convertedTotal = total_balance;
+            let convertedTotal = total_price;
 
-            if(accountCurrency !== window.securityCurrency) { // Setting window.securityCurrency in security.js
-                const rates = await ex
+            if (accountCurrency !== security_currency) { // Setting window.securityCurrency in security.js
+                const rates = await exchangeRateService.getCurrency(security_currency);
+                convertedTotal = currencyUtils.convertCurrency(
+                    total_price,
+                    security_currency,
+                    accountCurrency,
+                    rates.conversion_rates
+                );
             }
 
+            if (transaction_type === 'buy' && convertedTotal > parseFloat(total_balance)) {
+                throw new Error(`Insufficient balance. Need ${convertedTotal.toFixed(2)} ${accountCurrency}, but have ${parseFloat(total_balance).toFixed(2)}`);
+            }
 
             // 4. Insert into Transactions table
             const insertQuery = await pool
@@ -402,9 +415,22 @@ const databaseServices = {
                     VALUES (@portfolio_id, @securities_id, @transaction_type, @amount, @price_per_share, @total_price)
             `);
 
+            // 5. Update account balance if 'buy'
+            if(transaction_type === 'buy') {
+                await pool
+                    .request()
+                    .input('accountId', sql.Int, accountId)
+                    .input('amount', sql.Decimal(18, 2), convertedTotal)
+                    .query(`
+                    UPDATE Accounts
+                    SET total_balance = total_balance - @amount
+                    WHERE id = @accountId        
+                `);
+            }
+
             const transaction_id = insertQuery.recordset[0].id; // OUTPUT from "OUTPUT INSERTED.id"
 
-            return { success: true, transaction_id}
+            return { success: true, transaction_id }
         } catch (error) {
             console.error("Failed to buy security to portfolio", error);
             throw error;
