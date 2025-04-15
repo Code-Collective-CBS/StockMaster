@@ -167,6 +167,25 @@ const databaseServices = {
         }
     },
 
+    getAccountBalanceAndCurrency: async (accounId) => {
+        try{
+            const pool = await poolPromise;
+            const result = await pool
+                .request()
+                .input('accountId', sql.Int, accounId)
+                .query(`
+                SELECT total_balance, currency
+                FROM Accounts
+                WHERE id = @accountId
+            `);
+            
+            return result.recordset[0]; // { total_balance, currency }
+        } catch (error) {
+            console.error("Error getting account balance and currency", error);
+            throw error;
+        }
+    },
+
     searchStockNames: async (query) => {
         try {
             const pool = await poolPromise;
@@ -340,6 +359,8 @@ const databaseServices = {
             }
 
             // 1. Get current account balance
+            const { total_balance, currency: accountCurrency } = await this.getAccountBalanceAndCurrency(accountId);
+
 
             // 2. Get security ID from DB table Securities
             const securityQuery = await pool
@@ -358,6 +379,12 @@ const databaseServices = {
 
             // 3. Calculate total price
             const total_price = amount * price_per_share;
+            let convertedTotal = total_balance;
+
+            if(accountCurrency !== window.securityCurrency) { // Setting window.securityCurrency in security.js
+                const rates = await ex
+            }
+
 
             // 4. Insert into Transactions table
             const insertQuery = await pool
