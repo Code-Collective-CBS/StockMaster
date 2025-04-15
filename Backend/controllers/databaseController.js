@@ -356,30 +356,35 @@ const databaseController = {
             const user_id = req.session.user_id;
             const { portfolioId } = req.params;
 
-            const { accountId, symbol, amount, price_per_share } = req.body;
+            const { accountId, symbol, amount, price_per_share, security_currency } = req.body;
 
-            if (!user_id || !portfolioId || !accountId || !symbol || !amount || !price_per_share || !security_currency) {
+            if (!user_id || !portfolioId || !accountId || !symbol || !amount || !price_per_share) {
                 return res.status(400).json({ message: "Missing required fields" });
             }
 
             const result = await databaseServices.buyOrSellSecurity({
-                user_id,
+                userId: user_id,
                 accountId,
                 portfolioId,
                 symbol,
                 amount,
                 price_per_share,
-                transaction_type: 'sell',
+                transaction_type: 'buy',
                 security_currency
             });
 
             const cacheKey = `accounts-user_id-${user_id}`;
             cache.del(cacheKey);
 
-            res.status(201).json({ message: "Security sold: ", result });
+            res.status(201).json({
+                message: "Security bought",
+                transaction_id: result.transaction_id
+
+            });
+
         } catch (error) {
-            console.error('Error selling security', error);
-            res.status(500).json({ message: "Something went wrong trying to sell security" });
+            console.error('Error buying security', error);
+            res.status(500).json({ message: "Something went wrong trying to buy security" });
         }
     }
 };
