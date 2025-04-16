@@ -17,9 +17,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   let globalTimeSeriesData;
   let globalCompanyOverview;
 
-  const portfolioSummary = await checkHoldingForSecurity(symbol);
-  console.log(portfolioSummary);
-
   try {
     // Get company overview data
     const companyData = await stockAPI.getCompanyOverview(symbol);
@@ -63,6 +60,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch (error) {
     console.error("Error fetching data:", error);
   }
+
+  await checkHoldingForSecurity(symbol);
 });
 
 function updateStockHeader(text) {
@@ -132,7 +131,6 @@ async function checkHoldingForSecurity(symbol) {
   try {
     const selectedAccount = sessionStorage.getItem('selectedAccountId');
     const portfolioSummary = await stockAPI.getPortfolioSummary(selectedAccount);
-    console.log(portfolioSummary);
 
     let matchedSecurities = [];
 
@@ -158,9 +156,50 @@ async function checkHoldingForSecurity(symbol) {
       console.log("Matched holdings:", matchedSecurities);
     }
 
-    return matchedSecurities;
+    displaySecurityHolding(matchedSecurities);
 
+    return matchedSecurities;
   } catch (error) {
     console.error('Error fetching portfolios', error);
   }
 };
+
+let holdingMapByPortfolioId = {};
+
+function displaySecurityHolding(matchedSecurities) {
+  holdingMapByPortfolioId = {}; // reset
+
+  const portfolioSelect = document.getElementById('portfolioSelect');
+  portfolioSelect.innerHTML = ''; // clear previous
+
+  matchedSecurities.forEach((match) => {
+    const option = document.createElement('option');
+    option.value = match.portfolioId;
+    option.textContent = match.portfolioName;
+    portfolioSelect.appendChild(option);
+
+    // Save holding by portfolioId
+    holdingMapByPortfolioId[match.portfolioId] = match.holding;
+  });
+
+  // Set initial display to first match
+  if (matchedSecurities.length > 0) {
+    updateHoldingDisplay(matchedSecurities[0].portfolioId);
+  }
+};
+
+function updateHoldingDisplay(portfolioId) {
+  const holding = holdingMapByPortfolioId[portfolioId];
+  const securityCurrency = window.securityCurrency
+  if (!holding) return;
+
+  document.getElementById('amountOfSecurity').textContent = holding.quantity;
+  document.getElementById('totalValue').textContent = `${holding.totalCost} - (${securityCurrency})`;
+  document.getElementById('gak').textContent = `${parseFloat(holding.gak).toFixed(2)} - (${securityCurrency})`;
+};
+
+
+portfolioSelect.addEventListener('change', (e) => {
+  const selectedId = e.target.value;
+  updateHoldingDisplay(selectedId);
+});
