@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Error fetching data:", error);
   }
 
-  await checkHoldingForSecurity(symbol);
+  await checkHoldingForSecurity(symbol); // note UPDATE PAGE IF USER BUYS OR SELL (MISING)
 });
 
 function updateStockHeader(text) {
@@ -131,6 +131,7 @@ async function checkHoldingForSecurity(symbol) {
   try {
     const selectedAccount = sessionStorage.getItem('selectedAccountId');
     const portfolioSummary = await stockAPI.getPortfolioSummary(selectedAccount);
+    const holdingsSection = document.querySelector('.holdings-info-container');
 
     let matchedSecurities = [];
 
@@ -152,13 +153,14 @@ async function checkHoldingForSecurity(symbol) {
 
     if (matchedSecurities.length === 0) {
       console.log("Security not found in any holdings.");
+      holdingsSection.style.display = 'none'; // Hides section if no math
+      return;
     } else {
       console.log("Matched holdings:", matchedSecurities);
+      holdingsSection.style.display = 'block'; // Hides section if no math
+      displaySecurityHolding(matchedSecurities);
+      return;
     }
-
-    displaySecurityHolding(matchedSecurities);
-
-    return matchedSecurities;
   } catch (error) {
     console.error('Error fetching portfolios', error);
   }
