@@ -132,6 +132,7 @@ async function checkHoldingForSecurity(symbol) {
   try {
     const selectedAccount = sessionStorage.getItem('selectedAccountId');
     const portfolioSummary = await stockAPI.getPortfolioSummary(selectedAccount);
+    console.log(portfolioSummary);
 
     let matchedSecurities = [];
 

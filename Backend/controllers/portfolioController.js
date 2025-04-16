@@ -66,10 +66,10 @@ function calculateHoldings(transactions) {
 
     const holding = holdingsBySecurityId[securityId];
 
-    if (transaction.transaction_type === "BUY") {
+    if (transaction.transaction_type === "BUY" || transaction.transaction_type === 'buy') { // DELETE "BUY" LATER AND KEEP LOWER CASE
       holding.quantity += transaction.amount;
       holding.totalCost += transaction.total_price; // remember this line, because I can't see any totalCost row in the transactions table
-    } else if (transaction.transaction_type === "SELL") {
+    } else if (transaction.transaction_type === "SELL" || transaction.transaction_type === "sell") { // DELETE "SELL" AND KEEP LOWER CASE
       holding.quantity -= transaction.amount;
       // In a more complex implementation, we would calculate realized gains here
     }
