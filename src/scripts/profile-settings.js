@@ -20,7 +20,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Sæt avatar-billede
             if (user.avatar) {
                 const avatarURL = `https://api.dicebear.com/7.x/adventurer/svg?seed=${user.avatar}`;
-                document.getElementById('profile-avatar').src = avatarURL;
+                document.getElementById('profile-settings-avatar').src = avatarURL;
+                console.log("Avatar seed:", user.avatar);
             }
 
             // Checks if an avatar is selected
@@ -59,7 +60,6 @@ document.getElementById('profileForm').addEventListener('submit', async (event) 
         avatar = null;
     }
 
-
     const profilData = {
         firstname,
         lastname,
@@ -71,7 +71,6 @@ document.getElementById('profileForm').addEventListener('submit', async (event) 
     if (newPassword !== '') {
         profilData.newPassword = newPassword;
     }
-
 
     try {
         const response = await fetch('http://localhost:3000/api/database/updateprofileInfo', {
