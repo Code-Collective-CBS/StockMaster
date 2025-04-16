@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Sæt avatar-billede
             if (user.avatar) {
                 const avatarURL = `https://api.dicebear.com/7.x/adventurer/svg?seed=${user.avatar}`;
-                document.getElementById('profile-avatar').src = avatarURL;
+                document.getElementById('profile-settings-avatar').src = avatarURL;
                 console.log("Avatar seed:", user.avatar);
             }
 
