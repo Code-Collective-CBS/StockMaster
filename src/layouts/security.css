@@ -415,8 +415,6 @@ section {
   color: var(--primary-text);
 }
 
-
-
 /* responsive */
 @media (max-width: 768px) {
   .stock-info-container {

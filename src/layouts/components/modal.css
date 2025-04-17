@@ -140,3 +140,21 @@ input::placeholder {
     color: var(--secondary-color);
     font-weight: bold;
 }
+
+/* SELECT PORTFOLIO */
+/* DROPDOWN FOR ACCOUNT SELECTION */
+#popup-portfolios-select {
+    padding: 5px;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    background-color: var(--secondary-highligth);
+    color: var(--primary-color);
+    font-size: 11px;
+    cursor: pointer;
+}
+
+#popup-portfolios-select:hover {
+    background-color: var(--highlight);
+    color: var(--primary-text);
+}

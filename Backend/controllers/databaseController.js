@@ -350,7 +350,7 @@ const databaseController = {
             res.status(500).json({ message: "Something went wrong trying to buy security" });
         }
     },
-    // NOT DONE YET (MIMIC BUY)
+
     sellSecurity: async (req, res) => {
         try {
             const user_id = req.session.user_id;
@@ -369,7 +369,7 @@ const databaseController = {
                 symbol,
                 amount,
                 price_per_share,
-                transaction_type: 'buy',
+                transaction_type: 'sell',
                 security_currency
             });
 
@@ -377,14 +377,14 @@ const databaseController = {
             cache.del(cacheKey);
 
             res.status(201).json({
-                message: "Security bought",
+                message: "Security sold",
                 transaction_id: result.transaction_id
 
             });
 
         } catch (error) {
-            console.error('Error buying security', error);
-            res.status(500).json({ message: "Something went wrong trying to buy security" });
+            console.error('Error selling security', error);
+            res.status(500).json({ message: "Something went wrong trying to sell security" });
         }
     }
 };

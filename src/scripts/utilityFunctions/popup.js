@@ -224,7 +224,8 @@ export const popUps = {
 
             allPortfolioDetails.forEach(portfolio => {
                 const option = document.createElement('option');
-                option.value = portfolio.id
+                option.classList.add('popup-portfolios-option');
+                option.value = portfolio.id;
                 option.textContent = portfolio.name;
 
                 dropdown.appendChild(option);
@@ -334,6 +335,7 @@ export const popUps = {
             // Populate dropdown
             allPortfolioDetails.forEach(portfolio => {
                 const option = document.createElement('option');
+                option.classList.add('popup-portfolios-option');
                 option.value = portfolio.id;
                 option.textContent = portfolio.name;
                 dropdown.appendChild(option);

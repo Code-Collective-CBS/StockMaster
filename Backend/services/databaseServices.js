@@ -331,7 +331,7 @@ const databaseServices = {
             throw error;
         }
     },
-    // NEED TO ADD CHECK ACCOUN BALANCE (MADE exchangeRateService and currencyUtils for Exchange currencies and conversion)
+    // NEED TO ADD CHECK ACCOUNT BALANCE (MADE exchangeRateService and currencyUtils for Exchange currencies and conversion)
     buyOrSellSecurity: async ({
         userId,
         accountId,
@@ -425,6 +425,18 @@ const databaseServices = {
                     UPDATE Accounts
                     SET total_balance = total_balance - @amount
                     WHERE id = @accountId        
+                `);
+            }
+
+            if(transaction_type === 'sell') {
+                await pool
+                    .request()
+                    .input('accountId', sql.Int, accountId)
+                    .input('amount', sql.Decimal(18, 2), convertedTotal)
+                    .query(`
+                    UPDATE Accounts
+                    SET total_balance = total_balance + @amount
+                    WHERE id = @accountId
                 `);
             }
 
