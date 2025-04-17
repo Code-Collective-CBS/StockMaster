@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Error fetching data:", error);
   }
 
-  await checkHoldingForSecurity(symbol); // note UPDATE PAGE IF USER BUYS OR SELL (MISING)
+  await checkHoldingForSecurity(symbol); // note NEED TO BE INSIDE DOM - UPDATE PAGE IF USER BUYS OR SELL (MISING)
 });
 
 function updateStockHeader(text) {
@@ -153,11 +153,11 @@ async function checkHoldingForSecurity(symbol) {
 
     if (matchedSecurities.length === 0) {
       console.log("Security not found in any holdings.");
-      holdingsSection.style.display = 'none'; // Hides section if no math
+      holdingsSection.style.display = 'none'; // Hides section if no match
       return;
     } else {
       console.log("Matched holdings:", matchedSecurities);
-      holdingsSection.style.display = 'block'; // Hides section if no math
+      holdingsSection.style.display = 'block'; // Hides section if no match
       displaySecurityHolding(matchedSecurities);
       return;
     }
@@ -169,7 +169,7 @@ async function checkHoldingForSecurity(symbol) {
 let holdingMapByPortfolioId = {};
 
 function displaySecurityHolding(matchedSecurities) {
-  holdingMapByPortfolioId = {}; // reset
+  holdingMapByPortfolioId = {}; //  Acts as a quick-access dictionary:
 
   const portfolioSelect = document.getElementById('portfolioSelect');
   portfolioSelect.innerHTML = ''; // clear previous
@@ -181,7 +181,7 @@ function displaySecurityHolding(matchedSecurities) {
     portfolioSelect.appendChild(option);
 
     // Save holding by portfolioId
-    holdingMapByPortfolioId[match.portfolioId] = match.holding;
+    holdingMapByPortfolioId[match.portfolioId] = match.holding; // 3: { quantity: 12, symbol: "IBM", ... },
   });
 
   // Set initial display to first match
@@ -191,13 +191,13 @@ function displaySecurityHolding(matchedSecurities) {
 };
 
 function updateHoldingDisplay(portfolioId) {
-  const holding = holdingMapByPortfolioId[portfolioId];
+  const holding = holdingMapByPortfolioId[portfolioId]; // Quick search for id set by select
   const securityCurrency = window.securityCurrency
   if (!holding) return;
 
   document.getElementById('amountOfSecurity').textContent = holding.quantity;
-  document.getElementById('totalValue').textContent = `${holding.totalCost} - (${securityCurrency})`;
-  document.getElementById('gak').textContent = `${parseFloat(holding.gak).toFixed(2)} - (${securityCurrency})`;
+  document.getElementById('totalValue').textContent = `${(holding.totalCost).toFixed(2)} (${securityCurrency})`;
+  document.getElementById('gak').textContent = `${(holding.gak).toFixed(2)} (${securityCurrency})`;
 };
 
 

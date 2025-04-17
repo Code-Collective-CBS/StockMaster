@@ -24,7 +24,23 @@ export const popUps = {
         }
     },
 
-    setupDepositPopup:  () => {
+    getStockQuantityInPortfolio: async (symbol, portfolioId) => {
+        try {
+            const selectedAccountId = sessionStorage.getItem('selectedAccountId');
+            const portfolios = await popUps.allPortfolioDetails(selectedAccountId);
+
+            const portfolio = portfolios.find(p => p.id == portfolioId);
+            if (!portfolio) return 0;
+
+            const holding = portfolio.holdings.find(h => h.symbol === symbol);
+            return holding ? holding.quantity : 0;
+        } catch (error) {
+            console.error('Failed to get stock quantity in portfolio', error);
+            return 0;
+        }
+    },
+
+    setupDepositPopup: () => {
         const button = document.getElementById("depositButton");
 
         if (!button) return console.log("Could not find #depositButton button");
@@ -168,7 +184,7 @@ export const popUps = {
                 <span class="modal-close">&times;</span>
                 <div class="modal-form">
                     <p class="account-name"></p>
-                    <p class="modal-instruction">Enter ammount to buy</p>
+                    <p class="modal-instruction">Enter amount to buy</p>
                     <select id="popup-portfolios-select"></select>
                     <div class="input-group">
                         <input id="buy-amount" type="number" placeholder="Amount" />
@@ -182,14 +198,14 @@ export const popUps = {
             `;
             document.body.appendChild(tradeModal);
 
-            const dropdown = document.getElementById('popup-portfolios-select');
+            const dropdown = tradeModal.querySelector('#popup-portfolios-select');
             const amountInput = tradeModal.querySelector('#buy-amount');
             const totalPriceSpan = tradeModal.querySelector('#total-price')
-            
+
             const selectedAccount = await popUps.accountDetails();
             const stockPriceSpan = tradeModal.querySelector("#stock-price");
             const accountBalanceSpan = tradeModal.querySelector("#account-balance");
-            
+
             amountInput.addEventListener("input", () => { // MAYBE ADD CURRENCY CHANGE?
                 const amount = parseFloat(amountInput.value);
                 const total = amount * window.latestStockPrice;
@@ -216,10 +232,6 @@ export const popUps = {
 
             const accountNamePara = tradeModal.querySelector('.account-name');
             accountNamePara.innerHTML = `Account: ${selectedAccount.account_name}`;
-
-            const currencySpan = tradeModal.querySelector('.security-currency');
-            // const securityCurrency = selectedAccount.currency;
-            // currencySpan.textContent = securityCurrency;
 
             // Close modal
             tradeModal.querySelector('.modal-close').addEventListener('click', () => tradeModal.remove());
@@ -261,6 +273,7 @@ export const popUps = {
 
                         const refreshedAccount = await popUps.accountDetails();
                         accountBalanceSpan.textContent = `${refreshedAccount.total_balance} ${refreshedAccount.currency}`;
+                        window.location.reload(); // MAYBE SMOTHER UX LATER - BUT NEED FOR UPDATING HOLDINGS OF SECURITY
                     } else {
                         alert('Transaction failed: ', result.message);
                     }
@@ -273,14 +286,15 @@ export const popUps = {
             });
         });
     },
-    // NOT DONE YET (MIMIC BUY)
+
     sellSecurity: () => {
         const sellButton = document.getElementById('sellButton');
-
         if (!sellButton) return console.log('Could not find #sellButton');
 
         sellButton.addEventListener('click', async () => {
             if (document.getElementById('tradeModal')) return;
+
+            let currentQuantityHeld = 0; // To cache amount
 
             const tradeModal = document.createElement('div');
             tradeModal.id = 'tradeModal';
@@ -291,41 +305,137 @@ export const popUps = {
                 <span class="modal-close">&times;</span>
                 <div class="modal-form">
                     <p class="account-name"></p>
-                    <p class="modal-instruction">Enter ammount to sell</p>
+                    <p class="modal-instruction">Enter amount to sell</p>
                     <select id="popup-portfolios-select"></select>
                     <div class="input-group">
                         <input id="sell-amount" type="number" placeholder="Amount" />
-                        <span class="currency-label" id="security-currency"></span>
                     </div>
+                    <p class="stock-price-info">Price per share: <span id="stock-price"></span></p>
+                    <p class="total-price-info">Total price: <span id="total-price">0</span></p>
+                    <p class="portfolio-amount-info">You own: <span id="owned-quantity">-</span></p>
+                    <p class="account-balance-info">Available balance: <span id="account-balance"></span></p>
                     <button id="confirmAction" class="btn btn-primary">Confirm</button>
                 </div>
             </div>
             `;
             document.body.appendChild(tradeModal);
 
-            const dropdown = document.getElementById('popup-portfolios-select');
+            const symbol = urlParams.get("symbol");
+            const dropdown = tradeModal.querySelector('#popup-portfolios-select');
             const amountInput = tradeModal.querySelector('#sell-amount');
+            const totalPriceSpan = tradeModal.querySelector('#total-price');
+            const stockPriceSpan = tradeModal.querySelector("#stock-price");
+            const accountBalanceSpan = tradeModal.querySelector("#account-balance");
+            const ownedQuantitySpan = tradeModal.querySelector('#owned-quantity');
 
             const selectedAccount = await popUps.accountDetails();
-
             const allPortfolioDetails = await popUps.allPortfolioDetails(selectedAccount.account_id);
 
+            // Populate dropdown
+            allPortfolioDetails.forEach(portfolio => {
+                const option = document.createElement('option');
+                option.value = portfolio.id;
+                option.textContent = portfolio.name;
+                dropdown.appendChild(option);
+            });
+
+            // Initial UI setup
+            stockPriceSpan.textContent = `${window.latestStockPrice} ${window.securityCurrency}`;
+            accountBalanceSpan.textContent = `${selectedAccount.total_balance} ${selectedAccount.currency}`;
             const accountNamePara = tradeModal.querySelector('.account-name');
             accountNamePara.innerHTML = `Account: ${selectedAccount.account_name}`;
 
-            // const currencySpan = tradeModal.querySelector('#security-currency');
-            // const securityCurrency = selectedAccount.currency;
-            // currencySpan.textContent = securityCurrency;
+            // Update quantity display
+            const updateOwnedQuantity = async () => {
+                const portfolioId = dropdown.value;
+                const quantity = await popUps.getStockQuantityInPortfolio(symbol, portfolioId);
+                currentQuantityHeld = quantity; // Cache for later use
+                ownedQuantitySpan.textContent = `${quantity} shares`;
+            };
+
+            await updateOwnedQuantity();
+            dropdown.addEventListener('change', updateOwnedQuantity);
+
+            // Calculate total on input
+            amountInput.addEventListener("input", () => {
+                const amount = parseFloat(amountInput.value);
+                const total = amount * window.latestStockPrice;
+
+                if (!isNaN(total)) {
+                    totalPriceSpan.textContent = `${total.toFixed(2)} ${window.securityCurrency}`;
+                } else {
+                    totalPriceSpan.textContent = `0 ${window.securityCurrency}`;
+                }
+
+                // Clear any previous error
+                const existingError = tradeModal.querySelector("#sell-error-message");
+                if (existingError) existingError.remove();
+
+                // Add error if amount is too high
+                if (!isNaN(amount) && amount > currentQuantityHeld) {
+                    const errorMsg = document.createElement("p");
+                    errorMsg.id = "sell-error-message";
+                    errorMsg.style.color = "red";
+                    errorMsg.style.marginTop = "6px";
+                    errorMsg.textContent = `You only own ${currentQuantityHeld} shares in this portfolio.`;
+
+                    amountInput.parentElement.appendChild(errorMsg);
+                }
+            });
 
             // Close modal
             tradeModal.querySelector('.modal-close').addEventListener('click', () => tradeModal.remove());
             tradeModal.querySelector('.modal-overlay').addEventListener('click', () => tradeModal.remove());
 
-            tradeModal.querySelector('#confirmAction').addEventListener('click', () => {
+            // Confirm sell
+            tradeModal.querySelector('#confirmAction').addEventListener('click', async () => {
                 const amount = parseFloat(amountInput.value);
-                // HERE 
-                console.log(`User wants to sell: STOCKNAME, Amunt: ${amount.value}`)
-            })
+                const selectedPortfolio = dropdown.value;
+                const latestPrice = window.latestStockPrice;
+
+                if (!amount || isNaN(latestPrice) || !selectedPortfolio || !symbol) {
+                    alert('Missing or invalid input');
+                    return;
+                }
+
+                if (amount > currentQuantityHeld) {
+                    alert(`You only own ${currentQuantityHeld} shares in this portfolio.`);
+                    return;
+                }
+
+                const payload = {
+                    accountId: selectedAccount.account_id,
+                    symbol,
+                    amount,
+                    price_per_share: latestPrice,
+                    security_currency: window.securityCurrency
+                };
+
+                try {
+                    const response = await fetch(`/api/database/sell-security/${selectedPortfolio}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const result = await response.json();
+                    console.log("Transaction ID:", result.transaction_id);
+
+                    if (response.status === 201) {
+                        alert(`Successfully sold ${amount} shares of ${symbol} at ${latestPrice} per share.`);
+                        const refreshedAccount = await popUps.accountDetails();
+                        accountBalanceSpan.textContent = `${refreshedAccount.total_balance} ${refreshedAccount.currency}`;
+                        window.location.reload();
+                    } else {
+                        alert('Transaction failed: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('Sell request failed:', error);
+                    alert('An error occurred while processing your sell request.');
+                }
+
+                tradeModal.remove();
+            });
         });
     },
 
