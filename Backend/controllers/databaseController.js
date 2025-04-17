@@ -386,6 +386,20 @@ const databaseController = {
             console.error('Error selling security', error);
             res.status(500).json({ message: "Something went wrong trying to sell security" });
         }
+    },
+
+    getTransactionsSummary: async (req, res) => {
+        const user_id = req.session.user_id;
+        const account_id = req.params;
+
+        if(!user_id || !account_id) {
+            return res.status(400).json({ message: "Something went wrong trying to get transaction" });
+        }
+
+        const result = await databaseServices.getTransactionsSummary(user_id, account_id);
+        
+        // note CACHE HERE for later
+        
     }
 };
 

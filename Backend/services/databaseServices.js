@@ -466,6 +466,41 @@ const databaseServices = {
             console.error("Error: Could not create account", err);
             throw err;
         }
+    },
+
+    getTransactionsSummary: async (userId, accounId) => {
+        try{
+            const pool = await poolPromise;
+            const transactions = await pool
+                .request()
+                .input('userId', sql.Int, userId)
+                .input('accountId', sql.Int, accounId)
+                .query(`
+                SELECT
+                    t.id AS transaction_id,
+                    t.transaction_type,
+                    t.amount,
+                    t.price_per_share,
+                    t.total_price,
+                    t.transaction_date,
+                    s.symbol,
+                    s.name AS security_name
+                    s.type AS security_type
+                    p.name AS portfolio_name
+                FROM Transactions t
+                JOIN Securities s ON t.securities_id = s.id
+                JOIN Portfolio p ON t.portfolio_id = p.id
+                JOIN Accounts a ON p.account_id = a.id
+                WHERE a.id = @accountId
+                    AND a.user_id = @userId
+                ORDER BY t.transaction_date DESC;
+            `);
+
+            return transactions;
+        } catch (error) {
+            console.error('Failed to get transaction for user account');
+            throw error;
+        }
     }
 };
 
