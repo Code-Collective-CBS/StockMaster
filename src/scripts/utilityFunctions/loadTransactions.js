@@ -8,7 +8,7 @@ const loadTransactions = async () => {
         throw new Error('Account id missing');
       }
     
-      const response = await fetch(`${databaseUrl}//transactions/account/${accountId}`);
+      const response = await fetch(`${databaseUrl}/transactions/account/${accountId}`);
       if(!response.ok) {
         throw new Error('Error fetching transactions', error);
       }

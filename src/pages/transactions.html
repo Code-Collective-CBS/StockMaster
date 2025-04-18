@@ -161,71 +161,39 @@
               <th class="th-account">Konto</th>
               <th class="th-portofolio">Portefølje</th>
               <th class="th-type">Type</th>
-              <th class="th-ammount">Beløb</th>
-              <th class="th-market-price">Kurs</th>
-              <th class="th-cost">Omkostninger</th>
-              <th class="th-money-ammount">Beløb</th>
+              <th class="th-security-type">Værdipapir type</th>
+              <th class="th-symbol">Symbol</th>
+              <th class="th-market-price">Antal</th>
+              <th class="th-price-per-share">Pris pr. stk.</th>
+              <th class="th-money-ammount">Total</th>
             </tr>
           </thead>
           <tbody class="tbody-transactions">
-            <tr class="tr-body-1">
-              <td class="td-date">01/01/2025</td>
-              <td class="td-account">Konto 1</td>
-              <td class="td-portofolio">Portefølje 1</td>
-              <td class="td-type">Inbetaling</td>
-              <td class="td-ammount">-</td>
-              <td class="td-market-price">-</td>
-              <td class="td-cost">-</td>
-              <td class="td-money-ammount">9999 <span class="currency">DKK</span></td>
-            </tr>
-            <tr class="tr-body-2">
-              <td class="td-date">02/02/2025</td>
-              <td class="td-account">Konto 2</td>
-              <td class="td-portofolio">Portefølje 2</td>
-              <td class="td-type">Inbetaling</td>
-              <td class="td-ammount">-</td>
-              <td class="td-market-price">-</td>
-              <td class="td-cost">-</td>
-              <td class="td-money-ammount">9999 <span class="currency">DKK</span></td>
-            </tr>
           </tbody>
         </table>
       </section>
 
       <section class="balance">
-        <h2>Saldooversigt</h2>
+        <h2>Konto oversigt</h2>
         <table id="balance-table">
           <thead>
             <tr class="tr-head">
               <th class="th-currency">Valuta</th>
-              <th class="th-added-account">Tilføjet konto</th>
-              <th class="th-subtracted-account">Fratrukket konto</th>
+              <th class="th-account-name">Konto</th>
               <th class="th-total">Total</th>
             </tr>
           </thead>
-          <tbody>
-            <tr class="tr-body-1">
-              <td class="td-currency">DKK</td>
-              <td class="td-added-account">999</td>
-              <td class="td-subtracted-account">100</td>
-              <td class="td-total">899</td>
-            </tr>
-          <tbody>
-            <tr class="tr-body-2">
-              <td class="td-currency">SEK</td>
-              <td class="td-added-account">200</td>
-              <td class="td-subtracted-account">100</td>
-              <td class="td-total">100</td>
-            </tr>
+          <tbody class="tbody-balance">
           </tbody>
         </table>
       </section>
 
-      <section class="top-trades">
-        <h2>Mest handlede</h2>
-        <p class="most-traded-1">Novo nordisk A/S</p>
-        <p class="most-traded-2">Apple Inc</p>
-        <p class="most-traded-2">Microsoft corp.</p>
+      <section class="top-picks">
+        <h2>Indeks</h2>
+        <p id="I:NDX">NASDAQ 100 - <span class="market-price"></span> USD</p>
+        <p id="I:CX10GI">OMX Copenhagen Technology GI - <span class="market-price"></span> DKK</p>
+        <p id="I:CX35PI">OMX Copenhagen Real Estate PI - <span class="market-price"></span> DKK</p>
+        <p id="I:CX20GI">OMX Copenhagen Health Care GI - <span class="market-price"></span> DKK</p>
       </section>
     </section>
   </main>

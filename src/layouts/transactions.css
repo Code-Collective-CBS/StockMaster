@@ -106,29 +106,47 @@ section {
 }
 
 /*TABLE STYLING*/
-table{
+table {
     width: 100%;
     text-align: left;
     border-collapse: collapse;
 }
-thead tr{
+
+thead tr {
     font-weight: var(--text-weight-bold);
-    border-bottom: solid 3px var(--third-blue);
-}
-tbody tr{
-    border-bottom: solid 2px var(--grey);
-    transition:  0.3s ease-in-out;
+    border-bottom: 3px solid var(--third-blue);
 }
 
-tbody tr:hover{
+tbody tr {
+    border-bottom: 2px solid var(--grey);
+    transition: 0.3s ease-in-out;
+}
+
+tbody tr:hover {
     color: var(--secondary-color);
     background-color: var(--secondary-highligth);
 }
 
-th, td{
+th,
+td {
     padding: 10px;
+    text-align: left;
+    border-right: 1px solid var(--grey); 
 }
 
-td{
+th:last-child,
+td:last-child {
+    border-right: none; 
+}
+
+th {
+    background-color: var(--primary-color);
+}
+
+td {
     height: 35px;
+}
+
+tr:nth-child(even) {
+    background-color: var(--primary-color);
 }
