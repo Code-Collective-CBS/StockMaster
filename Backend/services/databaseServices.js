@@ -287,6 +287,8 @@ const databaseServices = {
     depositToAccount: async (userId, accountId, amount) => {
         try {
             const pool = await poolPromise;
+
+            // 1. Update balance
             const result = await pool
                 .request()
                 .input("userId", sql.Int, userId)
@@ -300,6 +302,22 @@ const databaseServices = {
                 SELECT * FROM Accounts WHERE id = @accountId
             `); // USE OF SELECT FOR LATER USE TO DISPLAY NEW ACCOUNT INSTEAD OF GETTING NEW INFORMATION MAYBE NOT NEEDED
 
+            ///////// NÅET HER TIL (Insert into transaktioner)
+            // 2. Insert into Transactions table
+            await pool
+            .request()
+            .input("account_id", sql.Int, accountId)
+            .input("transaction_type", sql.VarChar(10), 'deposit')
+            .input('amount', sql.Decimal(37, 2), amount)
+            .input("price_per_share", sql.Decimal(18, 2), 1) // 1 is a placeholder maybe change to 0 if no interference with GAK
+            .input('total_price', sql.Decimal(37, 2), amount)
+            .query(`
+                INSERT INTO Transactions    
+                (portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price)
+                VALUES (NULL, NULL, @transaction_type, @amount, @price_per_share, @total_price)
+                `);
+                
+            ///////// NÅET HER TIL 
             return result.recordset[0];
         } catch (error) {
             console.error("Failed to deposit to account", error);
