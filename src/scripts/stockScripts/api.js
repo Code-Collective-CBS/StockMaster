@@ -125,6 +125,22 @@ export const stockAPI = {
     }
   },
 
+  getTransactionsSummary: async () => {
+    try {
+      const accountId = sessionStorage.getItem('selectedAccountId');
+
+      if(!accountId) {
+        throw new Error('Account id missing');
+      }
+
+      
+
+    } catch (error) {
+      console.error('Error fetching transactions', error);
+      throw error;
+    }
+  }
+
   // Test connection
   // testConnection: async () => {
   //   try {
