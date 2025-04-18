@@ -54,6 +54,7 @@ router.put('/buy-security/:portfolioId', databaseController.buySecurity);
 // Sell stocks to portfolio
 router.put('/sell-security/:portfolioId', databaseController.sellSecurity);
 
-router.get('transactions/account/:accountId', databaseController.getTransactionsSummary);
+// Get all transactions for an account
+router.get('/transactions/account/:accountId', databaseController.getTransactionsSummary);
 
 module.exports = router;
