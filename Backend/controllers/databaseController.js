@@ -243,38 +243,47 @@ const databaseController = {
 
     depositToAccount: async (req, res) => {
         try {
-            const userId = req.session.user_id;
+            const user_id = req.session.user_id;
             const { accountId } = req.params;
             const { amount } = req.body; // { "amount": 500 }
 
-            if (!userId || !accountId) {
+            if (!user_id || !accountId) {
                 return res.status(400).json({ error: 'User Id or Accound Id is required' });
             }
 
-            const cacheKey = `accounts-user_id-${userId}`;
-            cache.del(cacheKey);
+            // Acounts cache
+            const cacheKeyAccounts = `accounts-user_id-${user_id}`;
+            cache.del(cacheKeyAccounts);
+            // Transaction cache
+            const cacheKeyTransactions = `transactions-user_id-${user_id}`;
+            cache.del(cacheKeyTransactions);
 
-            const result = await databaseServices.depositToAccount(userId, accountId, amount);
+            const result = await databaseServices.depositToAccount(user_id, accountId, amount);
             res.status(201).json(result);
         } catch (error) {
-            console.error(`Error depositing users id ${userId} to account id: ${accountId}`, error);
+            console.error(`Error depositing users id ${user_id} to account id: ${accountId}`, error);
         }
     },
 
     withdrawFromAccount: async (req, res) => {
         try {
-            const userId = req.session.user_id;
+            const user_id = req.session.user_id;
             const { accountId } = req.params;
             const { amount } = req.body;
 
-            if (!userId || !accountId) {
+            if (!user_id || !accountId) {
                 return res.status(400).json({ error: 'User Id or account Id is required' });
             }
 
-            const cacheKey = `accounts-user_id-${userId}`;
-            cache.del(cacheKey);
+            // Acounts cache
+            const cacheKeyAccounts = `accounts-user_id-${user_id}`;
+            cache.del(cacheKeyAccounts);
+            // Transaction cache
+            const cacheKeyTransactions = `transactions-user_id-${user_id}`;
+            cache.del(cacheKeyTransactions);
 
-            const result = await databaseServices.withdrawFromAccount(userId, accountId, amount);
+
+            const result = await databaseServices.withdrawFromAccount(user_id, accountId, amount);
             res.status(201).json(result);
         } catch (error) {
             console.error(`Error withdrawing user's id ${req.session?.user_id} from account id: ${req.params?.accountId}`, error);
@@ -336,8 +345,12 @@ const databaseController = {
                 security_currency
             });
 
-            const cacheKey = `accounts-user_id-${user_id}`;
-            cache.del(cacheKey);
+            // Acounts cache
+            const cacheKeyAccounts = `accounts-user_id-${user_id}`;
+            cache.del(cacheKeyAccounts);
+            // Transaction cache
+            const cacheKeyTransactions = `transactions-user_id-${user_id}`;
+            cache.del(cacheKeyTransactions);
 
             res.status(201).json({
                 message: "Security bought",
@@ -373,8 +386,12 @@ const databaseController = {
                 security_currency
             });
 
-            const cacheKey = `accounts-user_id-${user_id}`;
-            cache.del(cacheKey);
+            // Acounts cache
+            const cacheKeyAccounts = `accounts-user_id-${user_id}`;
+            cache.del(cacheKeyAccounts);
+            // Transaction cache
+            const cacheKeyTransactions = `transactions-user_id-${user_id}`;
+            cache.del(cacheKeyTransactions);
 
             res.status(201).json({
                 message: "Security sold",
@@ -389,17 +406,30 @@ const databaseController = {
     },
 
     getTransactionsSummary: async (req, res) => {
-        const user_id = req.session.user_id;
-        const account_id = req.params;
-
-        if(!user_id || !account_id) {
-            return res.status(400).json({ message: "Something went wrong trying to get transaction" });
+        try {
+            const user_id = req.session.user_id;
+            const account_id = parseInt(req.params.accountId); // Convert accountId (defined in routes) to an interger (string -> number) because of sql.Int
+    
+            if(!user_id || !account_id) {
+                return res.status(400).json({ message: "Missing credentials to get transaction" });
+            }
+        
+            const cacheKey = `transactions-user_id-${user_id}`;
+            const { data, source } = await getOrSetCache(
+                cacheKey,
+                () => databaseServices.getTransactionsSummary(user_id, account_id),
+                600
+            );
+    
+            if (!data || data.length === 0) {
+                return res.status(404).json({ error: "No accounts found for this user" });
+            }
+    
+            res.json({ data, source });
+        } catch (error) {
+            console.error('Error in transactions summary', error);
+            res.status(500).json({ message: 'Something went wrong trying to get transactions' });
         }
-
-        const result = await databaseServices.getTransactionsSummary(user_id, account_id);
-        
-        // note CACHE HERE for later
-        
     }
 };
 

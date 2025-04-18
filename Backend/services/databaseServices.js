@@ -484,8 +484,8 @@ const databaseServices = {
                     t.total_price,
                     t.transaction_date,
                     s.symbol,
-                    s.name AS security_name
-                    s.type AS security_type
+                    s.name AS security_name,
+                    s.type AS security_type,
                     p.name AS portfolio_name
                 FROM Transactions t
                 JOIN Securities s ON t.securities_id = s.id
@@ -496,7 +496,7 @@ const databaseServices = {
                 ORDER BY t.transaction_date DESC;
             `);
 
-            return transactions;
+            return transactions.recordset;
         } catch (error) {
             console.error('Failed to get transaction for user account');
             throw error;
