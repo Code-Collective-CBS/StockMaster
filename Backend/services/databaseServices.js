@@ -302,22 +302,20 @@ const databaseServices = {
                 SELECT * FROM Accounts WHERE id = @accountId
             `); // USE OF SELECT FOR LATER USE TO DISPLAY NEW ACCOUNT INSTEAD OF GETTING NEW INFORMATION MAYBE NOT NEEDED
 
-            ///////// NÅET HER TIL (Insert into transaktioner)
             // 2. Insert into Transactions table
             await pool
             .request()
             .input("account_id", sql.Int, accountId)
             .input("transaction_type", sql.VarChar(10), 'deposit')
-            .input('amount', sql.Decimal(37, 2), amount)
-            .input("price_per_share", sql.Decimal(18, 2), 1) // 1 is a placeholder maybe change to 0 if no interference with GAK
-            .input('total_price', sql.Decimal(37, 2), amount)
+            .input("amount", sql.Decimal(37, 2), amount)
+            .input("price_per_share", sql.Decimal(18, 2), 1) // Placeholder 1 maybe change into 0 if no change on gak
+            .input("total_price", sql.Decimal(37, 2), amount)
             .query(`
-                INSERT INTO Transactions    
-                (portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price)
-                VALUES (NULL, NULL, @transaction_type, @amount, @price_per_share, @total_price)
-                `);
+                INSERT INTO Transactions
+                (account_id, portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price)
+                VALUES (@account_id, NULL, NULL, @transaction_type, @amount, @price_per_share, @total_price)
+            `);
                 
-            ///////// NÅET HER TIL 
             return result.recordset[0];
         } catch (error) {
             console.error("Failed to deposit to account", error);
@@ -342,6 +340,20 @@ const databaseServices = {
             `);
 
             if (result.rowsAffected[0] === 0) throw new Error("Insufficient funds"); // Extra check if total_balance >= @amount in SQL fails
+
+            // 2. Insert into Transactions table
+            await pool
+            .request()
+            .input("account_id", sql.Int, accountId)
+            .input("transaction_type", sql.VarChar(10), 'withdraw')
+            .input("amount", sql.Decimal(37, 2), amount)
+            .input("price_per_share", sql.Decimal(18, 2), 1) // Placeholder 1 maybe change into 0 if no change on gak
+            .input("total_price", sql.Decimal(37, 2), amount)
+            .query(`
+                INSERT INTO Transactions
+                (account_id, portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price)
+                VALUES (@account_id, NULL, NULL, @transaction_type, @amount, @price_per_share, @total_price)
+            `);
 
             return result.recordset[0];
         } catch (error) {
@@ -419,18 +431,19 @@ const databaseServices = {
 
             // 4. Insert into Transactions table
             const insertQuery = await pool
-                .request()
-                .input("portfolio_id", sql.Int, portfolioId)
-                .input("securities_id", sql.Int, securities_id)
-                .input("transaction_type", sql.VarChar(10), transaction_type)
-                .input("amount", sql.Decimal(37, 2), amount)
-                .input("price_per_share", sql.Decimal(18, 2), price_per_share)
-                .input("total_price", sql.Decimal(37, 2), total_price)
-                .query(`
-                    INSERT INTO Transactions
-                    (portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price)
-                    OUTPUT INSERTED.id
-                    VALUES (@portfolio_id, @securities_id, @transaction_type, @amount, @price_per_share, @total_price)
+            .request()
+            .input("account_id", sql.Int, accountId) // ✅ NEW
+            .input("portfolio_id", sql.Int, portfolioId)
+            .input("securities_id", sql.Int, securities_id)
+            .input("transaction_type", sql.VarChar(10), transaction_type)
+            .input("amount", sql.Decimal(37, 2), amount)
+            .input("price_per_share", sql.Decimal(18, 2), price_per_share)
+            .input("total_price", sql.Decimal(37, 2), total_price)
+            .query(`
+                INSERT INTO Transactions
+                (account_id, portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price)
+                OUTPUT INSERTED.id
+                VALUES (@account_id, @portfolio_id, @securities_id, @transaction_type, @amount, @price_per_share, @total_price)
             `);
 
             // 5. Update account balance if 'buy'
