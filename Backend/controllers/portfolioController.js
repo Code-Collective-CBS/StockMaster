@@ -1,33 +1,46 @@
 const databaseServices = require("../services/databaseServices");
 const alphaVantageService = require("../services/alphaVantageService");
 const exchangeRateService = require("../services/exchangeRateService");
+const { getOrSetCache } = require('../utilityFunctions/cacheHelper');
 
 const portfolioController = {
   getPortfolioSummary: async (req, res) => {
     try {
       const accountId = req.params.accountId;
+      console.log(`Getting portfolio summary for account: ${accountId}`);
 
-      // Get user's accounts with portfolios in one query
-      const portfolios = await databaseServices.getPortfoliosByAccount(accountId);
-      if (!portfolios || portfolios.length === 0) {
-        return res.status(200).json([]);
-      }
+      // Define the cache key for this account's portfolio data
+      const cacheKey = `portfolio-${accountId}`;
 
-      const accountCurrency = portfolios[0].currency;
-      const accountName = portfolios[0].account_name;
+      // Use your existing getOrSetCache function
+      const { data, source } = await getOrSetCache(
+        cacheKey,
+        async () => {
+          // This function only runs when cache is missing or expired
+          const portfolios = await databaseServices.getPortfoliosByAccount(accountId);
+          console.log(`Found ${portfolios?.length || 0} portfolios for account ${accountId}`);
 
-      // Get detailed portfolio data for each account
-      const portfolioData = await Promise.all(
-        portfolios.map(async (portfolio) => {
-          const transactions = await databaseServices.getTransactionsForPortfolio(portfolio.id);
+          if (!portfolios || portfolios.length === 0) {
+            return []; // Return empty array if no portfolios
+          }
 
-          const holdings = calculateHoldings(transactions);
-          const securitiesData = await getSecuritiesData(holdings);
-          const metrics = await calculatePortfolioMetrics(
-            holdings,
-            securitiesData,
-            accountCurrency
-          );
+          // Get account info from the first portfolio (assuming all portfolios in same account have same currency)
+          const accountCurrency = portfolios[0].currency;
+          const accountName = portfolios[0].account_name;
+
+          // Process each portfolio with its transactions
+          const portfolioData = await Promise.all(
+            portfolios.map(async (portfolio) => {
+              console.log(`Processing portfolio: ${portfolio.id} - ${portfolio.name}`);
+              const transactions = await databaseServices.getTransactionsForPortfolio(portfolio.id);
+              console.log(`Found ${transactions?.length || 0} transactions for portfolio ${portfolio.id}`);
+
+              const holdings = calculateHoldings(transactions);
+              console.log(`Calculated ${holdings?.length || 0} holdings for portfolio ${portfolio.id}`);
+
+              const securitiesData = getSecuritiesData(holdings);
+              const metrics = calculatePortfolioMetrics(holdings);
+
               return {
                 ...portfolio,
                 account_name: accountName,
@@ -37,7 +50,14 @@ const portfolioController = {
               };
             })
           );
-      res.json(portfolioData);
+
+          return portfolioData;
+        },
+        3600 // Cache for 1 hour (or adjust as needed)
+      );
+
+      // Return data (without source for now)
+      res.json(data);
     } catch (error) {
       console.error("Error in getPortfolioSummary", error);
       res.status(500).json({ error: "Failed to fetch portfolio data" });
@@ -45,19 +65,37 @@ const portfolioController = {
   }
 };
 
-// Helper function to calculate holdings
+// Helper function to calculate holdings from transactions
 function calculateHoldings(transactions) {
+  // Check if transactions is valid
+  if (!transactions || !Array.isArray(transactions) || transactions.length === 0) {
+    console.warn('No valid transactions data');
+    return [];
+  }
+
   const holdingsBySecurityId = {};
 
   transactions.forEach((transaction) => {
+    // Validate transaction object
+    if (!transaction || typeof transaction !== 'object') {
+      console.warn('Invalid transaction object:', transaction);
+      return; // Skip this transaction
+    }
+
     const securityId = transaction.securities_id;
+
+    // Skip if no security ID
+    if (!securityId) {
+      console.warn('Transaction missing securities_id:', transaction);
+      return;
+    }
 
     if (!holdingsBySecurityId[securityId]) {
       holdingsBySecurityId[securityId] = {
         securityId,
-        security_name: transaction.security_name,
-        symbol: transaction.symbol,
-        type: transaction.security_type,
+        security_name: transaction.security_name || 'Unknown Security',
+        symbol: transaction.symbol || 'UNKNOWN',
+        type: transaction.security_type || 'unknown',
         quantity: 0,
         totalCost: 0,
         transactions: [],
@@ -65,13 +103,16 @@ function calculateHoldings(transactions) {
     }
 
     const holding = holdingsBySecurityId[securityId];
+    const transactionType = (transaction.transaction_type || '').toLowerCase();
+    const amount = typeof transaction.amount === 'number' ? transaction.amount : 0;
+    const totalPrice = typeof transaction.total_price === 'number' ? transaction.total_price : 0;
 
-    if (transaction.transaction_type === "BUY" || transaction.transaction_type === 'buy') { // DELETE "BUY" LATER AND KEEP LOWER CASE
-      holding.quantity += transaction.amount;
-      holding.totalCost += transaction.total_price; // remember this line, because I can't see any totalCost row in the transactions table
-    } else if (transaction.transaction_type === "SELL" || transaction.transaction_type === "sell") { // DELETE "SELL" AND KEEP LOWER CASE
-      holding.quantity -= transaction.amount;
-      // In a more complex implementation, we would calculate realized gains here
+    if (transactionType === "buy") {
+      holding.quantity += amount;
+      holding.totalCost += totalPrice;
+    } else if (transactionType === "sell") {
+      holding.quantity -= amount;
+      // Handle realized gains here if needed
     }
 
     holding.transactions.push(transaction);
@@ -86,132 +127,70 @@ function calculateHoldings(transactions) {
     }));
 }
 
-// // Helper function to get current securities data
-// async function getSecuritiesData(holdings) {
-//   // Get current prices and data for all securities in the portfolio
-//   const securitiesData = {};
-
-//   // For each security in holdings, fetch current price data
-//   await Promise.all(
-//     holdings.map(async (holding) => {
-//       try {
-//         // Get company overview for more details (optional)
-//         const companyData = await alphaVantageService.getCompanyOverview(
-//           holding.symbol
-//         );
-
-//         // Get current quote
-//         const quoteData = await alphaVantageService.getStockQuote(
-//           holding.symbol
-//         );
-
-//         // Extract current price from quote
-//         const currentPrice = quoteData["Global Quote"]
-//           ? parseFloat(quoteData["Global Quote"]["05. price"])
-//           : 0;
-
-//         securitiesData[holding.securityId] = {
-//           currentPrice,
-//           companyData,
-//         };
-//       } catch (error) {
-//         console.error(`Error fetching data for ${holding.symbol}:`, error);
-//         securitiesData[holding.securityId] = { currentPrice: 0 };
-//       }
-//     })
-//   );
-
-//   return securitiesData;
-// }
-
-
-// I have commented the function above so we now only use database data and now apiCalls
+// In portfolioController.js
 async function getSecuritiesData(holdings) {
-  // Simply return GAK (average cost) as the "current price"
+  // Get current currency rates (using cache)
+  const currencyRates = await getOrSetCache(
+    'currency-rates',
+    async () => await exchangeRateService.getCurrency('DKK'),
+    86400 // Cache for 24 hours
+  );
+
+  // Return enhanced securities data
   return holdings.reduce((acc, holding) => {
+    // Determine currency for this security (could be from DB)
+    const stockCurrency = holding.currency || 'DKK';
+
     acc[holding.securityId] = {
-      currentPrice: holding.gak // Use average purchase price
+      currentPrice: holding.gak, // Still using GAK as price
+      currency: stockCurrency,
+      currencyRates: currencyRates.data?.conversion_rates || {}
     };
     return acc;
   }, {});
 }
 
-// Helper function to calculate portfolio metrics
-// async function calculatePortfolioMetrics(holdings, securitiesData, portfolioCurrency) {
-//     // Get exchange rates for the portfolio currency
-//     const exchangeRates = await exchangeRateService.getCurrency(portfolioCurrency);
+// Then in calculatePortfolioMetrics
+// Simplified function to calculate portfolio metrics without API calls
+function calculatePortfolioMetrics(holdings) {
+  // Ensure we have holdings and it's an array
+  if (!holdings || !Array.isArray(holdings)) {
+    console.warn('Invalid holdings data in calculatePortfolioMetrics');
+    return {
+      holdings: [],
+      totalCost: 0,
+      totalCurrentValue: 0,
+      totalUnrealizedGain: 0,
+      totalUnrealizedGainPercent: 0
+    };
+  }
 
-//     let totalCost = 0;
-//     let totalCurrentValue = 0;
+  // Calculate total cost from holdings
+  const totalCost = holdings.reduce((sum, h) => {
+    // Ensure totalCost exists and is a number
+    const cost = typeof h.totalCost === 'number' ? h.totalCost : 0;
+    return sum + cost;
+  }, 0);
 
-//     // Calculate values for each holding with currency conversion
-//     const holdingsWithMetrics = await Promise.all(holdings.map(async holding => {
-//         const securityData = securitiesData[holding.securityId] || { currentPrice: 0 };
-//         const stockCurrency = securityData.companyData?.Currency || 'DKK'; // Default to DKK
-
-//         // Convert currentValue to portfolio currency
-//         const valueInStockCurrency = holding.quantity * securityData.currentPrice;
-//         const currentValue = convertCurrency(
-//             valueInStockCurrency,
-//             stockCurrency,
-//             portfolioCurrency,
-//             exchangeRates.conversion_rates
-//         );
-
-//         // Convert cost to portfolio currency if needed
-//         // (costs were recorded in the stock's currency)
-//         const costInPortfolioCurrency = convertCurrency(
-//             holding.totalCost,
-//             stockCurrency, // totalCost is in the stock's currency
-//             portfolioCurrency,
-//             exchangeRates.conversion_rates
-//         );
-
-//         const unrealizedGain = currentValue - costInPortfolioCurrency;
-//         const unrealizedGainPercent = costInPortfolioCurrency > 0 ?
-//             (unrealizedGain / costInPortfolioCurrency) * 100 : 0;
-
-//         totalCost += costInPortfolioCurrency;
-//         totalCurrentValue += currentValue;
-
-//         return {
-//             ...holding,
-//             stockCurrency,
-//             currentPrice: securityData.currentPrice,
-//             currentValue,
-//             costInPortfolioCurrency,
-//             unrealizedGain,
-//             unrealizedGainPercent
-//         };
-//     }));
-
-//     // Calculate overall portfolio metrics
-//     const totalUnrealizedGain = totalCurrentValue - totalCost;
-//     const totalUnrealizedGainPercent = totalCost > 0 ?
-//         (totalUnrealizedGain / totalCost) * 100 : 0;
-
-//     return {
-//         holdings: holdingsWithMetrics,
-//         totalCost,
-//         totalCurrentValue,
-//         totalUnrealizedGain,
-//         totalUnrealizedGainPercent
-//     };
-// }
-
-
-// simplified calculate fuction to not use api calls
-// Simplify calculatePortfolioMetrics
-async function calculatePortfolioMetrics(holdings) {
-  const totalCost = holdings.reduce((sum, h) => sum + h.totalCost, 0);
-
-  return {
-    holdings: holdings.map(h => ({
+  // Create enhanced holdings with metrics
+  const enhancedHoldings = holdings.map(h => {
+    // Ensure all properties exist
+    const holding = {
       ...h,
-      currentValue: h.totalCost, // Value = cost since no live price
+      totalCost: typeof h.totalCost === 'number' ? h.totalCost : 0,
+      quantity: typeof h.quantity === 'number' ? h.quantity : 0
+    };
+
+    return {
+      ...holding,
+      currentValue: holding.totalCost, // Value = cost since no live price
       unrealizedGain: 0, // No gain/loss calculation
       unrealizedGainPercent: 0
-    })),
+    };
+  });
+
+  return {
+    holdings: enhancedHoldings,
     totalCost,
     totalCurrentValue: totalCost,
     totalUnrealizedGain: 0,
@@ -219,8 +198,7 @@ async function calculatePortfolioMetrics(holdings) {
   };
 }
 
-
-
+// Keep your original convertCurrency function in case you need it later
 function convertCurrency(amount, fromCurrency, toCurrency, ratesData) {
     // If currencies are the same, no conversion needed
     if (fromCurrency === toCurrency) return amount;

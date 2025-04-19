@@ -3,6 +3,74 @@ import { stockAPI } from "./api.js";
 import { favoredStocks } from "../utilityFunctions/favoredStocks.js";
 import { portfolioChartService } from "../utilityFunctions/portfolioChartService.js";
 
+// Complete the CachingService implementation
+class CachingService {
+  constructor() {
+    this.cache = {}; // In-memory cache
+    this.storage = window.localStorage; // Persistent storage
+    this.defaultTTL = 15 * 60 * 1000; // 15 minutes default
+  }
+
+  // Get from cache (memory or localStorage)
+  get(key) {
+    // First check memory cache
+    if (this.cache[key] && this.cache[key].expires > Date.now()) {
+      console.log(`Cache hit (memory): ${key}`);
+      return this.cache[key].data;
+    }
+
+    // Then check localStorage
+    try {
+      const stored = this.storage.getItem(key);
+      if (stored) {
+        const item = JSON.parse(stored);
+        if (item.expires > Date.now()) {
+          console.log(`Cache hit (localStorage): ${key}`);
+          // Also store in memory for faster access next time
+          this.cache[key] = item;
+          return item.data;
+        } else {
+          // Expired item, remove it
+          this.storage.removeItem(key);
+        }
+      }
+    } catch (e) {
+      console.error("Error reading from localStorage:", e);
+    }
+
+    return null; // Cache miss
+  }
+
+  // Set in both memory and localStorage
+  set(key, data, ttl = this.defaultTTL) {
+    const expires = Date.now() + ttl;
+    const item = { data, expires };
+
+    // Store in memory
+    this.cache[key] = item;
+
+    // Store in localStorage
+    try {
+      this.storage.setItem(key, JSON.stringify(item));
+    } catch (e) {
+      console.error("Error writing to localStorage:", e);
+    }
+  }
+
+  // Clear specific item
+  clear(key) {
+    delete this.cache[key];
+    try {
+      this.storage.removeItem(key);
+    } catch (e) {
+      console.error("Error removing from localStorage:", e);
+    }
+  }
+}
+
+// Create a singleton instance
+const cachingService = new CachingService();
+
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("Portfolio page loaded!");
 
@@ -14,25 +82,80 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    // Fetch all portfolio data in one call
-    const portfolioData = await stockAPI.getPortfolioSummary(accountId);
+    // Show loading state first
+    showLoadingState();
 
-    // Update UI
-    if (
-      (portfolioData &&
-        Array.isArray(portfolioData) &&
-        portfolioData.length > 0) ||
-      (portfolioData.accounts && portfolioData.accounts.length > 0)
-    ) {
+    // Try to get data from cache first
+    const cacheKey = `portfolioData-${accountId}`;
+    let portfolioData = cachingService.get(cacheKey);
+
+    if (portfolioData) {
+      // Update UI with cached data
       updatePortfolioUI(portfolioData);
+
+      // Optionally refresh in background
+      setTimeout(() => refreshDataInBackground(accountId, cacheKey), 100);
     } else {
-      showNoPortfoliosMessage();
+      // Not in cache, fetch it
+      portfolioData = await fetchPortfolioData(accountId, cacheKey);
+      updatePortfolioUI(portfolioData);
     }
   } catch (error) {
     console.error("Error loading portfolio data:", error);
     showErrorMessage("Failed to load portfolio data. Please try again later.");
   }
 });
+
+// Separate function to fetch data and update cache
+// In portfolio.js
+async function fetchPortfolioData(accountId, cacheKey) {
+  try {
+    const portfolioData = await stockAPI.getPortfolioSummary(accountId);
+
+    // Store in our frontend cache
+    cachingService.set(cacheKey, portfolioData);
+
+    return portfolioData;
+  } catch (error) {
+    console.error("Error fetching portfolio data:", error);
+
+    // Try to fall back to cached data if available
+    const cachedData = cachingService.get(cacheKey);
+    if (cachedData) {
+      console.log("Using cached data due to fetch error");
+      return cachedData;
+    }
+
+    throw error; // Re-throw if no cached data
+  }
+}
+
+// Refresh data without blocking the UI
+async function refreshDataInBackground(accountId, cacheKey) {
+  try {
+    const freshData = await fetchPortfolioData(accountId, cacheKey);
+    // Only update UI if it's meaningfully different
+    if (JSON.stringify(freshData) !== JSON.stringify(cachingService.get(cacheKey))) {
+      updatePortfolioUI(freshData);
+    }
+  } catch (error) {
+    console.error("Background refresh failed:", error);
+    // Don't show errors for background refresh
+  }
+}
+
+// Show a loading state
+function showLoadingState() {
+  const portfolioList = document.getElementById("portfolioList");
+  if (portfolioList) {
+    portfolioList.innerHTML = `
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading portfolio data...</p>
+      </div>
+    `;
+  }
+}
 
 function updatePortfolioUI(portfolios) {
   const totalValue = document.getElementById("totalValueDisplay");
