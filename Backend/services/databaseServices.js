@@ -265,17 +265,48 @@ const databaseServices = {
         }
     },
 
+// Add this function to databaseServices.js
+getTransactionsForMultiplePortfolios: async (portfolioIds) => {
+    try {
+      if (!portfolioIds || portfolioIds.length === 0) {
+        return [];
+      }
+
+      const pool = await poolPromise;
+
+      // SQL Server doesn't directly support array parameters
+      // We'll use a comma-separated string and STRING_SPLIT
+      const portfolioIdsString = portfolioIds.join(',');
+
+      const result = await pool.request()
+        .input('portfolioIds', sql.NVarChar, portfolioIdsString)
+        .query(`
+          SELECT t.*, s.symbol, s.name as security_name, s.type as security_type
+          FROM Transactions t
+          JOIN Securities s ON t.securities_id = s.id
+          WHERE t.portfolio_id IN (SELECT value FROM STRING_SPLIT(@portfolioIds, ','))
+          ORDER BY t.transaction_date DESC
+        `);
+
+      return result.recordset;
+    } catch (err) {
+      console.error('Error getting transactions for multiple portfolios:', err);
+      throw err;
+    }
+  },
+
     getPortfoliosByAccount: async (accountId) => {
         try {
             const pool = await poolPromise;
-            const result = await pool.request().input("accountId", sql.Int, accountId)
-                .query(`
-        SELECT
-          p.id, p.name, p.account_id, p.create_date, p.balance,
-          a.currency, a.account_name
-        FROM Portfolio p
-        JOIN Accounts a ON p.account_id = a.id
-        WHERE p.account_id = @accountId
+            const result = await pool.request()
+            .input("accountId", sql.Int, accountId)
+            .query(`
+                SELECT
+                p.id, p.name, p.account_id, p.create_date, p.balance,
+                a.currency, a.account_name
+                FROM Portfolio p
+                JOIN Accounts a ON p.account_id = a.id
+                WHERE p.account_id = @accountId
       `); // Fixed: Filter by account_id
             return result.recordset;
         } catch (err) {
@@ -315,7 +346,7 @@ const databaseServices = {
                 (account_id, portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price)
                 VALUES (@account_id, NULL, NULL, @transaction_type, @amount, @price_per_share, @total_price)
             `);
-                
+
             return result.recordset[0];
         } catch (error) {
             console.error("Failed to deposit to account", error);
@@ -455,7 +486,7 @@ const databaseServices = {
                     .query(`
                     UPDATE Accounts
                     SET total_balance = total_balance - @amount
-                    WHERE id = @accountId        
+                    WHERE id = @accountId
                 `);
             }
 
@@ -522,7 +553,7 @@ const databaseServices = {
                 FROM Transactions t
                 LEFT JOIN Securities s ON t.securities_id = s.id
                 LEFT JOIN Portfolio p ON t.portfolio_id = p.id
-                JOIN Accounts a ON t.account_id = a.id 
+                JOIN Accounts a ON t.account_id = a.id
                 WHERE a.id = @accountId
                     AND a.user_id = @userId
                 ORDER BY t.transaction_date DESC;

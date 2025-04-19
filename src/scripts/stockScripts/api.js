@@ -98,27 +98,35 @@ export const stockAPI = {
 
   getPortfolioSummary: async (accountId) => {
     try {
-
       if (!accountId) {
-        throw new Error('User ID is required');
+        throw new Error('Account ID is required');
       }
 
       const USE_MOCK_DATA = false;
 
       if (USE_MOCK_DATA) {
-        console.log("Using mock portfolio data for user:", accountId);
-        // Simulate network delay for realistic testing
+        console.log("Using mock portfolio data for account:", accountId);
         await new Promise((resolve) => setTimeout(resolve, 300));
         return mockPortfolioData;
       }
 
-      // our actual api call (when USE_MOCK_DATA is not true)
+      // Make API call
       const url = `${PORTFOLIO_URL}/${accountId}`;
       const response = await fetch(url);
+
       if (!response.ok) {
         throw new Error(`HTTP error, could not get the portfolio url! Status: ${response.status}`);
       }
-      return await response.json();
+
+      const result = await response.json();
+
+      // Handle both formats: {data, source} and direct array
+      if (result.data && result.source) {
+        console.log(`Data source: ${result.source}`);
+        return result.data;
+      }
+
+      return result; // Direct array format
     } catch (error) {
       console.error("Error fetching portfolio summary", error);
       throw error;
@@ -133,7 +141,7 @@ export const stockAPI = {
         throw new Error('Account id missing');
       }
 
-      
+
 
     } catch (error) {
       console.error('Error fetching transactions', error);

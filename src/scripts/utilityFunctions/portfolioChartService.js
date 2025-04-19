@@ -2,112 +2,69 @@ export const portfolioChartService = {
   // Function to create pie chart
   createPortfolioPieChart: (canvas, portfolios) => {
     try {
-      
-      const data = portfolios.map(p => ({
-        label: p.name,
-        value: p.metrics.totalCost // Use invested amount
+      if (!canvas || !portfolios || portfolios.length === 0) {
+        console.warn("Missing canvas or portfolio data");
+        return;
+      }
+
+      // Extract portfolio names and values
+      const portfolioValues = portfolios.map(portfolio => ({
+        name: portfolio.name,
+        value: portfolio.metrics.totalCost || 0
       }));
 
+      // Skip if no values
+      if (portfolioValues.length === 0 || portfolioValues.every(p => p.value === 0)) {
+        console.warn("No portfolio values to display");
+        return;
+      }
 
-
-      // console.log("Creating pie chart with portfolios:", portfolios);
-
-      // if (!canvas) {
-      //   console.error("Canvas element is null or undefined");
-      //   return;
-      // }
-
-      // // Create a distribution by individual stock symbol
-      // const stockDistribution = {};
-      // let totalValue = 0;
-
-      // // Aggregate by stock symbol
-      // portfolios.forEach((portfolio) => {
-      //   if (!portfolio.metrics || !portfolio.metrics.holdings) {
-      //     console.error(
-      //       "Portfolio doesn't have metrics or holdings",
-      //       portfolio
-      //     );
-      //     return;
-      //   }
-
-      //   portfolio.metrics.holdings.forEach((holding) => {
-      //     const symbol = holding.symbol;
-
-      //     if (!stockDistribution[symbol]) {
-      //       stockDistribution[symbol] = {
-      //         value: 0,
-      //         name: holding.security_name,
-      //       };
-      //     }
-
-      //     // Using currentValue which is price × quantity
-      //     stockDistribution[symbol].value += holding.currentValue;
-      //     totalValue += holding.currentValue;
-      //   });
-      // });
-
-      // if (totalValue === 0) {
-      //   console.error("No value to display in pie chart");
-      //   return;
-      // }
-
-      // // Convert to arrays for Chart.js with percentages in labels
-      // const labels = Object.keys(stockDistribution).map((symbol) => {
-      //   const percentage = (
-      //     (stockDistribution[symbol].value / totalValue) *
-      //     100
-      //   ).toFixed(1);
-      //   return `${symbol} (${percentage}%)`;
-      // });
-
-      // const data = Object.values(stockDistribution).map((item) => item.value);
-      // const percentages = data.map((value) => (value / totalValue) * 100);
-
-      // console.log("Chart data:", { labels, data, percentages });
+      // Prepare data for chart
+      const totalValue = portfolioValues.reduce((sum, p) => sum + p.value, 0);
+      const labels = portfolioValues.map(p => {
+        const percentage = ((p.value / totalValue) * 100).toFixed(1);
+        return `${p.name} (${percentage}%)`;
+      });
+      const data = portfolioValues.map(p => p.value);
 
       // Generate colors
       const colors = generateChartColors(labels.length);
 
-      // Create the pie chart
+      // Create chart
       new Chart(canvas, {
         type: "pie",
         data: {
           labels: labels,
-          datasets: [
-            {
-              data: data, // Using actual monetary values
-              backgroundColor: colors,
-              borderWidth: 1,
-            },
-          ],
+          datasets: [{
+            data: data,
+            backgroundColor: colors,
+            borderWidth: 1
+          }]
         },
         options: {
           responsive: true,
           plugins: {
             tooltip: {
               callbacks: {
-                label: function (context) {
+                label: function(context) {
                   const label = context.label || "";
                   const value = formatCurrency(context.raw, "DKK");
                   const percent = ((context.raw / totalValue) * 100).toFixed(1);
                   return `${label.split(" ")[0]}: ${value} (${percent}%)`;
-                },
-              },
+                }
+              }
             },
             legend: {
               position: "right",
               labels: {
                 font: {
-                  size: 12,
-                },
-              },
-            },
-          },
-        },
+                  size: 12
+                }
+              }
+            }
+          }
+        }
       });
-
-      console.log("Chart created successfully");
     } catch (error) {
       console.error("Error creating pie chart:", error);
     }
