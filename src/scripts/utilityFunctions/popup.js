@@ -1,4 +1,5 @@
 import { loadAccounts } from './loadAccounts.js';
+import { currencyHandler } from '../utilityFunctions/currencyConverter.js'
 
 export const popUps = {
     accountDetails: async () => {
@@ -21,6 +22,26 @@ export const popUps = {
         } catch (error) {
             console.error('Error fetching portfolios', error);
             return [];
+        }
+    },
+
+    // NEW NEED MORE WORK
+    currencyConverter: async (amount, fromCurrency, toCurrency) => {
+        try {
+            const rates = await fetch(`/api/currency/exchange/${fromCurrency}`);
+
+            const converted = await currencyHandler(
+                amount,
+                fromCurrency,
+                toCurrency,
+                rates
+            );
+
+            return await converted;
+
+        } catch (error) {
+            console.error('Error fetching rates for currency conversion');
+            throw error;
         }
     },
 
@@ -206,9 +227,14 @@ export const popUps = {
             const stockPriceSpan = tradeModal.querySelector("#stock-price");
             const accountBalanceSpan = tradeModal.querySelector("#account-balance");
 
-            amountInput.addEventListener("input", () => { // MAYBE ADD CURRENCY CHANGE?
+            amountInput.addEventListener("input", () => {
                 const amount = parseFloat(amountInput.value);
                 const total = amount * window.latestStockPrice;
+
+                // Currency conversion for display
+                if(window.securityCurrency !==  selectedAccount.currency) {
+                    console.log("We need to change");
+                }
 
                 if (!isNaN(total)) {
                     totalPriceSpan.textContent = `${total.toFixed(2)} ${window.securityCurrency}`;

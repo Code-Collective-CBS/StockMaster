@@ -361,7 +361,7 @@ const databaseServices = {
             throw error;
         }
     },
-    // NEED TO ADD CHECK ACCOUNT BALANCE (MADE exchangeRateService and currencyUtils for Exchange currencies and conversion)
+
     buyOrSellSecurity: async ({
         userId,
         accountId,
@@ -425,6 +425,8 @@ const databaseServices = {
                 );
             }
 
+            const convertedPricePerShare = convertedTotal / amount;
+
             if (transaction_type === 'buy' && convertedTotal > parseFloat(total_balance)) {
                 throw new Error(`Insufficient balance. Need ${convertedTotal.toFixed(2)} ${accountCurrency}, but have ${parseFloat(total_balance).toFixed(2)}`);
             }
@@ -432,13 +434,13 @@ const databaseServices = {
             // 4. Insert into Transactions table
             const insertQuery = await pool
             .request()
-            .input("account_id", sql.Int, accountId) // ✅ NEW
+            .input("account_id", sql.Int, accountId)
             .input("portfolio_id", sql.Int, portfolioId)
             .input("securities_id", sql.Int, securities_id)
             .input("transaction_type", sql.VarChar(10), transaction_type)
             .input("amount", sql.Decimal(37, 2), amount)
-            .input("price_per_share", sql.Decimal(18, 2), price_per_share)
-            .input("total_price", sql.Decimal(37, 2), total_price)
+            .input("price_per_share", sql.Decimal(18, 2), convertedPricePerShare) // Using converted price per share
+            .input("total_price", sql.Decimal(37, 2), convertedTotal) // Using account currency
             .query(`
                 INSERT INTO Transactions
                 (account_id, portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price)
@@ -451,10 +453,10 @@ const databaseServices = {
                 await pool
                     .request()
                     .input('accountId', sql.Int, accountId)
-                    .input('amount', sql.Decimal(18, 2), convertedTotal)
+                    .input('total_price', sql.Decimal(18, 2), convertedTotal)
                     .query(`
                     UPDATE Accounts
-                    SET total_balance = total_balance - @amount
+                    SET total_balance = total_balance - @total_price
                     WHERE id = @accountId        
                 `);
             }
@@ -463,10 +465,10 @@ const databaseServices = {
                 await pool
                     .request()
                     .input('accountId', sql.Int, accountId)
-                    .input('amount', sql.Decimal(18, 2), convertedTotal)
+                    .input('total_price', sql.Decimal(18, 2), convertedTotal)
                     .query(`
                     UPDATE Accounts
-                    SET total_balance = total_balance + @amount
+                    SET total_balance = total_balance + @total_price
                     WHERE id = @accountId
                 `);
             }
