@@ -4,7 +4,6 @@ import { favoredStocks } from "../utilityFunctions/favoredStocks.js";
 import { portfolioChartService } from "../utilityFunctions/portfolioChartService.js";
 import { cachingService } from "../utilityFunctions/cachingService.js";
 
-
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("Portfolio page loaded!");
 
@@ -69,7 +68,9 @@ async function refreshDataInBackground(accountId, cacheKey) {
   try {
     const freshData = await fetchPortfolioData(accountId, cacheKey);
     // Only update UI if it's meaningfully different
-    if (JSON.stringify(freshData) !== JSON.stringify(cachingService.get(cacheKey))) {
+    if (
+      JSON.stringify(freshData) !== JSON.stringify(cachingService.get(cacheKey))
+    ) {
       updatePortfolioUI(freshData);
     }
   } catch (error) {
@@ -140,13 +141,13 @@ function updatePortfolioUI(portfolios) {
         portfolioElement.innerHTML = `
               <h4>${portfolio.name}</h4>
               <p>Invested Value: ${formatCurrency(
-                        portfolio.metrics.totalCost,
-                        account.currency
-                      )}</p>
+                portfolio.metrics.totalCost,
+                account.currency
+              )}</p>
               <p>Shares: ${portfolio.metrics.holdings.reduce(
-                        (sum, h) => sum + h.quantity,
-                        0
-                      )}</p>
+                (sum, h) => sum + h.quantity,
+                0
+              )}</p>
               `;
 
         container.appendChild(portfolioElement);
@@ -212,33 +213,35 @@ function createPortfolioSelector(portfolios, chartCanvas) {
   const chartContainer = chartCanvas.parentNode;
 
   // Create the selector container if it doesn't exist
-  let selectorContainer = document.getElementById('portfolio-selector-container');
+  let selectorContainer = document.getElementById(
+    "portfolio-selector-container"
+  );
   if (!selectorContainer) {
-    selectorContainer = document.createElement('div');
-    selectorContainer.id = 'portfolio-selector-container';
-    selectorContainer.className = 'portfolio-selector-container';
+    selectorContainer = document.createElement("div");
+    selectorContainer.id = "portfolio-selector-container";
+    selectorContainer.className = "portfolio-selector-container";
 
     // Insert before the chart canvas
     chartContainer.insertBefore(selectorContainer, chartCanvas);
   }
 
   // Clear any existing content
-  selectorContainer.innerHTML = '';
+  selectorContainer.innerHTML = "";
 
   // Create the label
-  const label = document.createElement('label');
-  label.textContent = 'Vælg portefølje: ';
-  label.setAttribute('for', 'portfolio-selector');
+  const label = document.createElement("label");
+  label.textContent = "Vælg portefølje: ";
+  label.setAttribute("for", "portfolio-selector");
   selectorContainer.appendChild(label);
 
   // Create the select element
-  const select = document.createElement('select');
-  select.id = 'portfolio-selector';
-  select.className = 'portfolio-selector';
+  const select = document.createElement("select");
+  select.id = "portfolio-selector";
+  select.className = "portfolio-selector";
 
   // Create options for each portfolio
   portfolios.forEach((portfolio, index) => {
-    const option = document.createElement('option');
+    const option = document.createElement("option");
     option.value = index;
     option.textContent = portfolio.name;
     select.appendChild(option);
@@ -247,18 +250,68 @@ function createPortfolioSelector(portfolios, chartCanvas) {
   selectorContainer.appendChild(select);
 
   // Event listener for select change
-  select.addEventListener('change', function() {
+  select.addEventListener("change", function () {
     const selectedIndex = parseInt(this.value);
     const selectedPortfolio = portfolios[selectedIndex];
 
     // Update chart with selected portfolio
-    portfolioChartService.createHoldingsDistributionChart(chartCanvas, selectedPortfolio);
+    portfolioChartService.createHoldingsDistributionChart(
+      chartCanvas,
+      selectedPortfolio
+    );
+
+    // Update holdings table
+    updateHoldingsTable(selectedPortfolio);
   });
 
   // Initialize with first portfolio
   if (portfolios.length > 0) {
-    portfolioChartService.createHoldingsDistributionChart(chartCanvas, portfolios[0]);
+    portfolioChartService.createHoldingsDistributionChart(
+      chartCanvas,
+      portfolios[0]
+    );
+    updateHoldingsTable(portfolios[0]);
   }
+}
+
+function updateHoldingsTable(portfolio) {
+  const tableBody = document.querySelector("#holdings-table tbody");
+  if (
+    !tableBody ||
+    !portfolio ||
+    !portfolio.metrics ||
+    !portfolio.metrics.holdings
+  ) {
+    return;
+  }
+
+  // Clear existing rows
+  tableBody.innerHTML = "";
+
+  // Sort holdings by value (descending)
+  const sortedHoldings = [...portfolio.metrics.holdings].sort(
+    (a, b) => b.currentValue - a.currentValue
+  );
+
+  // Add a row for each holding
+  sortedHoldings.forEach((holding) => {
+    const row = document.createElement("tr");
+
+    // Format values
+    const boughtPrice = formatCurrency(holding.gak, portfolio.currency);
+    const totalValue = formatCurrency(holding.currentValue, portfolio.currency);
+
+    row.innerHTML = `
+      <td>${holding.symbol}</td>
+      <td>${holding.security_name}</td>
+      <td>${boughtPrice}</td>
+      <td>${boughtPrice}</td>
+      <td>${holding.quantity}</td>
+      <td>${totalValue}</td>
+    `;
+
+    tableBody.appendChild(row);
+  });
 }
 
 // Helper functions

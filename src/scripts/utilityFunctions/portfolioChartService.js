@@ -8,24 +8,27 @@ export const portfolioChartService = {
       }
 
       // Extract portfolio names and values
-      const portfolioValues = portfolios.map(portfolio => ({
+      const portfolioValues = portfolios.map((portfolio) => ({
         name: portfolio.name,
-        value: portfolio.metrics.totalCost || 0
+        value: portfolio.metrics.totalCost || 0,
       }));
 
       // Skip if no values
-      if (portfolioValues.length === 0 || portfolioValues.every(p => p.value === 0)) {
+      if (
+        portfolioValues.length === 0 ||
+        portfolioValues.every((p) => p.value === 0)
+      ) {
         console.warn("No portfolio values to display");
         return;
       }
 
       // Prepare data for chart
       const totalValue = portfolioValues.reduce((sum, p) => sum + p.value, 0);
-      const labels = portfolioValues.map(p => {
+      const labels = portfolioValues.map((p) => {
         const percentage = ((p.value / totalValue) * 100).toFixed(1);
         return `${p.name} (${percentage}%)`;
       });
-      const data = portfolioValues.map(p => p.value);
+      const data = portfolioValues.map((p) => p.value);
 
       // Generate colors
       const colors = generateChartColors(labels.length);
@@ -35,35 +38,37 @@ export const portfolioChartService = {
         type: "pie",
         data: {
           labels: labels,
-          datasets: [{
-            data: data,
-            backgroundColor: colors,
-            borderWidth: 1
-          }]
+          datasets: [
+            {
+              data: data,
+              backgroundColor: colors,
+              borderWidth: 1,
+            },
+          ],
         },
         options: {
           responsive: true,
           plugins: {
             tooltip: {
               callbacks: {
-                label: function(context) {
+                label: function (context) {
                   const label = context.label || "";
                   const value = formatCurrency(context.raw, "DKK");
                   const percent = ((context.raw / totalValue) * 100).toFixed(1);
                   return `${label.split(" ")[0]}: ${value} (${percent}%)`;
-                }
-              }
+                },
+              },
             },
             legend: {
               position: "right",
               labels: {
                 font: {
-                  size: 12
-                }
-              }
-            }
-          }
-        }
+                  size: 12,
+                },
+              },
+            },
+          },
+        },
       });
     } catch (error) {
       console.error("Error creating pie chart:", error);
@@ -72,7 +77,12 @@ export const portfolioChartService = {
 
   createHoldingsDistributionChart: (canvas, portfolio) => {
     try {
-      if (!canvas || !portfolio || !portfolio.metrics || !portfolio.metrics.holdings) {
+      if (
+        !canvas ||
+        !portfolio ||
+        !portfolio.metrics ||
+        !portfolio.metrics.holdings
+      ) {
         console.warn("Missing canvas or portfolio holdings data");
         return;
       }
@@ -89,21 +99,21 @@ export const portfolioChartService = {
       const totalValue = holdings.reduce((sum, h) => sum + h.currentValue, 0);
 
       // Map holdings to chart data
-      const chartData = holdings.map(holding => ({
+      const chartData = holdings.map((holding) => ({
         symbol: holding.symbol,
         name: holding.security_name,
         value: holding.currentValue,
-        percentage: (holding.currentValue / totalValue) * 100
+        percentage: (holding.currentValue / totalValue) * 100,
       }));
 
       // Sort by value descending for better visualization
       chartData.sort((a, b) => b.value - a.value);
 
-      const labels = chartData.map(item =>
-        `${item.symbol} (${item.percentage.toFixed(1)}%)`
+      const labels = chartData.map(
+        (item) => `${item.symbol} (${item.percentage.toFixed(1)}%)`
       );
 
-      const data = chartData.map(item => item.value);
+      const data = chartData.map((item) => item.value);
 
       // Generate colors
       const colors = generateChartColors(labels.length);
@@ -118,41 +128,47 @@ export const portfolioChartService = {
         type: "pie",
         data: {
           labels: labels,
-          datasets: [{
-            data: data,
-            backgroundColor: colors,
-            borderWidth: 1
-          }]
+          datasets: [
+            {
+              data: data,
+              backgroundColor: colors,
+              borderWidth: 1,
+            },
+          ],
         },
         options: {
           responsive: true,
+          maintainAspectRatio: true,
+          aspectRatio: 1.5, // Adjust this value to control height (higher = shorter)
           plugins: {
             title: {
               display: true,
               text: `Holdings in ${portfolio.name}`,
               font: {
-                size: 16
-              }
+                size: 16,
+              },
             },
             tooltip: {
               callbacks: {
-                label: function(context) {
+                label: function (context) {
                   const item = chartData[context.dataIndex];
                   const value = formatCurrency(item.value, portfolio.currency);
-                  return `${item.name}: ${value} (${item.percentage.toFixed(1)}%)`;
-                }
-              }
+                  return `${item.name}: ${value} (${item.percentage.toFixed(
+                    1
+                  )}%)`;
+                },
+              },
             },
             legend: {
               position: "right",
               labels: {
                 font: {
-                  size: 12
-                }
-              }
-            }
-          }
-        }
+                  size: 12,
+                },
+              },
+            },
+          },
+        },
       });
     } catch (error) {
       console.error("Error creating holdings distribution chart:", error);
