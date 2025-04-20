@@ -8,7 +8,7 @@ class CachingService {
   constructor() {
     this.cache = {}; // In-memory cache
     this.storage = window.localStorage; // Persistent storage
-    this.defaultTTL = 15 * 60 * 1000; // 15 minutes default
+    this.defaultTTL = 24 * 60 * 60* 1000; // 24 hours default
   }
 
   // Get from cache (memory or localStorage)
@@ -215,17 +215,6 @@ function updatePortfolioUI(portfolios) {
                       )}</p>
               `;
 
-        // portfolioElement.innerHTML = `
-        //   <h4>${portfolio.name}</h4>
-        //   <p>Value: ${formatCurrency(
-        //     portfolio.metrics.totalCurrentValue,
-        //     account.currency
-        //   )}</p>
-        //   <p>Gain: ${portfolio.metrics.totalUnrealizedGainPercent.toFixed(
-        //     2
-        //   )}%</p>
-        // `;
-
         container.appendChild(portfolioElement);
       });
     });
@@ -271,10 +260,70 @@ function updatePortfolioUI(portfolios) {
     );
   }
 
-  // Create growth chart
+  // Create portfolio selector for holdings distribution chart (replacing mock growth chart)
   if (portfolioGrowthChartCanvas) {
-    // For now, we'll use a mock growth chart since we don't have historical data
-    portfolioChartService.createMockGrowthChart(portfolioGrowthChartCanvas);
+    // Create and add the portfolio selector above the chart
+    createPortfolioSelector(portfolios, portfolioGrowthChartCanvas);
+  }
+}
+
+// Function to create portfolio selector and holdings distribution chart
+function createPortfolioSelector(portfolios, chartCanvas) {
+  if (!portfolios || portfolios.length === 0 || !chartCanvas) {
+    console.warn("Missing portfolios data or chart canvas");
+    return;
+  }
+
+  // Get the parent container of the canvas
+  const chartContainer = chartCanvas.parentNode;
+
+  // Create the selector container if it doesn't exist
+  let selectorContainer = document.getElementById('portfolio-selector-container');
+  if (!selectorContainer) {
+    selectorContainer = document.createElement('div');
+    selectorContainer.id = 'portfolio-selector-container';
+    selectorContainer.className = 'portfolio-selector-container';
+
+    // Insert before the chart canvas
+    chartContainer.insertBefore(selectorContainer, chartCanvas);
+  }
+
+  // Clear any existing content
+  selectorContainer.innerHTML = '';
+
+  // Create the label
+  const label = document.createElement('label');
+  label.textContent = 'Vælg portefølje: ';
+  label.setAttribute('for', 'portfolio-selector');
+  selectorContainer.appendChild(label);
+
+  // Create the select element
+  const select = document.createElement('select');
+  select.id = 'portfolio-selector';
+  select.className = 'portfolio-selector';
+
+  // Create options for each portfolio
+  portfolios.forEach((portfolio, index) => {
+    const option = document.createElement('option');
+    option.value = index;
+    option.textContent = portfolio.name;
+    select.appendChild(option);
+  });
+
+  selectorContainer.appendChild(select);
+
+  // Event listener for select change
+  select.addEventListener('change', function() {
+    const selectedIndex = parseInt(this.value);
+    const selectedPortfolio = portfolios[selectedIndex];
+
+    // Update chart with selected portfolio
+    portfolioChartService.createHoldingsDistributionChart(chartCanvas, selectedPortfolio);
+  });
+
+  // Initialize with first portfolio
+  if (portfolios.length > 0) {
+    portfolioChartService.createHoldingsDistributionChart(chartCanvas, portfolios[0]);
   }
 }
 

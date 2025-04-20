@@ -1,5 +1,4 @@
 const databaseServices = require("../services/databaseServices");
-const alphaVantageService = require("../services/alphaVantageService");
 const exchangeRateService = require("../services/exchangeRateService");
 const { getOrSetCache } = require('../utilityFunctions/cacheHelper');
 
@@ -127,7 +126,7 @@ function calculateHoldings(transactions) {
     }));
 }
 
-// In portfolioController.js
+
 async function getSecuritiesData(holdings) {
   // Get current currency rates (using cache)
   const currencyRates = await getOrSetCache(
@@ -150,7 +149,6 @@ async function getSecuritiesData(holdings) {
   }, {});
 }
 
-// Then in calculatePortfolioMetrics
 // Simplified function to calculate portfolio metrics without API calls
 function calculatePortfolioMetrics(holdings) {
   // Ensure we have holdings and it's an array

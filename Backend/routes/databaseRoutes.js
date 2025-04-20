@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const databaseController = require('../controllers/databaseController');
-const { database } = require('../config/config');
 const portfolioController = require('../controllers/portfolioController');
-const databaseServices = require('../services/databaseServices');
 
 // User routes
 router.post('/users', databaseController.createUser);
@@ -37,10 +35,6 @@ router.get('/portfolio/account/:accountId', portfolioController.getPortfolioSumm
 // Create portfolio
 router.post('/createPortfolio/:accountId', databaseController.createPortfolio);
 
-// Test to see if our API is working
-router.get('/test', (req, res) => {
-    res.json({ message: 'API is working!' });
-});
 
 // Deposit to account
 router.put('/deposit-to-account/:accountId', databaseController.depositToAccount);

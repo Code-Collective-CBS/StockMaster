@@ -70,6 +70,95 @@ export const portfolioChartService = {
     }
   },
 
+  createHoldingsDistributionChart: (canvas, portfolio) => {
+    try {
+      if (!canvas || !portfolio || !portfolio.metrics || !portfolio.metrics.holdings) {
+        console.warn("Missing canvas or portfolio holdings data");
+        return;
+      }
+
+      const holdings = portfolio.metrics.holdings;
+
+      // Skip if no holdings
+      if (holdings.length === 0) {
+        console.warn("No holdings to display");
+        return;
+      }
+
+      // Prepare data for chart
+      const totalValue = holdings.reduce((sum, h) => sum + h.currentValue, 0);
+
+      // Map holdings to chart data
+      const chartData = holdings.map(holding => ({
+        symbol: holding.symbol,
+        name: holding.security_name,
+        value: holding.currentValue,
+        percentage: (holding.currentValue / totalValue) * 100
+      }));
+
+      // Sort by value descending for better visualization
+      chartData.sort((a, b) => b.value - a.value);
+
+      const labels = chartData.map(item =>
+        `${item.symbol} (${item.percentage.toFixed(1)}%)`
+      );
+
+      const data = chartData.map(item => item.value);
+
+      // Generate colors
+      const colors = generateChartColors(labels.length);
+
+      // Destroy previous chart if it exists
+      if (canvas.chart) {
+        canvas.chart.destroy();
+      }
+
+      // Create chart
+      canvas.chart = new Chart(canvas, {
+        type: "pie",
+        data: {
+          labels: labels,
+          datasets: [{
+            data: data,
+            backgroundColor: colors,
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: `Holdings in ${portfolio.name}`,
+              font: {
+                size: 16
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const item = chartData[context.dataIndex];
+                  const value = formatCurrency(item.value, portfolio.currency);
+                  return `${item.name}: ${value} (${item.percentage.toFixed(1)}%)`;
+                }
+              }
+            },
+            legend: {
+              position: "right",
+              labels: {
+                font: {
+                  size: 12
+                }
+              }
+            }
+          }
+        }
+      });
+    } catch (error) {
+      console.error("Error creating holdings distribution chart:", error);
+    }
+  },
+
   createMockGrowthChart: (canvas) => {
     // Create a mock growth chart with random data
     // In a real app, you'd use historical data
