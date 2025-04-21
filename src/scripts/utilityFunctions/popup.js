@@ -1,5 +1,5 @@
 import { loadAccounts } from './loadAccounts.js';
-import { currencyHandler } from '../utilityFunctions/currencyConverter.js'
+import { currencyHandler } from './currencyConverter.js'
 
 export const popUps = {
     accountDetails: async () => {
@@ -28,19 +28,20 @@ export const popUps = {
     // NEW NEED MORE WORK
     currencyConverter: async (amount, fromCurrency, toCurrency) => {
         try {
-            const rates = await fetch(`/api/currency/exchange/${fromCurrency}`);
+            const reponse = await fetch(`/api/currency/exchange/${fromCurrency}`);
+            const data = await reponse.json();
 
-            const converted = await currencyHandler(
+            const converted = await currencyHandler.convertCurrency(
                 amount,
                 fromCurrency,
                 toCurrency,
-                rates
+                data
             );
 
-            return await converted;
+            return converted;
 
         } catch (error) {
-            console.error('Error fetching rates for currency conversion');
+            console.error('Error fetching rates for currency conversion', error);
             throw error;
         }
     },
@@ -227,19 +228,19 @@ export const popUps = {
             const stockPriceSpan = tradeModal.querySelector("#stock-price");
             const accountBalanceSpan = tradeModal.querySelector("#account-balance");
 
-            amountInput.addEventListener("input", () => {
+            amountInput.addEventListener("input", async () => {
                 const amount = parseFloat(amountInput.value);
-                const total = amount * window.latestStockPrice;
+                let total = amount * window.latestStockPrice;
 
                 // Currency conversion for display
                 if(window.securityCurrency !==  selectedAccount.currency) {
-                    console.log("We need to change");
+                    total = await popUps.currencyConverter(total, window.securityCurrency, selectedAccount.currency);
                 }
 
                 if (!isNaN(total)) {
-                    totalPriceSpan.textContent = `${total.toFixed(2)} ${window.securityCurrency}`;
+                    totalPriceSpan.textContent = `${total.toFixed(2)} ${selectedAccount.currency}`;
                 } else {
-                    totalPriceSpan.textContent = `0 ${window.securityCurrency}`;
+                    totalPriceSpan.textContent = `0 ${selectedAccount.currency}`;
                 }
             });
 
@@ -385,14 +386,19 @@ export const popUps = {
             dropdown.addEventListener('change', updateOwnedQuantity);
 
             // Calculate total on input
-            amountInput.addEventListener("input", () => {
+            amountInput.addEventListener("input", async () => {
                 const amount = parseFloat(amountInput.value);
-                const total = amount * window.latestStockPrice;
+                let total = amount * window.latestStockPrice;
+
+                // Currency conversion for display
+                if(window.securityCurrency !==  selectedAccount.currency) {
+                    total = await popUps.currencyConverter(total, window.securityCurrency, selectedAccount.currency);
+                }
 
                 if (!isNaN(total)) {
-                    totalPriceSpan.textContent = `${total.toFixed(2)} ${window.securityCurrency}`;
+                    totalPriceSpan.textContent = `${total.toFixed(2)} ${selectedAccount.currency}`;
                 } else {
-                    totalPriceSpan.textContent = `0 ${window.securityCurrency}`;
+                    totalPriceSpan.textContent = `0 ${selectedAccount.currency}`;
                 }
 
                 // Clear any previous error
