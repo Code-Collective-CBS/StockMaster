@@ -68,17 +68,13 @@ function setActiveSidebarItem() {
 }
 
 function handleNavigation() {
-  const sidebarLinks = document.querySelectorAll(CONFIG.selectors.sidebarLinks);
+  const navItems = document.querySelectorAll(`${CONFIG.selectors.navItems}, ${CONFIG.selectors.settingItem}`);
 
-  sidebarLinks.forEach((link) => {
-    link.addEventListener("click", (event) => {
-      if (link.classList.contains("signOut")) return;
-
-      event.preventDefault();
-      const href = link.getAttribute("href");
-
+  navItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const href = item.getAttribute('data-href');
       if (href) {
-        updateActiveState(link);
+        updateActiveState(item);
         navigateToPage(href);
       }
     });
