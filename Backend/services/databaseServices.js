@@ -425,7 +425,7 @@ getTransactionsForMultiplePortfolios: async (portfolioIds) => {
     buyOrSellSecurity: async ({
         userId,
         accountId,
-        portfolioId,
+        portfolio_id,
         symbol,
         amount,
         price_per_share,
@@ -440,12 +440,12 @@ getTransactionsForMultiplePortfolios: async (portfolioIds) => {
                 .request()
                 .input("userId", sql.Int, userId)
                 .input("accountId", sql.Int, accountId)
-                .input("portfolioId", sql.Int, portfolioId)
+                .input("portfolio_id", sql.Int, portfolio_id)
                 .query(`
                     SELECT p.id
                     FROM Portfolio p
                     JOIN Accounts a ON p.account_id = a.id
-                    WHERE p.id = @portfolioId AND a.id = @accountId AND a.user_id = @userId
+                    WHERE p.id = @portfolio_id AND a.id = @accountId AND a.user_id = @userId
             `);
 
             if (validatePortfolio.recordset.length === 0) {
@@ -493,7 +493,7 @@ getTransactionsForMultiplePortfolios: async (portfolioIds) => {
             const insertQuery = await pool
             .request()
             .input("account_id", sql.Int, accountId)
-            .input("portfolio_id", sql.Int, portfolioId)
+            .input("portfolio_id", sql.Int, portfolio_id)
             .input("securities_id", sql.Int, securities_id)
             .input("transaction_type", sql.VarChar(10), transaction_type)
             .input("amount", sql.Decimal(37, 2), amount)

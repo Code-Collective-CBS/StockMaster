@@ -42,10 +42,10 @@ router.put('/deposit-to-account/:account_id', databaseController.depositToAccoun
 router.put('/withdraw-to-account/:account_id', databaseController.withdrawFromAccount);
 
 // Buy stocks to portfolio
-router.put('/buy-security/:portfolioId', databaseController.buySecurity);
+router.put('/buy-security/:portfolio_id', databaseController.buySecurity);
 
 // Sell stocks to portfolio
-router.put('/sell-security/:portfolioId', databaseController.sellSecurity);
+router.put('/sell-security/:portfolio_id', databaseController.sellSecurity);
 
 // Get all transactions for an account
 router.get('/transactions/account/:accountId', databaseController.getTransactionsSummary);

@@ -326,18 +326,18 @@ const databaseController = {
     buySecurity: async (req, res) => {
         try {
             const user_id = req.session.user_id;
-            const { portfolioId } = req.params;
+            const portfolio_id = parseInt(req.params.portfolio_id);
 
             const { accountId, symbol, amount, price_per_share, security_currency } = req.body;
 
-            if (!user_id || !portfolioId || !accountId || !symbol || !amount || !price_per_share) {
+            if (!user_id || !portfolio_id || !accountId || !symbol || !amount || !price_per_share) {
                 return res.status(400).json({ message: "Missing required fields" });
             }
 
             const result = await databaseServices.buyOrSellSecurity({
                 userId: user_id,
                 accountId,
-                portfolioId,
+                portfolio_id,
                 symbol,
                 amount,
                 price_per_share,
@@ -367,18 +367,18 @@ const databaseController = {
     sellSecurity: async (req, res) => {
         try {
             const user_id = req.session.user_id;
-            const { portfolioId } = req.params;
+            const portfolio_id = parseInt(req.params.portfolio_id);
 
             const { accountId, symbol, amount, price_per_share, security_currency } = req.body;
 
-            if (!user_id || !portfolioId || !accountId || !symbol || !amount || !price_per_share) {
+            if (!user_id || !portfolio_id || !accountId || !symbol || !amount || !price_per_share) {
                 return res.status(400).json({ message: "Missing required fields" });
             }
 
             const result = await databaseServices.buyOrSellSecurity({
                 userId: user_id,
                 accountId,
-                portfolioId,
+                portfolio_id,
                 symbol,
                 amount,
                 price_per_share,
