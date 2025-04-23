@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       // Update UI with cached data
       updatePortfolioUI(portfolioData);
 
-      // Optionally refresh in background
+      // Optionally refresh in background (not necessar4y, but nice to do)
       setTimeout(() => refreshDataInBackground(accountId, cacheKey), 100);
     } else {
       // Not in cache, fetch it
