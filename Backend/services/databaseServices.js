@@ -319,21 +319,33 @@ getTransactionsForMultiplePortfolios: async (portfolioIds) => {
         try {
             const pool = await poolPromise;
 
-            // 1. Update balance
+            // 1. Fetch account currency
+            const accountQuery = await pool
+                .request()
+                .input('account_id', sql.Int, accountId)
+                .query(`
+                SELECT currency FROM Accounts    
+                WHERE id = @account_id
+            `);
+
+            const accountCurrency = accountQuery.recordset[0]?.currency; // "?.currency" safety to acces currency from recordset[0] only if it exist, otherwise asign undefined to variable 
+            if(!accountCurrency) throw new Error('Account currency not found');
+        
+            // 2. Update balance
             const result = await pool
                 .request()
-                .input("userId", sql.Int, userId)
-                .input("accountId", sql.Int, accountId)
+                .input("user_id", sql.Int, userId)
+                .input("account_id", sql.Int, accountId)
                 .input("amount", sql.Decimal(18, 2), amount) // Use the same type as your DB column
                 .query(`
                 UPDATE Accounts
                 SET total_balance = total_balance + @amount
-                WHERE id = @accountId AND user_id = @userId
+                WHERE id = @account_id AND user_id = @user_id
 
-                SELECT * FROM Accounts WHERE id = @accountId
+                SELECT * FROM Accounts WHERE id = @account_id
             `); // USE OF SELECT FOR LATER USE TO DISPLAY NEW ACCOUNT INSTEAD OF GETTING NEW INFORMATION MAYBE NOT NEEDED
 
-            // 2. Insert into Transactions table
+            // 3. Insert into Transactions table
             await pool
             .request()
             .input("account_id", sql.Int, accountId)
@@ -341,10 +353,11 @@ getTransactionsForMultiplePortfolios: async (portfolioIds) => {
             .input("amount", sql.Decimal(37, 2), amount)
             .input("price_per_share", sql.Decimal(18, 2), 1) // Placeholder 1 maybe change into 0 if no change on gak
             .input("total_price", sql.Decimal(37, 2), amount)
+            .input('currency', sql.VarChar(10), accountCurrency)
             .query(`
                 INSERT INTO Transactions
-                (account_id, portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price)
-                VALUES (@account_id, NULL, NULL, @transaction_type, @amount, @price_per_share, @total_price)
+                (account_id, portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price, currency)
+                VALUES (@account_id, NULL, NULL, @transaction_type, @amount, @price_per_share, @total_price, @currency)
             `);
 
             return result.recordset[0];
@@ -357,22 +370,37 @@ getTransactionsForMultiplePortfolios: async (portfolioIds) => {
     withdrawFromAccount: async (userId, accountId, amount) => {
         try {
             const pool = await poolPromise;
+
+            // 1. Fetch account currency
+            const accountQuery = await pool
+            .request()
+            .input('account_id', sql.Int, accountId)
+            .query(`
+            SELECT currency FROM Accounts    
+            WHERE id = @account_id
+            `);
+
+            
+            const accountCurrency = accountQuery.recordset[0]?.currency;
+            if(!accountCurrency) throw new Error('Account currency not found');
+
+            // 2. Update balance
             const result = await pool
                 .request()
-                .input("userId", sql.Int, userId)
-                .input("accountId", sql.Int, accountId)
+                .input("user_id", sql.Int, userId)
+                .input("account_id", sql.Int, accountId)
                 .input("amount", sql.Decimal(18, 2), amount)
                 .query(`
                 UPDATE Accounts
                 SET total_balance = total_balance - @amount
-                WHERE id = @accountId AND user_id = @userId AND total_balance >= @amount
+                WHERE id = @account_id AND user_id = @user_id AND total_balance >= @amount
 
-                SELECT * FROM Accounts WHERE id = @accountId
+                SELECT * FROM Accounts WHERE id = @account_id
             `);
 
             if (result.rowsAffected[0] === 0) throw new Error("Insufficient funds"); // Extra check if total_balance >= @amount in SQL fails
 
-            // 2. Insert into Transactions table
+            // 3. Insert into Transactions table
             await pool
             .request()
             .input("account_id", sql.Int, accountId)
@@ -380,10 +408,11 @@ getTransactionsForMultiplePortfolios: async (portfolioIds) => {
             .input("amount", sql.Decimal(37, 2), amount)
             .input("price_per_share", sql.Decimal(18, 2), 1) // Placeholder 1 maybe change into 0 if no change on gak
             .input("total_price", sql.Decimal(37, 2), amount)
+            .input('currency', sql.VarChar(10), accountCurrency)
             .query(`
                 INSERT INTO Transactions
-                (account_id, portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price)
-                VALUES (@account_id, NULL, NULL, @transaction_type, @amount, @price_per_share, @total_price)
+                (account_id, portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price, currency)
+                VALUES (@account_id, NULL, NULL, @transaction_type, @amount, @price_per_share, @total_price, @currency)
             `);
 
             return result.recordset[0];
@@ -444,11 +473,11 @@ getTransactionsForMultiplePortfolios: async (portfolioIds) => {
 
             // 3. Calculate total price
             const total_price = amount * price_per_share;
-            let convertedTotal = total_price;
+            let convertedTotalPrice = total_price;
 
-            if (accountCurrency !== security_currency) { // Setting window.securityCurrency in security.js
+            if (accountCurrency !== security_currency) { // SET window.securityCurrency in security.js
                 const rates = await exchangeRateService.getCurrency(security_currency);
-                convertedTotal = currencyUtils.convertCurrency(
+                convertedTotalPrice = currencyUtils.convertCurrency(
                     total_price,
                     security_currency,
                     accountCurrency,
@@ -456,10 +485,8 @@ getTransactionsForMultiplePortfolios: async (portfolioIds) => {
                 );
             }
 
-            const convertedPricePerShare = convertedTotal / amount;
-
-            if (transaction_type === 'buy' && convertedTotal > parseFloat(total_balance)) {
-                throw new Error(`Insufficient balance. Need ${convertedTotal.toFixed(2)} ${accountCurrency}, but have ${parseFloat(total_balance).toFixed(2)}`);
+            if (transaction_type === 'buy' && convertedTotalPrice > parseFloat(total_balance)) {
+                throw new Error(`Insufficient balance. Need ${convertedTotalPrice.toFixed(2)} ${accountCurrency}, but have ${parseFloat(total_balance).toFixed(2)}`);
             }
 
             // 4. Insert into Transactions table
@@ -470,13 +497,14 @@ getTransactionsForMultiplePortfolios: async (portfolioIds) => {
             .input("securities_id", sql.Int, securities_id)
             .input("transaction_type", sql.VarChar(10), transaction_type)
             .input("amount", sql.Decimal(37, 2), amount)
-            .input("price_per_share", sql.Decimal(18, 2), convertedPricePerShare) // Using converted price per share
-            .input("total_price", sql.Decimal(37, 2), convertedTotal) // Using account currency
+            .input("price_per_share", sql.Decimal(18, 2), price_per_share)
+            .input("total_price", sql.Decimal(37, 2), convertedTotalPrice) // Using account currency
+            .input('currency', sql.VarChar(10), security_currency)
             .query(`
                 INSERT INTO Transactions
-                (account_id, portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price)
+                (account_id, portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price, currency)
                 OUTPUT INSERTED.id
-                VALUES (@account_id, @portfolio_id, @securities_id, @transaction_type, @amount, @price_per_share, @total_price)
+                VALUES (@account_id, @portfolio_id, @securities_id, @transaction_type, @amount, @price_per_share, @total_price, @currency)
             `);
 
             // 5. Update account balance if 'buy'
@@ -484,7 +512,7 @@ getTransactionsForMultiplePortfolios: async (portfolioIds) => {
                 await pool
                     .request()
                     .input('accountId', sql.Int, accountId)
-                    .input('total_price', sql.Decimal(18, 2), convertedTotal)
+                    .input('total_price', sql.Decimal(18, 2), convertedTotalPrice)
                     .query(`
                     UPDATE Accounts
                     SET total_balance = total_balance - @total_price
@@ -496,7 +524,7 @@ getTransactionsForMultiplePortfolios: async (portfolioIds) => {
                 await pool
                     .request()
                     .input('accountId', sql.Int, accountId)
-                    .input('total_price', sql.Decimal(18, 2), convertedTotal)
+                    .input('total_price', sql.Decimal(18, 2), convertedTotalPrice)
                     .query(`
                     UPDATE Accounts
                     SET total_balance = total_balance + @total_price

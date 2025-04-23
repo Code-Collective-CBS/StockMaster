@@ -244,10 +244,10 @@ const databaseController = {
     depositToAccount: async (req, res) => {
         try {
             const user_id = req.session.user_id;
-            const { accountId } = req.params;
+            const account_id = parseInt(req.params.account_id);
             const { amount } = req.body; // { "amount": 500 }
 
-            if (!user_id || !accountId) {
+            if (!user_id || !account_id) {
                 return res.status(400).json({ error: 'User Id or Accound Id is required' });
             }
 
@@ -258,20 +258,20 @@ const databaseController = {
             const cacheKeyTransactions = `transactions-user_id-${user_id}`;
             cache.del(cacheKeyTransactions);
 
-            const result = await databaseServices.depositToAccount(user_id, accountId, amount);
+            const result = await databaseServices.depositToAccount(user_id, account_id, amount);
             res.status(201).json(result);
         } catch (error) {
-            console.error(`Error depositing users id ${user_id} to account id: ${accountId}`, error);
+            console.error(`Error depositing users id ${user_id} to account id: ${account_id}`, error);
         }
     },
 
     withdrawFromAccount: async (req, res) => {
         try {
             const user_id = req.session.user_id;
-            const { accountId } = req.params;
+            const account_id = parseInt(req.params.account_id);
             const { amount } = req.body;
 
-            if (!user_id || !accountId) {
+            if (!user_id || !account_id) {
                 return res.status(400).json({ error: 'User Id or account Id is required' });
             }
 
@@ -283,10 +283,10 @@ const databaseController = {
             cache.del(cacheKeyTransactions);
 
 
-            const result = await databaseServices.withdrawFromAccount(user_id, accountId, amount);
+            const result = await databaseServices.withdrawFromAccount(user_id, account_id, amount);
             res.status(201).json(result);
         } catch (error) {
-            console.error(`Error withdrawing user's id ${req.session?.user_id} from account id: ${req.params?.accountId}`, error);
+            console.error(`Error withdrawing user's id ${req.session?.user_id} from account id: ${req.params?.account_id}`, error);
 
             if (error.message === "Insufficient funds") {
                 return res.status(400).json({ message: "Insufficient funds" });

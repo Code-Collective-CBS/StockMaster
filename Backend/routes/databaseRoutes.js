@@ -35,12 +35,11 @@ router.get('/portfolio/account/:accountId', portfolioController.getPortfolioSumm
 // Create portfolio
 router.post('/createPortfolio/:accountId', databaseController.createPortfolio);
 
-
 // Deposit to account
-router.put('/deposit-to-account/:accountId', databaseController.depositToAccount);
+router.put('/deposit-to-account/:account_id', databaseController.depositToAccount);
 
 // Withdraw to account
-router.put('/withdraw-to-account/:accountId', databaseController.withdrawFromAccount);
+router.put('/withdraw-to-account/:account_id', databaseController.withdrawFromAccount);
 
 // Buy stocks to portfolio
 router.put('/buy-security/:portfolioId', databaseController.buySecurity);
