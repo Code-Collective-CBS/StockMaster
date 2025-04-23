@@ -28,8 +28,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     popUps.createPortfolio();
 
     // Get transactions
-    const data = await loadTransactions();
-    displayTransactions(data);
+    const transactionData = await loadTransactions();
+    displayTransactions(transactionData);
 
     displayAccountSummary();
 
@@ -59,8 +59,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 });
 
-function displayTransactions(data) {
-    const transaction = data.data;
+function displayTransactions(transactionData) {
+    const transaction = transactionData.data;
 
     const table = document.getElementById('transaction-table');
     const tableBody = document.querySelector('.tbody-transactions');
@@ -75,6 +75,7 @@ function displayTransactions(data) {
         'symbol',
         'amount',
         'price_per_share',
+        'currency',
         'total_price'
     ];
 

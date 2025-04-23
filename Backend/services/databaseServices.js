@@ -560,13 +560,13 @@ getTransactionsForMultiplePortfolios: async (portfolioIds) => {
         }
     },
 
-    getTransactionsSummary: async (userId, accounId) => {
+    getTransactionsSummary: async (user_id, account_id) => {
         try{
             const pool = await poolPromise;
             const transactions = await pool
                 .request()
-                .input('userId', sql.Int, userId)
-                .input('accountId', sql.Int, accounId)
+                .input('user_id', sql.Int, user_id)
+                .input('account_id', sql.Int, account_id)
                 .query(`
                 SELECT
                     t.id AS transaction_id,
@@ -574,6 +574,7 @@ getTransactionsForMultiplePortfolios: async (portfolioIds) => {
                     t.amount,
                     t.price_per_share,
                     t.total_price,
+                    t.currency,
                     t.transaction_date,
                     s.symbol,
                     s.name AS security_name,
@@ -584,12 +585,12 @@ getTransactionsForMultiplePortfolios: async (portfolioIds) => {
                 LEFT JOIN Securities s ON t.securities_id = s.id
                 LEFT JOIN Portfolio p ON t.portfolio_id = p.id
                 JOIN Accounts a ON t.account_id = a.id
-                WHERE a.id = @accountId
-                    AND a.user_id = @userId
+                WHERE a.id = @account_id
+                    AND a.user_id = @user_id
                 ORDER BY t.transaction_date DESC;
             `);
 
-            return transactions.recordset;
+            return transactions.recordset; // Not [0] because result is multiple rows
         } catch (error) {
             console.error('Failed to get transaction for user account');
             throw error;

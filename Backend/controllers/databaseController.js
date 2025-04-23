@@ -408,7 +408,7 @@ const databaseController = {
     getTransactionsSummary: async (req, res) => {
         try {
             const user_id = req.session.user_id;
-            const account_id = parseInt(req.params.accountId); // Convert accountId (defined in routes) to an interger (string -> number) because of sql.Int
+            const account_id = parseInt(req.params.account_id); // Convert accountId (defined in routes) to an interger (string -> number) because of sql.Int
     
             if(!user_id || !account_id) {
                 return res.status(400).json({ message: "Missing credentials to get transaction" });
