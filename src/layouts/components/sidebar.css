@@ -38,6 +38,7 @@
 
 .nav-item:hover, .setting-item:hover {
     background-color: var(--sidebar-hover);
+    cursor: pointer;
 }
 
 /* Active state for selected nav item */
@@ -48,7 +49,7 @@
     padding-left: 21px; /* 25px - 4px border (align with the rest) */
 }
 
-.nav-item.active a, .nav-item.active .icon {
+.nav-item.active, .nav-item.active .icon {
     color: var(--primary-color);
 }
 
@@ -59,7 +60,7 @@
 }
 
 /* Link styling */
-.nav-item a, .setting-item a {
+.nav-item, .setting-item {
     text-decoration: none;
     color: inherit;
     font-size: var(--text-size);
@@ -151,7 +152,7 @@
         justify-content: center;
     }
 
-    .nav-item a, .setting-item a {
+    .nav-item span, .setting-item span {
         display: none;
     }
 

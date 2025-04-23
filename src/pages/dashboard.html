@@ -22,7 +22,7 @@
   <span class="brandName">StockMaster</span>
   <nav class="sideBarNav">
     
-    <div class="nav-item">
+    <div class="nav-item" data-href="/src/pages/dashboard.html">
       <svg
         class="icon"
         width="24"
@@ -36,10 +36,10 @@
           fill="currentColor"
         />
       </svg>
-      <a href="/src/pages/dashboard.html">Overblik</a>
+      <span>Dashboard</span>
     </div>
 
-    <div class="nav-item">
+    <div class="nav-item" data-href="/src/pages/portfolio.html">
       <svg
         class="icon"
         width="24"
@@ -53,10 +53,10 @@
           fill="currentColor"
         />
       </svg>
-      <a href="/src/pages/portfolio.html">Portefølje</a>
+      <span>Portfolios</span>
     </div>
 
-    <div class="nav-item">
+    <div class="nav-item" data-href="/src/pages/securities-news.html">
       <svg
         class="icon"
         width="24"
@@ -70,10 +70,10 @@
           fill="currentColor"
         />
       </svg>
-      <a href="/src/pages/securities-news.html">Aktier</a>
+      <span>Securities</span>
     </div>
 
-    <div class="nav-item">
+    <div class="nav-item" data-href="/src/pages/transactions.html">
       <svg
         class="icon"
         width="24"
@@ -91,7 +91,7 @@
           fill="currentColor"
         />
       </svg>
-      <a href="/src/pages/transactions.html">Transaktioner</a>
+      <span>Transactions</span>
     </div>
   </nav>
 
@@ -106,7 +106,7 @@
       </div>
     </div>
     <nav class="settingNav">
-      <div class="setting-item active">
+      <div class="setting-item active" data-href="/src/pages/profile-settings.html">
         <svg
           class="icon"
           width="24"
@@ -120,9 +120,9 @@
             fill="currentColor"
           />
         </svg>
-        <a href="/src/pages/profile-settings.html">Indstillinger</a>
+        <span>Settings</span>
       </div>
-      <div id="signOut-item" class="setting-item">
+      <div id="signOut-item" class="setting-item" data-href="#">
         <svg
           class="icon"
           width="24"
@@ -136,7 +136,7 @@
             fill="currentColor"
           />
         </svg>
-        <a class="signOut" href="#">Log ud</a>
+        <span>Sign out</span>
       </div>
     </nav>
   </div>
