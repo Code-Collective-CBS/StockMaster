@@ -1,27 +1,27 @@
 import { stockAPI } from "./stockScripts/api.js";
 import { popUps } from "./utilityFunctions/popup.js";
 
-// PRESENT IN THE SECURITIES-NEWS.JS MAYBE MOVE IT?
-const topPicksSymbols = [
-    {
-        symbol: "I:NDX",
-        htmlElement: document.getElementById("I:NDX"),
-    },
-    {
-        symbol: "I:CX10GI",
-        htmlElement: document.getElementById("I:CX10GI"),
-    },
-    {
-        symbol: "I:CX35PI",
-        htmlElement: document.getElementById("I:CX35PI"),
-    },
-    {
-        symbol: "I:CX20GI",
-        htmlElement: document.getElementById("I:CX20GI"),
-    },
-];
 
 document.addEventListener("DOMContentLoaded", () => {
+    // PRESENT IN THE SECURITIES-NEWS.JS MAYBE MOVE IT?
+    const topPicksSymbols = [
+        {
+            symbol: "I:NDX",
+            htmlElement: document.getElementById("I:NDX"),
+        },
+        {
+            symbol: "I:CX10GI",
+            htmlElement: document.getElementById("I:CX10GI"),
+        },
+        {
+            symbol: "I:CX35PI",
+            htmlElement: document.getElementById("I:CX35PI"),
+        },
+        {
+            symbol: "I:CX20GI",
+            htmlElement: document.getElementById("I:CX20GI"),
+        },
+    ];
     // POP UP
     popUps.setupDepositPopup()
     popUps.createPortfolio();
@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     //// NEWS ////
-
+    // article_url not working even though following documention on Polygon.io 
     const gethNews = async () => {
         try {
             const response = await stockAPI.getNews();

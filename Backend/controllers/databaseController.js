@@ -351,6 +351,9 @@ const databaseController = {
             // Transaction cache
             const cacheKeyTransactions = `transactions-account_id-${account_id}`;
             cache.del(cacheKeyTransactions);
+            // Portfolio cache
+            const cacheKeyPortfolios = `portfolio-${account_id}`;
+            cache.del(cacheKeyPortfolios);
 
             res.status(201).json({
                 message: "Security bought",
@@ -392,6 +395,9 @@ const databaseController = {
             // Transaction cache
             const cacheKeyTransactions = `transactions-account_id-${account_id}`;
             cache.del(cacheKeyTransactions);
+            // Portfolio cache
+            const cacheKeyPortfolios = `portfolio-${account_id}`;
+            cache.del(cacheKeyPortfolios);
 
             res.status(201).json({
                 message: "Security sold",

@@ -121,12 +121,6 @@ function updatePageTitle(stockName) {
   pageTitle.textContent = stockName;
 };
 
-/*
-  const portfolioSummary = await getPortfolioSummary();
-  console.log(portfolioSummary[0].holdings[0].symbol);
-
-*/
-
 async function checkHoldingForSecurity(symbol) {
   try {
     const selectedAccount = sessionStorage.getItem('selectedAccountId');

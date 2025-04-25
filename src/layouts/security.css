@@ -93,7 +93,7 @@ section.stock-info-container, .holdings-info-container {
 }
 
 section.action {
-  grid-column: span 2;
+  grid-column: span 3;
 }
 
 section.top-trades {

@@ -2,27 +2,28 @@ import { stockAPI } from "./stockScripts/api.js";
 import { searchFunction } from "./utilityFunctions/searchFunction.js";
 import { popUps } from "./utilityFunctions/popup.js";
 
-// PRESENT IN THE DASHBOARD.JS MAYBE MOVE IT?
-const topPicksSymbols = [
-  {
-    symbol: "I:NDX",
-    htmlElement: document.getElementById("I:NDX"),
-  },
-  {
-    symbol: "I:CX10GI",
-    htmlElement: document.getElementById("I:CX10GI"),
-  },
-  {
-    symbol: "I:CX35PI",
-    htmlElement: document.getElementById("I:CX35PI"),
-  },
-  {
-    symbol: "I:CX20GI",
-    htmlElement: document.getElementById("I:CX20GI"),
-  },
-];
 
 document.addEventListener("DOMContentLoaded", () => {
+  // PRESENT IN THE DASHBOARD.JS MAYBE MOVE IT?
+  const topPicksSymbols = [
+    {
+      symbol: "I:NDX",
+      htmlElement: document.getElementById("I:NDX"),
+    },
+    {
+      symbol: "I:CX10GI",
+      htmlElement: document.getElementById("I:CX10GI"),
+    },
+    {
+      symbol: "I:CX35PI",
+      htmlElement: document.getElementById("I:CX35PI"),
+    },
+    {
+      symbol: "I:CX20GI",
+      htmlElement: document.getElementById("I:CX20GI"),
+    },
+  ];
+  
   const stockInput = document.getElementById("stockInput");
   const deleteButton = document.querySelector(".delete-search");
   const searchContainer = document.querySelector(".displaySearch");
