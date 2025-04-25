@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Overblik</title>
+  <title>Dashboard</title>
   <link rel="stylesheet" href="/src/layouts/dashboard.css">
   <link rel="stylesheet" href="/src/base/color.css">
   <link rel="stylesheet" href="/src/base/typography.css">
@@ -145,7 +145,7 @@
 
   <main class="dashboard-content">
     <header class="page-header">
-      <h1>Overblik</h1>
+      <h1>Overview</h1>
       <div class="header-actions">
         <button class="btn btn-secondary" id="addPortfolioButton">Add portfolio</button>
         <button class="btn btn-primary" id="depositButton">Deposit/withdraw</button>
@@ -153,22 +153,22 @@
     </header>
     <section class="dashboard-grid">
       <section class="overview">
-        <h2>Egenkapital</h2>
+        <h2>Balance</h2>
         <p class="overview-value">999999 <span class="currency">[Valuta]</span></p>
         <p class="overview-change">15%</p>
         <select name="overview-interval" id="overview-interval">
-          <option value="day">Dag</option>
-          <option value="month">måned</option>
-          <option value="current-year">i år</option>
-          <option value="year">år</option>
+          <option value="day">Day</option>
+          <option value="month">Month</option>
+          <option value="current-year">Ytd</option>
+          <option value="year">Year</option>
         </select>
       </section>
 
       <section class="portfolios">
-        <h2>Porteføljer</h2>
-        <p><a class="portfolio" href="#">Portefølje 1</a></p>
-        <p><a class="portfolio" href="#">Portefølje 2</a></p>
-        <p><a class="portfolio" href="#">Portefølje 3</a></p>
+        <h2>Portfolios</h2>
+        <p><a class="portfolio" href="#">Portfolio 1</a></p>
+        <p><a class="portfolio" href="#">Portfolio 2</a></p>
+        <p><a class="portfolio" href="#">Portfolio 3</a></p>
       </section>
 
       <section class="benchmark">
@@ -176,27 +176,27 @@
         <p class="benchmark-index">OMXC25</p>
         <p class="benchmark-change">15%</p>
         <select name="benchmark" id="benchmark-interval">
-          <option value="day">Dag</option>
-          <option value="month">Måned</option>
-          <option value="current-year">I år</option>
-          <option value="year">år</option>
+          <option value="day">Day</option>
+          <option value="month">Month</option>
+          <option value="current-year">Ytd</option>
+          <option value="year">Year</option>
         </select>
       </section>
 
       <section class="portfolio-graph">
-        <h2>Alle porteføljer</h2>
+        <h2>All Portfolios</h2>
         <canvas id="portfolioChart"></canvas>
         <select name="portfolio-graph-interval" id="portfolio-graph-interval">
-          <option value="day">Dag</option>
-          <option value="month">Måned</option>
-          <option value="current-year">I år</option>
-          <option value="year">år</option>
+          <option value="day">Day</option>
+          <option value="month">Month</option>
+          <option value="current-year">Ytd</option>
+          <option value="year">Year</option>
         </select>
       </section>
 
       <section class="news">
         <div class="news-titel-container">
-          <h2>Nyheder</h2>
+          <h2>News</h2>
         </div>
         <p id="news-author" class="bold-text"></p>
         <div class="news-description-container">
@@ -205,7 +205,7 @@
       </section>
 
       <section class="top-picks">
-        <h2>Indeks</h2>
+        <h2>Index</h2>
         <p id="I:NDX">NASDAQ 100 - <span class="market-price"></span> USD</p>
         <p id="I:CX10GI">OMX Copenhagen Technology GI - <span class="market-price"></span> DKK</p>
         <p id="I:CX35PI">OMX Copenhagen Real Estate PI - <span class="market-price"></span> DKK</p>

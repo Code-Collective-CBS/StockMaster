@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Account Settings - StockMaster</title>
+    <title>Account Settings</title>
     <link rel="stylesheet" href="/src/layouts/account-settings.css" />
     <link rel="stylesheet" href="/src/layouts/components/sidebar.css" />
     <link rel="stylesheet" href="/src/base/color.css" />
@@ -148,20 +148,20 @@
     <main class="main-content">
       <div class="account-settings-container">
         <div class="account-header">
-          <h1>Kontoindstillinger</h1>
+          <h1>Account Settings</h1>
         </div>
 
         <div class="profile-form">
           <div class="name-row">
             <div class="form-group">
-              <label for="accountName">Kontonavn</label>
+              <label for="accountName">Account Name</label>
               <input type="text" id="accountName" placeholder="Udfyld venligst dette med navn på din konto" />
             </div>
 
             <div class="form-group">
-              <label for="accountCurrency">Valuta</label>
+              <label for="accountCurrency">Currency</label>
               <select name="accountCurrency" id="accountCurrency">
-                <option value="chooseCurrency">-- Vælg valuta her --</option>
+                <option value="chooseCurrency">-- Choose a currency --</option>
                 <option value="DKK">DKK</option>
                 <option value="USD">USD</option>
                 <option value="EUR">EUR</option>
@@ -171,10 +171,10 @@
 
 
           <div class="form-group">
-            <label for="accountState">Konto status</label>
+            <label for="accountState">Account Status</label>
             <select name="account" id="accountState">
-              <option value="active">Aktiv</option>
-              <option value="inactive">Inaktiv</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
             </select>
           </div>
 
@@ -186,8 +186,8 @@
 
 
           <div class="form-actions">
-            <button class="cancel-btn" id="deleteAcc">Slet konto</button>
-            <button class="save-btn" id="createAcc">Opret konto</button>
+            <button class="cancel-btn" id="deleteAcc">Delete Account</button>
+            <button class="save-btn" id="createAcc">Create Account</button>
           </div>
         </div>
       </div>

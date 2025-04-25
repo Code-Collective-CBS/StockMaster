@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StockMaster - Opret bruger</title>
+  <title>Create User</title>
   <link rel="stylesheet" href="/src/layouts/sign-up.css" />
   <link rel="stylesheet" href="/src/base/color.css" />
   <link rel="stylesheet" href="/src/base/typography.css" />
@@ -22,24 +22,24 @@
         <h1>StockMaster</h1>
       </div>
       <div class="welcome-section">
-        <h2>Velkommen tilbage</h2>
-        <p>Hvis du allerede har en bruger, kan du logge ind her.</p>
+        <h2>Welcome Back</h2>
+        <p>If you already have a user, you can log in here.</p>
         <button class="login-button">Login</button>
       </div>
     </section>
 
     <section class="right-column">
       <div class="registration-form">
-        <h2>Opret bruger</h2>
+        <h2>Create User</h2>
         <form id="registerForm">
           <div class="form-row">
             <div class="form-group">
-              <label for="fornavn">Fornavn</label>
-              <input type="text" id="fornavn" name="fornavn" placeholder="Fornavn" required />
+              <label for="fornavn">First Name</label>
+              <input type="text" id="fornavn" name="fornavn" placeholder="First Name" required />
             </div>
             <div class="form-group">
-              <label for="efternavn">Efternavn</label>
-              <input type="text" id="efternavn" name="efternavn" placeholder="Efternavn" required />
+              <label for="efternavn">Last Name</label>
+              <input type="text" id="efternavn" name="efternavn" placeholder="Last Name" required />
             </div>
           </div>
 
@@ -49,17 +49,17 @@
           </div>
 
           <div class="form-group">
-            <label for="telefon">Telefonnummer</label>
-            <input type="tel" id="telefon" name="telefon" placeholder="Telefonnummer" />
+            <label for="telefon">Telephone Number</label>
+            <input type="tel" id="telefon" name="telefon" placeholder="Telephone Number" />
           </div>
 
           <div class="form-group">
-            <label for="password">Adgangskode</label>
-            <input type="password" id="password" name="password" placeholder="Adgangskode" required />
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Password" required />
           </div>
 
           <div class="form-group">
-            <label>Vælg en avatar</label>
+            <label>Choose an avatar</label>
             <div class="avatar-selection">
               <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=Alex" class="avatar-option" data-avatar="Alex" />
               <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=Milo" class="avatar-option" data-avatar="Milo" />
@@ -70,8 +70,8 @@
           <input type="hidden" id="selectedAvatar" name="avatar" />
 
           <div class="form-buttons">
-            <button type="button" class="cancel-button">Annuller</button>
-            <button type="submit" class="save-button">Opret</button>
+            <button type="button" class="cancel-button">Cancel</button>
+            <button type="submit" class="save-button">Create</button>
           </div>
         </form>
       </div>
