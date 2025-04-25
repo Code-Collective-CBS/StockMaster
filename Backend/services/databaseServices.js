@@ -169,12 +169,12 @@ const databaseServices = {
         }
     },
 
-    getAccountBalanceAndCurrency: async (accounId) => {
+    getAccountBalanceAndCurrency: async (accoun_id) => {
         try {
             const pool = await poolPromise;
             const result = await pool
                 .request()
-                .input('accountId', sql.Int, accounId)
+                .input('accountId', sql.Int, accoun_id)
                 .query(`
                 SELECT total_balance, currency
                 FROM Accounts
@@ -423,8 +423,8 @@ getTransactionsForMultiplePortfolios: async (portfolioIds) => {
     },
 
     buyOrSellSecurity: async ({
-        userId,
-        accountId,
+        user_id,
+        account_id,
         portfolio_id,
         symbol,
         amount,
@@ -438,14 +438,14 @@ getTransactionsForMultiplePortfolios: async (portfolioIds) => {
             // 0. Validate portfolio belongs to account and user
             const validatePortfolio = await pool
                 .request()
-                .input("userId", sql.Int, userId)
-                .input("accountId", sql.Int, accountId)
+                .input("user_id", sql.Int, user_id)
+                .input("account_id", sql.Int, account_id)
                 .input("portfolio_id", sql.Int, portfolio_id)
                 .query(`
                     SELECT p.id
                     FROM Portfolio p
                     JOIN Accounts a ON p.account_id = a.id
-                    WHERE p.id = @portfolio_id AND a.id = @accountId AND a.user_id = @userId
+                    WHERE p.id = @portfolio_id AND a.id = @account_id AND a.user_id = @user_id
             `);
 
             if (validatePortfolio.recordset.length === 0) {
@@ -453,7 +453,7 @@ getTransactionsForMultiplePortfolios: async (portfolioIds) => {
             }
 
             // 1. Get current account balance
-            const { total_balance, currency: accountCurrency } = await databaseServices.getAccountBalanceAndCurrency(accountId);
+            const { total_balance, currency: accountCurrency } = await databaseServices.getAccountBalanceAndCurrency(account_id);
 
 
             // 2. Get security ID from DB table Securities
@@ -492,7 +492,7 @@ getTransactionsForMultiplePortfolios: async (portfolioIds) => {
             // 4. Insert into Transactions table
             const insertQuery = await pool
             .request()
-            .input("account_id", sql.Int, accountId)
+            .input("account_id", sql.Int, account_id)
             .input("portfolio_id", sql.Int, portfolio_id)
             .input("securities_id", sql.Int, securities_id)
             .input("transaction_type", sql.VarChar(10), transaction_type)
@@ -511,24 +511,24 @@ getTransactionsForMultiplePortfolios: async (portfolioIds) => {
             if(transaction_type === 'buy') {
                 await pool
                     .request()
-                    .input('accountId', sql.Int, accountId)
+                    .input('account_id', sql.Int, account_id)
                     .input('total_price', sql.Decimal(18, 2), convertedTotalPrice)
                     .query(`
                     UPDATE Accounts
                     SET total_balance = total_balance - @total_price
-                    WHERE id = @accountId        
+                    WHERE id = @account_id        
                 `);
             }
 
             if(transaction_type === 'sell') {
                 await pool
                     .request()
-                    .input('accountId', sql.Int, accountId)
+                    .input('account_id', sql.Int, account_id)
                     .input('total_price', sql.Decimal(18, 2), convertedTotalPrice)
                     .query(`
                     UPDATE Accounts
                     SET total_balance = total_balance + @total_price
-                    WHERE id = @accountId
+                    WHERE id = @account_id
                 `);
             }
 

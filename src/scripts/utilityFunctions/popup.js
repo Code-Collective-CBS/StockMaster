@@ -278,7 +278,7 @@ export const popUps = {
 
                 // HELPER VARIABLE TO SEND BODY AS OBJECT
                 const payload = {
-                    accountId: selectedAccount.account_id,
+                    account_id: selectedAccount.account_id,
                     symbol,
                     amount,
                     price_per_share: latestPrice,
@@ -438,7 +438,7 @@ export const popUps = {
                 }
 
                 const payload = {
-                    accountId: selectedAccount.account_id,
+                    account_id: selectedAccount.account_id,
                     symbol,
                     amount,
                     price_per_share: latestPrice,

@@ -328,15 +328,15 @@ const databaseController = {
             const user_id = req.session.user_id;
             const portfolio_id = parseInt(req.params.portfolio_id);
 
-            const { accountId, symbol, amount, price_per_share, security_currency } = req.body;
+            const { account_id, symbol, amount, price_per_share, security_currency } = req.body;
 
-            if (!user_id || !portfolio_id || !accountId || !symbol || !amount || !price_per_share) {
+            if (!user_id || !portfolio_id || !account_id || !symbol || !amount || !price_per_share) {
                 return res.status(400).json({ message: "Missing required fields" });
             }
 
             const result = await databaseServices.buyOrSellSecurity({
-                userId: user_id,
-                accountId,
+                user_id,
+                account_id,
                 portfolio_id,
                 symbol,
                 amount,
@@ -349,7 +349,7 @@ const databaseController = {
             const cacheKeyAccounts = `accounts-user_id-${user_id}`;
             cache.del(cacheKeyAccounts);
             // Transaction cache
-            const cacheKeyTransactions = `transactions-account_id-${accountId}`;
+            const cacheKeyTransactions = `transactions-account_id-${account_id}`;
             cache.del(cacheKeyTransactions);
 
             res.status(201).json({
@@ -369,15 +369,15 @@ const databaseController = {
             const user_id = req.session.user_id;
             const portfolio_id = parseInt(req.params.portfolio_id);
 
-            const { accountId, symbol, amount, price_per_share, security_currency } = req.body;
+            const { account_id, symbol, amount, price_per_share, security_currency } = req.body;
 
-            if (!user_id || !portfolio_id || !accountId || !symbol || !amount || !price_per_share) {
+            if (!user_id || !portfolio_id || !account_id || !symbol || !amount || !price_per_share) {
                 return res.status(400).json({ message: "Missing required fields" });
             }
 
             const result = await databaseServices.buyOrSellSecurity({
-                userId: user_id,
-                accountId,
+                user_id,
+                account_id,
                 portfolio_id,
                 symbol,
                 amount,
@@ -390,7 +390,7 @@ const databaseController = {
             const cacheKeyAccounts = `accounts-user_id-${user_id}`;
             cache.del(cacheKeyAccounts);
             // Transaction cache
-            const cacheKeyTransactions = `transactions-account_id-${accountId}`;
+            const cacheKeyTransactions = `transactions-account_id-${account_id}`;
             cache.del(cacheKeyTransactions);
 
             res.status(201).json({
