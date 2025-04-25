@@ -3,12 +3,17 @@ import { stockAPI } from "./api.js";
 import { favoredStocks } from "../utilityFunctions/favoredStocks.js";
 import { portfolioChartService } from "../utilityFunctions/portfolioChartService.js";
 import { cachingService } from "../utilityFunctions/cachingService.js";
+import { popUps } from "../utilityFunctions/popup.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("Portfolio page loaded!");
 
   try {
     const accountId = sessionStorage.getItem("selectedAccountId");
+
+    // POP UP
+    popUps.setupDepositPopup();
+    popUps.createPortfolio();
 
     if (!accountId) {
       showErrorMessage("Please select an account first");

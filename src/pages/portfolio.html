@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="da">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Portfolio</title>
     <link rel="stylesheet" href="/src/layouts/portfolio.css" />
     <link rel="stylesheet" href="/src/layouts/components/sidebar.css" />
+    <link rel="stylesheet" href="/src/layouts/components/modal.css">
     <link rel="stylesheet" href="/src/base/color.css" />
     <link rel="stylesheet" href="/src/base/typography.css" />
     <!--GOOGLE FONTS-->
@@ -150,12 +151,8 @@
       <header class="page-header">
         <h1>Portfolio Overview</h1>
         <div class="header-actions">
-          <button class="btn btn-secondary" id="addPortfolioButton">
-            Add portfolio
-          </button>
-          <button class="btn btn-primary" id="depositButton">
-            Deposit/withdraw
-          </button>
+          <button class="btn btn-secondary" id="addPortfolioButton">Add portfolio</button>
+          <button class="btn btn-primary" id="depositButton">Deposit/withdraw</button>
         </div>
       </header>
 
@@ -245,67 +242,6 @@
         </div>
       </section>
     </main>
-
-    <!-- Modal for adding new portfolio (hidden by default) -->
-    <div class="modal" id="addPortfolioModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Tilføj ny portefølje</h2>
-          <button class="close-button" id="closeModalButton">&times;</button>
-        </div>
-        <div class="modal-body">
-          <form id="addPortfolioForm">
-            <div class="form-group">
-              <label for="portfolioName">Portefølje navn</label>
-              <input type="text" id="portfolioName" required />
-            </div>
-            <div class="form-group">
-              <label for="accountSelect">Vælg konto</label>
-              <select id="accountSelect" required>
-                <!-- Account options will be filled by JavaScript -->
-              </select>
-            </div>
-            <button type="submit" class="btn btn-primary">
-              Opret portefølje
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal for deposits (hidden by default) -->
-    <div class="modal" id="depositModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Indbetal til konto</h2>
-          <button class="close-button" id="closeDepositModalButton">
-            &times;
-          </button>
-        </div>
-        <div class="modal-body">
-          <form id="depositForm">
-            <div class="form-group">
-              <label for="accountSelectDeposit">Vælg konto</label>
-              <select id="accountSelectDeposit" required>
-                <!-- Account options will be filled by JavaScript -->
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="depositAmount">Beløb (DKK)</label>
-              <input
-                type="number"
-                id="depositAmount"
-                min="1"
-                step="1"
-                required
-              />
-            </div>
-            <button type="submit" class="btn btn-primary">Indbetal</button>
-          </form>
-        </div>
-      </div>
-    </div>
-
     <!-- Add Chart.js library -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
