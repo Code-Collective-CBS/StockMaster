@@ -92,7 +92,7 @@ section.transactions{
     grid-column: span 3;
 }
 section.balance{
-    grid-column: span 2;
+    grid-column: span 3;
 }
 section.top-trades{
     grid-column: span 1;

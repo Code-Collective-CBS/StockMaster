@@ -1,26 +1,5 @@
 import { popUps } from "./utilityFunctions/popup.js";
 import { loadTransactions } from "./utilityFunctions/loadTransactions.js";
-import { stockAPI } from "./stockScripts/api.js";
-
-// PRESENT IN THE SECURITIES-NEWS.JS MAYBE MOVE IT?
-const topPicksSymbols = [
-    {
-        symbol: "I:NDX",
-        htmlElement: document.getElementById("I:NDX"),
-    },
-    {
-        symbol: "I:CX10GI",
-        htmlElement: document.getElementById("I:CX10GI"),
-    },
-    {
-        symbol: "I:CX35PI",
-        htmlElement: document.getElementById("I:CX35PI"),
-    },
-    {
-        symbol: "I:CX20GI",
-        htmlElement: document.getElementById("I:CX20GI"),
-    },
-];
 
 document.addEventListener("DOMContentLoaded", async () => {
     // POP UP
@@ -32,31 +11,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     displayTransactions(transactionData);
 
     displayAccountSummary();
-
-    //// TOP PICKS ////
-
-
-    topPicksSymbols.forEach(async (topPick) => {
-        try {
-            const response = await stockAPI.getIndicesoverview(topPick.symbol);
-            const data = response.data;
-
-            // Safely check for valid data
-            if (!data?.results?.length || !data.results[0]?.c) {
-                console.warn(`No valid results for ${topPick.symbol}`);
-                return; // Skip to next symbol
-            }
-
-            const closedPrice = data.results[0].c;
-
-            if (topPick.htmlElement) {
-                const marketPriceElement = topPick.htmlElement.querySelector(".market-price");
-                marketPriceElement.innerHTML = `${parseFloat(closedPrice.toFixed(1)) || "N/A"}`;
-            }
-        } catch (error) {
-            console.error(`Top pick fetch failed for ${topPick.symbol}:`, error.message);
-        }
-    });
 });
 
 function displayTransactions(transactionData) {
@@ -105,7 +59,7 @@ function displayTransactions(transactionData) {
 };
 
 const displayAccountSummary = () => {
-    const accounts = window.cachedAccounts;
+    const accounts = window.cachedAccounts; // Using window from ../scripts/utilityFunctions/loadAccounts.js and used inside sidebar.js for fresh account data when user switich account
 
     if (!accounts || accounts.length === 0) {
         console.warn("No cached accounts available.");
@@ -135,4 +89,3 @@ const displayAccountSummary = () => {
         tableBody.appendChild(tableRow);
     });
 };
-

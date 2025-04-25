@@ -255,7 +255,7 @@ const databaseController = {
             const cacheKeyAccounts = `accounts-user_id-${user_id}`;
             cache.del(cacheKeyAccounts);
             // Transaction cache
-            const cacheKeyTransactions = `transactions-user_id-${user_id}`;
+            const cacheKeyTransactions = `transactions-account_id-${account_id}`;
             cache.del(cacheKeyTransactions);
 
             const result = await databaseServices.depositToAccount(user_id, account_id, amount);
@@ -279,7 +279,7 @@ const databaseController = {
             const cacheKeyAccounts = `accounts-user_id-${user_id}`;
             cache.del(cacheKeyAccounts);
             // Transaction cache
-            const cacheKeyTransactions = `transactions-user_id-${user_id}`;
+            const cacheKeyTransactions = `transactions-account_id-${account_id}`;
             cache.del(cacheKeyTransactions);
 
 
@@ -349,7 +349,7 @@ const databaseController = {
             const cacheKeyAccounts = `accounts-user_id-${user_id}`;
             cache.del(cacheKeyAccounts);
             // Transaction cache
-            const cacheKeyTransactions = `transactions-user_id-${user_id}`;
+            const cacheKeyTransactions = `transactions-account_id-${accountId}`;
             cache.del(cacheKeyTransactions);
 
             res.status(201).json({
@@ -390,7 +390,7 @@ const databaseController = {
             const cacheKeyAccounts = `accounts-user_id-${user_id}`;
             cache.del(cacheKeyAccounts);
             // Transaction cache
-            const cacheKeyTransactions = `transactions-user_id-${user_id}`;
+            const cacheKeyTransactions = `transactions-account_id-${accountId}`;
             cache.del(cacheKeyTransactions);
 
             res.status(201).json({
@@ -414,7 +414,7 @@ const databaseController = {
                 return res.status(400).json({ message: "Missing credentials to get transaction" });
             }
         
-            const cacheKey = `transactions-user_id-${user_id}`;
+            const cacheKey = `transactions-account_id-${account_id}`;
             const { data, source } = await getOrSetCache(
                 cacheKey,
                 () => databaseServices.getTransactionsSummary(user_id, account_id),

@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         sessionStorage.setItem('selectedAccountId', selectedValue);
         console.log("Account switched to:", selectedValue); // Maybe delete later?
+        window.location.reload(); // Force reload to fetch new data
       }
     });
   }
