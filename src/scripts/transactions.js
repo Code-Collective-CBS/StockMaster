@@ -1,5 +1,6 @@
 import { popUps } from "./utilityFunctions/popup.js";
 import { loadTransactions } from "./utilityFunctions/loadTransactions.js";
+import {loadAccounts } from './utilityFunctions/loadAccounts.js'
 
 document.addEventListener("DOMContentLoaded", async () => {
     // POP UP
@@ -10,6 +11,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const transactionData = await loadTransactions();
     displayTransactions(transactionData);
 
+    // Load accounts for balance
+    await loadAccounts();
     displayAccountSummary();
 });
 
@@ -59,7 +62,7 @@ function displayTransactions(transactionData) {
 };
 
 const displayAccountSummary = () => {
-    const accounts = window.cachedAccounts; // Using window from ../scripts/utilityFunctions/loadAccounts.js and used inside sidebar.js for fresh account data when user switich account
+    const accounts = window.cachedAccounts; // Using window from ../scripts/utilityFunctions/loadAccounts.js and are called in DOM (note before was it called inside sidebar.js but the accounts could not load)
 
     if (!accounts || accounts.length === 0) {
         console.warn("No cached accounts available.");
