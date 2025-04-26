@@ -174,3 +174,7 @@
         width: 60px;
     }
 }
+
+#profile-avatar:not([src]) {
+    display: none;
+  }
