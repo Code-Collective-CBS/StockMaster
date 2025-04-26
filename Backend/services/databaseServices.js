@@ -435,7 +435,7 @@ const databaseServices = {
         try {
             const pool = await poolPromise;
 
-            // 0. Validate portfolio belongs to account and user
+            // 1. Validate portfolio belongs to account and user
             const validatePortfolio = await pool
                 .request()
                 .input("user_id", sql.Int, user_id)
@@ -452,11 +452,11 @@ const databaseServices = {
                 throw new Error("Unauthorized: Portfolio does not belong to this account or user");
             }
 
-            // 1. Get current account balance
+            // 2. Get current account balance
             const { total_balance, currency: accountCurrency } = await databaseServices.getAccountBalanceAndCurrency(account_id);
 
 
-            // 2. Get security ID from DB table Securities
+            // 3. Get security ID from DB table Securities
             const securityQuery = await pool
                 .request()
                 .input("symbol", sql.VarChar(10), symbol)
@@ -471,7 +471,7 @@ const databaseServices = {
 
             const securities_id = securityQuery.recordset[0].id;
 
-            // 3. Calculate total price
+            // 4. Calculate total price
             const total_price = amount * price_per_share;
             let convertedTotalPrice = total_price;
 
@@ -489,7 +489,15 @@ const databaseServices = {
                 throw new Error(`Insufficient balance. Need ${convertedTotalPrice.toFixed(2)} ${accountCurrency}, but have ${parseFloat(total_balance).toFixed(2)}`);
             }
 
-            // 4. Insert into Transactions table
+            if (transaction_type === 'sell') {
+                const quantityHeld = await databaseServices.validateSecurityAmount(symbol, portfolio_id, account_id);
+            
+                if (amount > quantityHeld) {
+                    throw new Error(`Cannot sell ${amount} shares. You only hold ${quantityHeld} shares in this portfolio.`);
+                }
+            }
+
+            // 5. Insert into Transactions table
             const insertQuery = await pool
                 .request()
                 .input("account_id", sql.Int, account_id)
@@ -507,7 +515,7 @@ const databaseServices = {
                 VALUES (@account_id, @portfolio_id, @securities_id, @transaction_type, @amount, @price_per_share, @total_price, @currency)
             `);
 
-            // 5. Update account balance if 'buy'
+            // 6. Update account balance if 'buy'
             if (transaction_type === 'buy') {
                 await pool
                     .request()
@@ -615,10 +623,59 @@ const databaseServices = {
             
             return { account_name, account_currency, account_state };
         } catch (err) {
-            console.log('Failed to update account in database', err)
+            console.log('Failed to update account in database', err) // WHY LOG AND NOT ERROR?
             throw err;
         }
-    }
+    },
+
+    validateSecurityAmount: async (symbol, portfolio_id, account_id) => {
+        try {
+            const pool = await poolPromise;
+    
+            // First query: sum of buys
+            const buysResult = await pool
+                .request()
+                .input('symbol', sql.VarChar(10), symbol)
+                .input('portfolio_id', sql.Int, portfolio_id)
+                .input('account_id', sql.Int, account_id)
+                .query(`
+                    SELECT
+                        SUM(t.amount) AS total_buys
+                    FROM Transactions t
+                    JOIN Securities s ON t.securities_id = s.id
+                    WHERE LOWER(t.transaction_type) = 'buy'
+                    AND s.symbol = @symbol
+                    AND t.portfolio_id = @portfolio_id
+                `); // USE OF LOWER TO TREAT LEGACCY DATA THAT USES UPPERCASE
+    
+            const totalBuys = buysResult.recordset[0].total_buys || 0;
+    
+            // Second query: sum of sells
+            const sellsResult = await pool
+                .request()
+                .input('symbol', sql.VarChar(10), symbol)
+                .input('portfolio_id', sql.Int, portfolio_id)
+                .input('account_id', sql.Int, account_id)
+                .query(`
+                    SELECT
+                        SUM(t.amount) AS total_sells
+                    FROM Transactions t
+                    JOIN Securities s ON t.securities_id = s.id
+                    WHERE LOWER(t.transaction_type) = 'sell'
+                    AND s.symbol = @symbol
+                    AND t.portfolio_id = @portfolio_id
+                `);
+    
+            const totalSells = sellsResult.recordset[0].total_sells || 0;
+    
+            const netQuantity = totalBuys - totalSells;
+    
+            return netQuantity;
+        } catch (error) {
+            console.error('Failed to validate security amount for portfolio', error);
+            throw error;
+        }
+    }  
 };
 
 module.exports = databaseServices;
