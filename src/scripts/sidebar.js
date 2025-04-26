@@ -141,32 +141,52 @@ function handleSignOut() {
 }
 
 const getUserInfo = async () => {
-  try {
-    const response = await fetch('http://localhost:3000/api/database/userInfo');
-    const data = await response.ok ? await response.json() : null;
+  try{
+    // Checking for session storrage
+    const firstname = sessionStorage.getItem('userFirstname');
+    const lastname = sessionStorage.getItem('userLastname');
+    const avatarSeed = sessionStorage.getItem('userAvatar');
 
-    if (data && data.user) {
-      // Sets avatar picture
-      const firstname = data.user.firstname;
-      const lastname = data.user.lastname;
-      const avatarSeed = data.user.avatar;
-
+    if(firstname && lastname && avatarSeed) {
+      // If exists in sessionstorrage use it
       const avatarURL = `https://api.dicebear.com/7.x/adventurer/svg?seed=${avatarSeed}`;
       const avatarElement = document.getElementById('profile-avatar');
 
       if (avatarElement) avatarElement.src = avatarURL;
 
-      // Set name
       document.getElementById('profile-name').textContent = `${firstname} ${lastname}`;
+    }else{
+      // If it dosent exist fetch it
+      const response = await fetch('http://localhost:3000/api/database/userInfo');
+      const data = await response.ok ? await response.json() : null;
 
-    } else {
-      document.getElementById('profile-name').textContent = 'N/A';
+      if (data && data.user) {
+        // Sets avatar picture
+        const firstname = data.user.firstname;
+        const lastname = data.user.lastname;
+        const avatarSeed = data.user.avatar;
+        
+        // Save in sessionstorrage
+        sessionStorage.setItem('userFirstname', firstname);
+        sessionStorage.setItem('userLastname', lastname);
+        sessionStorage.setItem('userAvatar', avatarSeed);
+
+        const avatarURL = `https://api.dicebear.com/7.x/adventurer/svg?seed=${avatarSeed}`;
+        const avatarElement = document.getElementById('profile-avatar');
+  
+        if (avatarElement) avatarElement.src = avatarURL;
+
+        document.getElementById('profile-name').textContent = `${firstname} ${lastname}`;
+      } else {
+        document.getElementById('profile-name').textContent = 'N/A';
+      }
     }
-  } catch (err) {
-    console.error('Could not get user data', err);
+  } catch (error) {
+    console.error('Could not get user data', error);
     document.getElementById('profile-name').textContent = 'User not found';
   }
 };
+
 
 const loadAccountDropdown = async (dropdown) => {
   try {
