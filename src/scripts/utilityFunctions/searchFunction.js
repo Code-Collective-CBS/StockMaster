@@ -1,5 +1,4 @@
 // File for utility functions used across pages
-const API_BASE_URL = 'http://localhost:3000/api/stocks';
 const DATABASE_BASE_URL = '/api/database';
 
 export const searchFunction = {
