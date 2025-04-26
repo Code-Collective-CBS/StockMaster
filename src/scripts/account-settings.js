@@ -1,3 +1,4 @@
+import { loadAccounts } from "./utilityFunctions/loadAccounts.js";
 import { searchFunction } from "./utilityFunctions/searchFunction.js";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -57,7 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
             searchContainer.appendChild(currencyElement);
         });
     };
-
     // 
 
     /// CHANGE ACCOUNT DETAILS
@@ -70,13 +70,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     saveAcc.addEventListener('click', async () => {
 
-        const name = account_name.value.trim();
+        // Gets the accountID from sidebar.js
+        const account_id = sessionStorage.getItem('selectedAccountId');
+
+        const name = account_name.value;
         const currency = account_currency.value.trim();
         const state = account_state.value
 
         try {
 
-            const response = await fetch(`http://localhost:3000/api/database/update-account-settings${accountId}`, {
+            const response = await fetch(`http://localhost:3000/api/database/update-account-settings/${account_id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json" // JSON data
@@ -88,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
             });
 
-            const result = await response.json();
+            const result = await response.json()
             if (response.status === 201) {
                 alert("Account changes saved");
                 window.location.href = "../pages/dashboard.html" // Redirects user to login-page

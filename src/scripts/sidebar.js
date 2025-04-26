@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (dropdown) {
     dropdown.addEventListener('change', () => {
       const selectedValue = dropdown.value;
+      console.log(selectedValue);
 
       if (selectedValue === 'create-account.html') {
         window.location.href = `/src/pages/${selectedValue}`;

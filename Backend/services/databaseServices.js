@@ -600,7 +600,7 @@ const databaseServices = {
     updateAccountSettings: async (user_id, account_id, account_name, account_currency, account_state) => {
         try {
         const pool = await poolPromise;
-        const accSettings = await pool.request()
+        const result = await pool.request()
             .input('user_id', sql.Int, user_id)
             .input('id', sql.Int, account_id)
             .input('account_name', sql.VarChar(100), account_name)
@@ -612,11 +612,7 @@ const databaseServices = {
                 WHERE id = @id
                 AND user_id = @user_id`
             );
-            // rowsAffected[0] er antal opdaterede rækker
-            if (result.rowsAffected[0] === 0) {
-              return null;
-            }
-            // evt. returner updated values – eller gør et SELECT bagefter
+            
             return { account_name, account_currency, account_state };
         } catch (err) {
             console.log('Failed to update account in database', err)
