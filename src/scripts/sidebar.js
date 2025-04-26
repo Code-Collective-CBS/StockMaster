@@ -199,7 +199,7 @@ const loadAccountDropdown = async (dropdown) => {
 
     const createAccount = document.createElement('option');
     createAccount.value = 'create-account.html';
-    createAccount.textContent = '-- Tilføj Konto --';
+    createAccount.textContent = '-- Add new account --';
     dropdown.appendChild(createAccount);
   } catch (error) {
     console.error('Error fetching accounts for sidebar', error);

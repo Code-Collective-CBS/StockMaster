@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Account Settings</title>
     <link rel="stylesheet" href="/src/layouts/account-settings.css" />
+    <link rel="stylesheet" href="/src/layouts/securities-news.css" />
     <link rel="stylesheet" href="/src/layouts/components/sidebar.css" />
     <link rel="stylesheet" href="/src/base/color.css" />
     <link rel="stylesheet" href="/src/base/typography.css" />
@@ -154,45 +155,39 @@
         <div class="profile-form">
           <div class="name-row">
             <div class="form-group">
-              <label for="accountName">Account Name</label>
-              <input type="text" id="accountName" placeholder="Udfyld venligst dette med navn på din konto" />
+              <label for="account_name">Account Name</label>
+              <input type="text" id="account_name" placeholder="" />
             </div>
 
             <div class="form-group">
-              <label for="accountCurrency">Currency</label>
-              <select name="accountCurrency" id="accountCurrency">
-                <option value="chooseCurrency">-- Choose a currency --</option>
-                <option value="DKK">DKK</option>
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-              </select>
+              <label for="account_currency">Currency</label>
+              <div class="search-container">
+                <input id="account_currency" type="text" placeholder="Search for currency">
+                <button type="button" class="delete-search">&times;</button>
+              </div>
+              <div class="displaySearch"></div>
             </div>
           </div>
 
 
           <div class="form-group">
-            <label for="accountState">Account Status</label>
-            <select name="account" id="accountState">
+            <label for="account_state">Account Status</label>
+            <select name="account" id="account_state">
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
           </div>
 
-          <div class="form-group">
-            <label for="accountBalance">Balance</label>
-            <input type="text" id="accountBalance" readonly />
-          </div>
-        </div>
-
 
           <div class="form-actions">
             <button class="cancel-btn" id="deleteAcc">Delete Account</button>
-            <button class="save-btn" id="createAcc">Create Account</button>
+            <button class="save-btn" id="changeAcc">Save</button>
           </div>
         </div>
       </div>
     </main>
 
     <script type="module" src="/src/scripts/sidebar.js"></script>
+    <script type="module" src="/src/scripts/account-settings.js"></script>
   </body>
 </html>

@@ -60,9 +60,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const name = accountName.value.trim();
         const currency = accountCurrency.value.trim();
 
-        if (accountCurrency.value.trim() === 'chooseCurrency' && name === "") return alert('Udfyld begge felter')
-        if (accountCurrency.value.trim() === 'chooseCurrency') return alert('Du skal vælge en valuta')
-        if (name === "") return alert('Du skal indtaste et kontonavn')
+        if (accountCurrency.value.trim() === 'chooseCurrency' && name === "") return alert('Please fill out all fields')
+        if (accountCurrency.value.trim() === 'chooseCurrency') return alert('You must choose a currency')
+        if (name === "") return alert('You must choose an account name')
 
         try {
 

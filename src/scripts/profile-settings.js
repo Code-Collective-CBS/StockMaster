@@ -11,13 +11,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (response.ok) {
             const user = await response.json();
 
-            // Indsætter data i felterne
+            // Fills data into the fields
             document.getElementById('firstname').value = user.firstname;
             document.getElementById('lastname').value = user.lastname;
             document.getElementById('email').value = user.email;
             document.getElementById('phone').value = user.phone;
 
-            // Sæt avatar-billede
+            // Sets the avatar-picture
             if (user.avatar) {
                 const avatarURL = `https://api.dicebear.com/7.x/adventurer/svg?seed=${user.avatar}`;
                 document.getElementById('profile-settings-avatar').src = avatarURL;
@@ -33,14 +33,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
         } else {
-            console.error('Kunne ikke hente user');
+            console.error('Could not fetch user');
         }
     } catch (error) {
-        console.error('Fejl ved hentning af user:', error);
+        console.error('Error fetching the user:', error);
     }
 });
 
-// Opdateren userens data
+// Updates the users data
 document.getElementById('profileForm').addEventListener('submit', async (event) => {
     event.preventDefault();
 
@@ -83,14 +83,14 @@ document.getElementById('profileForm').addEventListener('submit', async (event) 
 
         const result = await response.json();
         if (response.ok) {
-            alert('profil opdateret');
+            alert('Profile settings changed');
         } else {
-            alert('Fejl ved opdatering af profil ', result.message)
+            alert('Error changing profile settings', result.message)
 
         }
     } catch (err) {
-        console.log('Fejl ved ved opdatering', err);
-        alert('Fejl i respons')
+        console.log('Error changing profile settings', err);
+        alert('Fail in response')
     }
 });
 
@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
             avatarOptions.forEach((avatarElement) => avatarElement.classList.remove('selected'));
             avatar.classList.add('selected');
 
-            // Opdater preview
+            // Updates preview
             const avatarSeed = avatar.dataset.avatar;
             const avatarURL = `https://api.dicebear.com/7.x/adventurer/svg?seed=${avatarSeed}`;
             document.getElementById('profile-avatar').src = avatarURL;
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Funktionalitet til annuler
+// Functionality for cancelling 
 document.getElementById('cancelButton').addEventListener('click', () => {
     window.location.href = '../pages/dashboard.html';
 });

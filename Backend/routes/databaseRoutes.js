@@ -50,4 +50,7 @@ router.put('/sell-security/:portfolio_id', databaseController.sellSecurity);
 // Get all transactions for an account
 router.get('/transactions/account/:account_id', databaseController.getTransactionsSummary);
 
+// Change account settings (name, currency and status)
+router.put('/update-account-settings/:account_id', databaseController.updateAccountSettings)
+
 module.exports = router;

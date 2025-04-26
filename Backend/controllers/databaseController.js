@@ -415,28 +415,49 @@ const databaseController = {
         try {
             const user_id = req.session.user_id;
             const account_id = parseInt(req.params.account_id); // Convert account_id (defined in routes) to an interger (string -> number) because of sql.Int
-    
-            if(!user_id || !account_id) {
+
+            if (!user_id || !account_id) {
                 return res.status(400).json({ message: "Missing credentials to get transaction" });
             }
-        
+
             const cacheKey = `transactions-account_id-${account_id}`;
             const { data, source } = await getOrSetCache(
                 cacheKey,
                 () => databaseServices.getTransactionsSummary(user_id, account_id),
                 600
             );
-    
+
             if (!data || data.length === 0) {
                 return res.status(404).json({ error: "No accounts found for this user" });
             }
-    
+
             res.json({ data, source });
         } catch (error) {
             console.error('Error in transactions summary', error);
             res.status(500).json({ message: 'Something went wrong trying to get transactions' });
         }
+    },
+
+    updateAccountSettings: async (req, res) => {
+        // Saves the user- and account id from the session in variables
+        const user_id = req.session.user_id
+        const account_id = parseInt(req.params.account_id);
+
+        try {
+            const { account_name, account_currency, account_state } = req.body;
+            const changeAcc = await databaseServices.updateAccountSettings(user_id, account_id, account_name, account_currency, account_state)
+
+            if (!changeAcc) return res.status(404).json({ message: 'Account not found' });
+
+            res.status(201).json({
+                message: "Account created",
+                account_name: changeAcc.account_name,
+                account_currency: changeAcc.account_currency,
+                account_state: changeAcc.account_state
+            });
+        } catch (err) {
+            res.status(500).json({ message: 'Server fail' });
+        }
     }
 };
-
-module.exports = databaseController;
+    module.exports = databaseController;
