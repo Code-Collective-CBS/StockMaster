@@ -45,7 +45,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // Separate function to fetch data and update cache
-// In portfolio.js
 async function fetchPortfolioData(accountId, cacheKey) {
   try {
     const portfolioData = await stockAPI.getPortfolioSummary(accountId);
@@ -302,18 +301,29 @@ function updateHoldingsTable(portfolio) {
   sortedHoldings.forEach((holding) => {
     const row = document.createElement("tr");
 
-    // Format values
-    const boughtPrice = formatCurrency(holding.gak, portfolio.currency);
-    const totalValue = formatCurrency(holding.currentValue, portfolio.currency);
+    // // Format values
+    // const boughtPrice = formatCurrency(holding.gak, portfolio.currency);
+    // const totalValue = formatCurrency(holding.currentValue, portfolio.currency);
+
 
     row.innerHTML = `
-      <td>${holding.symbol}</td>
-      <td>${holding.security_name}</td>
-      <td>${boughtPrice}</td>
-      <td>${boughtPrice}</td>
-      <td>${holding.quantity}</td>
-      <td>${totalValue}</td>
-    `;
+    <td>${holding.symbol}</td>
+    <td>${holding.security_name}</td>
+    <td>${formatCurrency(
+      holding.boughtPriceNative,
+      holding.nativeCurrency
+    )}</td>
+    <td>${formatCurrency(
+      holding.currentPriceNative,
+      holding.nativeCurrency
+    )}</td>
+    <td>${holding.quantity}</td>
+    <td>${formatCurrency(
+      holding.currentValueNative,
+      holding.nativeCurrency
+    )}</td>
+    <td>${formatCurrency(holding.currentValueAccount, portfolio.currency)}</td>
+  `;
 
     tableBody.appendChild(row);
   });

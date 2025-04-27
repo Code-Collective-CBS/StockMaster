@@ -96,14 +96,14 @@ export const portfolioChartService = {
       }
 
       // Prepare data for chart
-      const totalValue = holdings.reduce((sum, h) => sum + h.currentValue, 0);
+      const totalValue = holdings.reduce((sum, h) => sum + h.currentValueAccount, 0);
 
       // Map holdings to chart data
       const chartData = holdings.map((holding) => ({
         symbol: holding.symbol,
         name: holding.security_name,
-        value: holding.currentValue,
-        percentage: (holding.currentValue / totalValue) * 100,
+        value: holding.currentValueAccount,
+        percentage: (holding.currentValueAccount / totalValue) * 100,
       }));
 
       // Sort by value descending for better visualization
