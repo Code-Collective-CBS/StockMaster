@@ -9,7 +9,7 @@ const databaseController = {
         const { firstname, lastname, email, password, phone_number, country_code, avatar } = req.body;
         const body = req.body;
         if (!firstname || !lastname || !email || !password || !avatar) {
-            return res.status(400).json({ message: "Manglende information" });
+            return res.status(400).json({ message: "Missing information" });
         }
 
         try {
@@ -20,11 +20,11 @@ const databaseController = {
             }
 
             // Save the user's ID in the session upon account creation
-            req.session.user_id = result.userID;
+            req.session.user_id = result.user_id;
 
-            const user = await databaseServices.userInfo(result.userID);
+            const user = await databaseServices.userInfo(result.user_id);
             if (!user) {
-                return res.status(404).json({ message: 'Fejl i database. Kunne ikke finde brugeren' });
+                return res.status(404).json({ message: 'Couldt find user i database' });
             }
 
             res.status(201).json({
@@ -35,7 +35,7 @@ const databaseController = {
             });
         } catch (err) {
             console.log(err);
-            res.status(500).json({ message: "Fejl ved oprettelse af bruger" });
+            res.status(500).json({ message: "Fail by creating user" });
         }
     },
 
@@ -47,11 +47,11 @@ const databaseController = {
             const user = await databaseServices.login(body);
 
             if (user) {
-                req.session.user_id = user.id;
+                req.session.user_id = user.user_id;
 
                 res.status(201).json({
                     message: "Login succesfull",
-                    id: user.id,
+                    id: user.user_id,
                     firstname: user.firstname,
                     lastname: user.lastname,
                     avatar: user.avatar
@@ -61,7 +61,7 @@ const databaseController = {
             }
         } catch (err) {
             console.error('Login failed', err);
-            res.status(500).json({ message: 'Intern serverfail' });
+            res.status(500).json({ message: 'Internal serverfail' });
         }
     },
 
@@ -105,36 +105,37 @@ const databaseController = {
     },
 
     getUserProfile: async (req, res) => {
-        const userID = req.session.user_id;
+        const user_id = req.session.user_id;
 
-        if (!userID) {
-            return res.status(401).json({ message: 'Bruger ikke logget ind' });
+        if (!user_id) {
+            return res.status(401).json({ message: 'User not logged in' });
         }
 
         try {
-            const user = await databaseServices.userInfo(userID);
+            const user = await databaseServices.userInfo(user_id);
+
 
             if (!user) {
-                return res.status(401).json({ message: 'Brugeren findes ikke' })
+                return res.status(401).json({ message: 'User dosent exists' })
             }
 
             res.status(200).json({
                 firstname: user.firstname,
                 lastname: user.lastname,
                 email: user.email,
-                phone: user.phone_number,
+                phone_number: user.phone_number,
                 avatar: user.avatar
             })
         } catch (err) {
-            console.log('Fejl ved hentning af profil', err);
-            res.status(500).json({ message: 'Fejl i database' })
+            console.log('Fail by gathering profile info', err);
+            res.status(500).json({ message: 'Fail in database' })
         }
     },
 
     updateUserProfile: async (req, res) => {
-        const userID = req.session.user_id;
+        const user_id = req.session.user_id;
 
-        if (!userID) {
+        if (!user_id) {
             return res.status(401).json({ message: "Fail by gathering id" })
         }
 
@@ -142,7 +143,7 @@ const databaseController = {
         const body = req.body;
 
         try {
-            const result = await databaseServices.updateProfile(userID, body);
+            const result = await databaseServices.updateProfile(user_id, body);
 
             if (!result.success) {
                 return res.status(400).json({ message: result.message })

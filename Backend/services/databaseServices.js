@@ -44,8 +44,8 @@ const databaseServices = {
                 VALUES (@firstname, @lastname, @email, @password, @phone_number, @country_code, @avatar, GETDATE())
             `);
 
-        const insertedID = userCreated.recordset[0].id;
-        return { status: 201, userID: insertedID };
+        const inserted_id = userCreated.recordset[0].id;
+        return { status: 201, user_id: inserted_id };
     },
 
     login: async (body) => {
@@ -56,7 +56,7 @@ const databaseServices = {
             const checkLogin = await pool.request()
                 .input('email', sql.NVarChar(100), email)
                 .input('password', sql.NVarChar(255), password)
-                .query(`SELECT id, firstname, lastname, email, avatar FROM Users WHERE email = @email AND password = @password`);
+                .query(`SELECT id AS user_id, firstname, lastname, email, avatar FROM Users WHERE email = @email AND password = @password`);
 
             if (checkLogin.recordset.length > 0) {
                 return checkLogin.recordset[0];
@@ -69,11 +69,11 @@ const databaseServices = {
         }
     },
 
-    userInfo: async (id) => {
+    userInfo: async (user_id) => {
         try {
             const pool = await poolPromise;
             const getUser = await pool.request()
-                .input('id', sql.Int, id)
+                .input('id', sql.Int, user_id)
                 .query('SELECT firstname, lastname, email, phone_number, avatar FROM Users WHERE id = @id');
             if (getUser.recordset.length > 0) {
                 return getUser.recordset[0];
@@ -86,14 +86,14 @@ const databaseServices = {
         }
     },
 
-    updateProfile: async (id, body) => {
+    updateProfile: async (user_id, body) => {
         const { firstname, lastname, email, phone_number, newPassword, avatar } = body;
 
         try {
             const pool = await poolPromise;
             const updateUser = await pool
                 .request()
-                .input("id", sql.Int, id)
+                .input("id", sql.Int, user_id)
                 .input("firstname", sql.NVarChar(50), firstname)
                 .input("lastname", sql.NVarChar(50), lastname)
                 .input("email", sql.NVarChar(100), email)

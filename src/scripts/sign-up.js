@@ -22,7 +22,7 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     const email = document.getElementById("email").value;
     const phone_number = document.getElementById("telefon").value;
     const password = document.getElementById("password").value;
-    const country_code = "DK"; // Evt. hardcode eller hent fra dropdown senere
+    const country_code = "DK"; // Hardcoded
     const avatar = document.getElementById('selectedAvatar').value;
 
 
@@ -47,7 +47,7 @@ document.getElementById("registerForm").addEventListener("submit", async functio
         const result = await response.json();
         if (response.status === 201) {
             alert("User succesfully created");
-            window.location.href = "../pages/dashboard.html" // Redirects user to login-page
+            window.location.href = "../pages/dashboard.html" // Redirects user to dashboard
         } else {
             alert("Fail: " + result.message)
         }

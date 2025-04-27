@@ -14,12 +14,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (response.ok) {
             const user = await response.json();
+            console.log('User received:', user);
+
 
             // Fills data into the fields
             document.getElementById('firstname').value = user.firstname;
             document.getElementById('lastname').value = user.lastname;
             document.getElementById('email').value = user.email;
-            document.getElementById('phone').value = user.phone;
+            document.getElementById('phone').value = user.phone_number;
 
             // Uses the first valid. If sessionstorrage exists use that either use avatar from Database
             const avatarToUse = avatarSeed || user.avatar;
@@ -104,6 +106,12 @@ document.getElementById('profileForm').addEventListener('submit', async (event) 
             if (avatar) {
                 sessionStorage.setItem('userAvatar', avatar);
             }
+            sessionStorage.setItem('userFirstname', firstname);
+            sessionStorage.setItem('userLastname', lastname);
+
+            // Reload page
+            window.location.reload();
+
         } else {
             alert('Error changing profile settings: ' + result.message);
         }
@@ -121,13 +129,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     avatarOptions.forEach((avatar) => {
         avatar.addEventListener('click', () => {
+            // Removes selected so only one is selected
             avatarOptions.forEach((avatarElement) => avatarElement.classList.remove('selected'));
             avatar.classList.add('selected');
 
             // Updates preview
             const avatarSeed = avatar.dataset.avatar;
             const avatarURL = `https://api.dicebear.com/7.x/adventurer/svg?seed=${avatarSeed}`;
-            document.getElementById('profile-avatar').src = avatarURL;
+
+            // Checks for preview and sets the image to the choosen one
+            const avatarElementPreview = document.getElementById('profile-settings-avatar');
+            if (avatarElementPreview) avatarElementPreview.src = avatarURL;
         });
     });
 });
