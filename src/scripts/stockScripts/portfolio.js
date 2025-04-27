@@ -142,24 +142,22 @@ function updatePortfolioUI(portfolios) {
       const container = document.getElementById(
         `portfolios-${account.account_id}`
       );
-      account.portfolios.forEach((portfolio) => {
-        const portfolioElement = document.createElement("div");
-        portfolioElement.className = "portfolio-item";
 
-        // Change "Value" to "Invested Value"
-        portfolioElement.innerHTML = `
-              <h4>${portfolio.name}</h4>
-              <p>Invested Value: ${formatCurrency(
-                portfolio.metrics.totalCost,
-                account.currency
-              )}</p>
-              <p>Shares: ${portfolio.metrics.holdings.reduce(
-                (sum, h) => sum + h.quantity,
-                0
-              )}</p>
-              `;
-
-        container.appendChild(portfolioElement);
+    account.portfolios.forEach((portfolio) => {
+      const portfolioElement = document.createElement("div");
+      portfolioElement.className = "portfolio-item";
+      portfolioElement.innerHTML = `
+        <h4>${portfolio.name}</h4>
+        <p>Invested Value: ${formatCurrency(
+          portfolio.metrics.totalCost,
+          account.currency
+        )}</p>
+        <p>Shares: ${portfolio.metrics.holdings.reduce(
+          (sum, h) => sum + h.quantity,
+          0
+        )}</p>
+      `;
+      container.appendChild(portfolioElement);
       });
     });
   }
@@ -304,50 +302,32 @@ function createPortfolioSelector(portfolios, chartCanvas) {
 
 function updateHoldingsTable(portfolio) {
   const tableBody = document.querySelector("#holdings-table tbody");
-  if (
-    !tableBody ||
-    !portfolio ||
-    !portfolio.metrics ||
-    !portfolio.metrics.holdings
-  ) {
-    return;
-  }
-
-  // Clear existing rows
+  if (!tableBody || !portfolio?.metrics?.holdings) return;
   tableBody.innerHTML = "";
 
-  // Sort holdings by value (descending)
-  const sortedHoldings = [...portfolio.metrics.holdings].sort(
-    (a, b) => b.currentValue - a.currentValue
+  // Sort holdings by current value (descending)
+  const sorted = [...portfolio.metrics.holdings].sort(
+    (a, b) => b.currentValueAccount - a.currentValueAccount
   );
 
-  // Add a row for each holding
-  sortedHoldings.forEach((holding) => {
+  sorted.forEach((h) => {
+    const boughtPriceNative = h.firstPurchasePriceNative ?? h.gak;
+    const currentPriceNative = h.currentPriceNative;
+    const avgCostNative = h.gak;
+    const qty = h.quantity;
+    const valueNative = h.currentValueNative;
+    const valueAccount = h.currentValueAccount;
+
     const row = document.createElement("tr");
-
-    // // Format values
-    // const boughtPrice = formatCurrency(holding.gak, portfolio.currency);
-    // const totalValue = formatCurrency(holding.currentValue, portfolio.currency);
-
     row.innerHTML = `
-    <td>${holding.symbol}</td>
-    <td>${holding.security_name}</td>
-    <td>${formatCurrency(
-      holding.boughtPriceNative,
-      holding.nativeCurrency
-    )}</td>
-    <td>${formatCurrency(
-      holding.currentPriceNative,
-      holding.nativeCurrency
-    )}</td>
-    <td>${holding.quantity}</td>
-    <td>${formatCurrency(
-      holding.currentValueNative,
-      holding.nativeCurrency
-    )}</td>
-    <td>${formatCurrency(holding.currentValueAccount, portfolio.currency)}</td>
+    <td>${h.symbol}</td>
+    <td>${formatCurrency(boughtPriceNative, h.nativeCurrency)}</td>
+    <td>${formatCurrency(currentPriceNative, h.nativeCurrency)}</td>
+    <td>${formatCurrency(avgCostNative, h.nativeCurrency)}</td>
+    <td>${qty}</td>
+    <td>${formatCurrency(valueNative, h.nativeCurrency)}</td>
+    <td>${formatCurrency(valueAccount, portfolio.currency)}</td>
   `;
-
     tableBody.appendChild(row);
   });
 }
