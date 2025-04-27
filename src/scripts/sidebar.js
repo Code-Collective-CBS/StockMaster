@@ -9,7 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (dropdown) {
     dropdown.addEventListener('change', () => {
       const selectedValue = dropdown.value;
-      console.log(selectedValue);
 
       if (selectedValue === 'create-account.html') {
         window.location.href = `/src/pages/${selectedValue}`;
@@ -34,9 +33,10 @@ const CONFIG = {
     navItems: ".nav-item",
     settingItem: ".setting-item",
     sidebarLinks: ".sideBar a",
-    signOutButton: ".signOut"
+    signOutButton: "#signOut-item"
   }
 };
+
 
 // Initialize sidebar functionality
 initializeSidebar();
@@ -134,6 +134,9 @@ function navigateToPage(href) {
 
 function handleSignOut() {
   try {
+    sessionStorage.clear();
+    localStorage.clear();
+    
     window.location.href = "/src/pages/login.html";
   } catch (error) {
     console.error("Sign out failed:", error);
