@@ -648,24 +648,26 @@ const databaseServices = {
                     AND t.portfolio_id = @portfolio_id
                 `); // USE OF LOWER TO TREAT LEGACCY DATA THAT USES UPPERCASE
     
-            const totalBuys = buysResult.recordset[0].total_buys || 0;
-    
-            // Second query: sum of sells
-            const sellsResult = await pool
+                // NOTE: Use "AND t.account_id = @account_id" When legacy data is wiped
+                const totalBuys = buysResult.recordset[0].total_buys || 0;
+                
+                // Second query: sum of sells
+                const sellsResult = await pool
                 .request()
                 .input('symbol', sql.VarChar(10), symbol)
                 .input('portfolio_id', sql.Int, portfolio_id)
                 .input('account_id', sql.Int, account_id)
                 .query(`
                     SELECT
-                        SUM(t.amount) AS total_sells
+                    SUM(t.amount) AS total_sells
                     FROM Transactions t
                     JOIN Securities s ON t.securities_id = s.id
                     WHERE LOWER(t.transaction_type) = 'sell'
                     AND s.symbol = @symbol
                     AND t.portfolio_id = @portfolio_id
-                `);
-    
+                    `);
+                    
+            // NOTE: Use "AND t.account_id = @account_id" When legacy data is wiped
             const totalSells = sellsResult.recordset[0].total_sells || 0;
     
             const netQuantity = totalBuys - totalSells;
