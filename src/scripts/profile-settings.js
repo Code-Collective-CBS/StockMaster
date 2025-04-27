@@ -1,6 +1,10 @@
-// Henter userens data
+// Collect user data
 document.addEventListener('DOMContentLoaded', async () => {
     try {
+        // Use sessionstorrage
+        const avatarSeed = sessionStorage.getItem('userAvatar');
+
+        // Fetching firstname, lastname, email, phone
         const response = await fetch('http://localhost:3000/api/database/profileInfo', {
             method: 'GET',
             headers: {
@@ -17,17 +21,27 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('email').value = user.email;
             document.getElementById('phone').value = user.phone;
 
+            // Uses the first valid. If sessionstorrage exists use that either use avatar from Database
+            const avatarToUse = avatarSeed || user.avatar;
+
+
             // Sets the avatar-picture
-            if (user.avatar) {
-                const avatarURL = `https://api.dicebear.com/7.x/adventurer/svg?seed=${user.avatar}`;
+            if (avatarToUse) {
+                const avatarURL = `https://api.dicebear.com/7.x/adventurer/svg?seed=${avatarToUse}`;
+                const avatarElement = document.getElementById('profile-settings-avatar')
                 document.getElementById('profile-settings-avatar').src = avatarURL;
-                console.log("Avatar seed:", user.avatar);
+                if (avatarElement) avatarElement.src = avatarURL;
+            }
+
+            // If we used database avatar then update sessionstorrage
+            if (!avatarSeed) {
+                sessionStorage.setItem('userAvatar', user.avatar);
             }
 
             // Checks if an avatar is selected
             const avatars = document.querySelectorAll('.avatar-option');
             avatars.forEach((avatarElement) => {
-                if (avatarElement.dataset.avatar === user.avatar) {
+                if (avatarElement.dataset.avatar === avatarToUse) {
                     avatarElement.classList.add('selected');
                 }
             });
@@ -82,17 +96,24 @@ document.getElementById('profileForm').addEventListener('submit', async (event) 
         });
 
         const result = await response.json();
+
         if (response.ok) {
             alert('Profile settings changed');
-        } else {
-            alert('Error changing profile settings', result.message)
 
+            // Update sessionStorage with new avatar if changed
+            if (avatar) {
+                sessionStorage.setItem('userAvatar', avatar);
+            }
+        } else {
+            alert('Error changing profile settings: ' + result.message);
         }
-    } catch (err) {
-        console.log('Error changing profile settings', err);
-        alert('Fail in response')
+
+    } catch (error) {
+        console.log('Error changing profile settings', error);
+        alert('Fail in response');
     }
 });
+
 
 // Avatar choosing. 
 document.addEventListener('DOMContentLoaded', () => {

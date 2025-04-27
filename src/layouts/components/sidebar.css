@@ -175,6 +175,16 @@
     }
 }
 
-#profile-avatar:not([src]) {
-    display: none;
-  }
+#profile-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    opacity: 0; /* Makes avatar invisible */
+
+}
+
+/* Makes avatar visible */
+#profile-avatar[src] {
+    opacity: 1;
+}
