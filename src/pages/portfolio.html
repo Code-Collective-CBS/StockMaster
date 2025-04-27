@@ -202,6 +202,19 @@
         </div>
       </section>
 
+
+      <!--Middle section for the portfolio line chart-->
+      <section class="dashboard-history">
+        <div class="card full-width">
+          <div class="card-header">
+            <h2 class="card-title">Portfolio Performance Over Time</h2>
+          </div>
+          <div class="chart-container">
+            <canvas id="portfolioHistoryChart"></canvas>
+          </div>
+        </div>
+      </section>
+
       <!-- Bottom section with portfolio graph and holdings table -->
       <section class="dashboard-bottom">
         <div class="card full-width">
@@ -246,12 +259,6 @@
     <!-- Add Chart.js library -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Add data files -->
-    <script
-      src="../scripts/stockScripts/mockPortfolioData.js"
-      type="module"
-    ></script>
-
     <!-- Add api files -->
     <script src="../scripts/stockScripts/api.js" type="module"></script>
 
@@ -260,10 +267,11 @@
       src="../scripts/utilityFunctions/portfolioChartService.js"
       type="module"
     ></script>
+    <!--caching-->
     <script
-      src="../../backend/services/cachingService.js"
-      type="module"
-    ></script>
+    src="../scripts/utilityFunctions/cachingService.js"
+    type="module"
+  ></script>
 
     <!-- Add portfolio.js and Sidebar.js -->
     <script src="../scripts/stockScripts/portfolio.js" type="module"></script>

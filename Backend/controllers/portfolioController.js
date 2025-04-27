@@ -149,58 +149,53 @@ const portfolioController = {
       res.status(500).json({ error: "Failed to fetch portfolio data" });
     }
   },
-  
+
   getPortfolioHistory: async (req, res) => {
     try {
       const accountId = req.params.accountId;
-      // 1) Load holdings once (reuse your existing summary logic if you like)
-      const summary = await databaseServices.getPortfoliosByAccount(accountId);
-      // assume single account / flatten to one portfolio or sum across them
-      const portfolios = await portfolioController.getPortfolioSummaryInternal(accountId);
-      const holdings = portfolios[0].metrics.holdings;
+      // 1) load portfolios and turn txs → holdings
+      const portfolios = await databaseServices.getPortfoliosByAccount(accountId);
+      if (!portfolios.length) return res.json([]);
 
-      // 2) Define date range (e.g. last 180 days)
-      const endDate = moment();
-      const startDate = moment().subtract(180, "days");
+      const allHoldings = (
+        await Promise.all(
+          portfolios.map(async (p) => {
+            const txs = await databaseServices.getTransactionsForPortfolio(p.id);
+            return calculateHoldings(txs);
+          })
+        )
+      ).flat();
 
-      // 3) For each holding, fetch its time series (cached)
-      const allSeries = await Promise.all(
-        holdings.map(async (h) => {
+      // 2) fetch each symbol’s time series (1h cache)
+      const seriesData = await Promise.all(
+        allHoldings.map(async (h) => {
           const { data: tsData } = await getOrSetCache(
             `timeSeries-${h.symbol}`,
             () => alphaVantageService.getDailyTimeSeries(h.symbol, "compact"),
             3600
           );
-          return { symbol: h.symbol, qty: h.quantity, series: tsData["Time Series (Daily)"] };
+          return { qty: h.quantity, series: tsData["Time Series (Daily)"] };
         })
       );
 
-      // 4) Build a map date→value
+      // 3) build date→value for the last 180 days
+      const start = moment().subtract(180, "days"), end = moment();
       const dailyValues = {};
-      for (
-        let m = startDate.clone();
-        m.isSameOrBefore(endDate);
-        m.add(1, "day")
-      ) {
-        const key = m.format("YYYY-MM-DD");
-        let sumValue = 0;
-        allSeries.forEach(({ qty, series }) => {
-          if (series[key]) {
-            sumValue += parseFloat(series[key]["4. close"]) * qty;
-          }
-        });
-        dailyValues[key] = sumValue;
+
+      for (let m = start.clone(); m.isSameOrBefore(end); m.add(1, "day")) {
+        const d = m.format("YYYY-MM-DD");
+        dailyValues[d] = seriesData.reduce((sum, {qty, series}) => {
+          const day = series[d];
+          return sum + (day ? parseFloat(day["4. close"]) * qty : 0);
+        }, 0);
       }
 
-      // 5) Convert map to sorted array
-      const history = Object.entries(dailyValues).map(([date, value]) => ({
-        date,
-        value,
-      }));
+      // 4) serialize and send
+      const history = Object.entries(dailyValues).map(([date, value]) => ({ date, value }));
+      res.json(history);
 
-      return res.json(history);
     } catch (err) {
-      console.error(err);
+      console.error("Error in getPortfolioHistory", err);
       res.status(500).json({ error: "Failed to fetch portfolio history" });
     }
   }

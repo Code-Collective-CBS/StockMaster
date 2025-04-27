@@ -23,7 +23,7 @@ app.use(session({
 const PORT = config.server.port;
 
 // Use absolute paths for static files
-app.use('/src', express.static(path.resolve(__dirname, '../src')));
+app.use('/src', express.static(path.join(__dirname, '../src')));
 app.use(express.json());
 app.use(cors());
 app.use(routes);

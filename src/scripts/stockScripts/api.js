@@ -133,6 +133,12 @@ export const stockAPI = {
     }
   },
 
+  getPortfolioHistory: async (accountId) => {
+    const response = await fetch(`${PORTFOLIO_URL}/${accountId}/history`);
+    if (!response.ok) throw new Error("History fetch failed");
+    return response.json();
+  },
+
   getTransactionsSummary: async () => {
     try {
       const accountId = sessionStorage.getItem('selectedAccountId');

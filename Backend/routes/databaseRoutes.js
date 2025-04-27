@@ -32,6 +32,8 @@ router.put('/updateprofileInfo', databaseController.updateUserProfile);
 
 router.get('/portfolio/account/:accountId', portfolioController.getPortfolioSummary);
 
+router.get('/portfolio/account/:accountId/history', portfolioController.getPortfolioHistory);
+
 // Create portfolio
 router.post('/createPortfolio/:accountId', databaseController.createPortfolio);
 

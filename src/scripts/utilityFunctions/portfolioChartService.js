@@ -175,6 +175,60 @@ export const portfolioChartService = {
     }
   },
 
+  createPortfolioHistoryChart: (canvas, history, currencyCode) => {
+    if (!canvas || !Array.isArray(history) || history.length === 0) {
+      console.warn("Missing canvas or history data");
+      return;
+    }
+
+    // Format labels and data
+    const labels = history.map((p) =>
+      new Date(p.date).toLocaleDateString("da-DK")
+    );
+    const data = history.map((p) => p.value);
+
+    // Destroy existing chart if any
+    if (canvas.chart) {
+      canvas.chart.destroy();
+    }
+
+    canvas.chart = new Chart(canvas, {
+      type: "line",
+      data: {
+        labels,
+        datasets: [
+          {
+            label: "Portfolio Value",
+            data,
+            tension: 0.2,
+            fill: false,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            title: { display: true, text: currencyCode },
+            ticks: {
+              callback: (val) =>
+                new Intl.NumberFormat("da-DK", {
+                  style: "decimal",
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }).format(val) +
+                " " +
+                currencyCode,
+            },
+          },
+        },
+        plugins: {
+          legend: { display: false },
+        },
+      },
+    });
+  },
+
   createMockGrowthChart: (canvas) => {
     // Create a mock growth chart with random data
     // In a real app, you'd use historical data

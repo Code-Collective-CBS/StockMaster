@@ -26,11 +26,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Try to get data from cache first
     const cacheKey = `portfolioData-${accountId}`;
     let portfolioData = cachingService.get(cacheKey);
-
     if (portfolioData) {
       // Update UI with cached data
       updatePortfolioUI(portfolioData);
-
       // Optionally refresh in background (not necessar4y, but nice to do)
       setTimeout(() => refreshDataInBackground(accountId, cacheKey), 100);
     } else {
@@ -38,6 +36,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       portfolioData = await fetchPortfolioData(accountId, cacheKey);
       updatePortfolioUI(portfolioData);
     }
+
+    renderHistoryChart(
+      accountId,
+      portfolioData[0]?.currency || "DKK"
+    );
+
   } catch (error) {
     console.error("Error loading portfolio data:", error);
     showErrorMessage("Failed to load portfolio data. Please try again later.");
@@ -104,6 +108,7 @@ function updatePortfolioUI(portfolios) {
   const portfolioChartCanvas = document.getElementById(
     "portfolioDistributionChart"
   );
+
   const portfolioList = document.getElementById("portfolioList");
   const portfolioGrowthChartCanvas = document.getElementById(
     "portfolioGrowthChart"
@@ -206,6 +211,25 @@ function updatePortfolioUI(portfolios) {
   }
 }
 
+async function renderHistoryChart(accountId, currencyCode) {
+  try {
+    // 1) Fetch history from the server
+    const historyData = await stockAPI.getPortfolioHistory(accountId);
+    // stockAPI.getPortfolioHistory should return JSON array [{date, value}, ...]
+
+    // 2) Get the canvas and draw
+    const historyCanvas = document.getElementById("portfolioHistoryChart");
+    portfolioChartService.createPortfolioHistoryChart(
+      historyCanvas,
+      historyData,
+      currencyCode
+    );
+  } catch (err) {
+    console.error("Failed to load history chart:", err);
+  }
+}
+
+
 // Function to create portfolio selector and holdings distribution chart
 function createPortfolioSelector(portfolios, chartCanvas) {
   if (!portfolios || portfolios.length === 0 || !chartCanvas) {
@@ -304,7 +328,6 @@ function updateHoldingsTable(portfolio) {
     // // Format values
     // const boughtPrice = formatCurrency(holding.gak, portfolio.currency);
     // const totalValue = formatCurrency(holding.currentValue, portfolio.currency);
-
 
     row.innerHTML = `
     <td>${holding.symbol}</td>
