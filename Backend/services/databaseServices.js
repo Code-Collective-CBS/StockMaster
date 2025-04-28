@@ -121,7 +121,7 @@ const databaseServices = {
         }
     },
 
-    createAccount: async (id, accountName, accountCurrency) => {
+    createAccount: async (id, accountName, accountCurrency, accountBank) => {
         try {
             const pool = await poolPromise;
             const checkUser = await pool
@@ -129,11 +129,12 @@ const databaseServices = {
                 .input("account_name", sql.VarChar(255), accountName)
                 .input("currency", sql.VarChar(3), accountCurrency)
                 .input("user_id", sql.Int, id)
+                .input("bank", sql.NVarChar(100), accountBank)
                 .query(`
-                INSERT INTO Accounts (account_name, currency, user_id)
-                VALUES (@account_name, @currency, @user_id)`);
+                INSERT INTO Accounts (account_name, currency, user_id, bank)
+                VALUES (@account_name, @currency, @user_id, @bank)`);
 
-            return { accountName, accountCurrency };
+            return { accountName, accountCurrency, accountBank };
         } catch (err) {
             console.error("Error: Could not create account", err);
             throw err;

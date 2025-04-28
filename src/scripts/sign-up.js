@@ -22,8 +22,8 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     const email = document.getElementById("email").value;
     const phone_number = document.getElementById("telefon").value;
     const password = document.getElementById("password").value;
-    const country_code = "DK"; // Hardcoded
     const avatar = document.getElementById('selectedAvatar').value;
+    const bank = document.getElementById('bank').value;
 
 
     // Sends sign-up data to backend via fetch
@@ -39,8 +39,8 @@ document.getElementById("registerForm").addEventListener("submit", async functio
                 email,
                 password,
                 phone_number,
-                country_code,
-                avatar
+                avatar,
+                bank
             })
         });
 

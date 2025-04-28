@@ -156,12 +156,12 @@ const databaseController = {
     },
 
     createAccount: async (req, res) => {
-        const { accountName, accountCurrency } = req.body;
+        const { accountName, accountCurrency, accountBank } = req.body;
         // Fetches the users id from the session
         const userID = req.session.user_id;
 
         try {
-            const account = await databaseServices.createAccount(userID, accountName, accountCurrency)
+            const account = await databaseServices.createAccount(userID, accountName, accountCurrency, accountBank)
 
             if (!userID) {
                 return res.status(401).json({ message: 'User not found' });
@@ -178,7 +178,8 @@ const databaseController = {
             res.status(201).json({
                 message: "Account created",
                 accountName: account.accountName,
-                accountCurrency: account.accountCurrency
+                accountCurrency: account.accountCurrency,
+                accountBank: account.accountBank
             });
         } catch (err) {
             res.status(500).json({ message: "Failed trying to create account", err });

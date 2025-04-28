@@ -167,13 +167,13 @@
     <main class="main-content">
       <div class="account-settings-container">
         <div class="account-header">
-          <h1>Create New Account</h1>
+          <h1>Create new account</h1>
         </div>
 
         <div class="profile-form">
           <div class="name-row">
             <div class="form-group">
-              <label for="accountName">Account Name</label>
+              <label for="accountName">Account name</label>
               <input type="text" id="accountName" placeholder="Input account name" />
             </div>
 
@@ -185,12 +185,26 @@
               </div>
               <div class="displaySearch"></div>
             </div>
+
+            <div class="form-group">
+              <label for="bank">Bank</label>
+              <select name="bank" id="bank">
+                <option value="">-- Choose bank institute --</option>
+                <option value="danske_bank">Danske Bank</option>
+                <option value="jyske_bank">Jyske Bank</option>
+                <option value="sydbank">Sydbank</option>
+                <option value="nykredit_bank">Nykredit Bank</option>
+                <option value="spar_nord_bank">Spar Nord Bank</option>
+              </select>
+            </div>
           </div>
+
+          
 
 
           <div class="form-actions">
             <button class="cancel-btn" type="button" id="cancel">Cancel</button>
-            <button class="save-btn" type="button" id="createAcc">Create Account</button>
+            <button class="save-btn" type="button" id="createAcc">Create account</button>
           </div>
         </div>
       </div>
