@@ -6,9 +6,9 @@ const { getOrSetCache } = require('../utilityFunctions/cacheHelper');
 
 const databaseController = {
     createUser: async (req, res) => {
-        const { firstname, lastname, email, password, phone_number, country_code, avatar } = req.body;
+        const { firstname, lastname, email, password, phone_number, avatar } = req.body;
         const body = req.body;
-        if (!firstname || !lastname || !email || !password || !avatar) {
+        if (!firstname || !lastname || !email || !password || !phone_number || !avatar) {
             return res.status(400).json({ message: "Missing information" });
         }
 

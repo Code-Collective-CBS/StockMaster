@@ -17,7 +17,7 @@ const poolPromise = new sql.ConnectionPool(config.database)
 
 const databaseServices = {
     createUser: async (body) => {
-        const { firstname, lastname, email, password, phone_number, country_code, avatar } = body;
+        const { firstname, lastname, email, password, phone_number, avatar } = body;
 
         const pool = await poolPromise;
 
@@ -35,13 +35,12 @@ const databaseServices = {
             .input("email", sql.NVarChar(100), email)
             .input("password", sql.NVarChar(255), password)
             .input("phone_number", sql.NVarChar(20), phone_number)
-            .input("country_code", sql.NVarChar(5), country_code)
             .input("avatar", sql.NVarChar(50), avatar)
 
             .query(`
-                INSERT INTO Users (firstname, lastname, email, password, phone_number, country_code, avatar, create_date)
+                INSERT INTO Users (firstname, lastname, email, password, phone_number, avatar, create_date)
                 OUTPUT INSERTED.id
-                VALUES (@firstname, @lastname, @email, @password, @phone_number, @country_code, @avatar, GETDATE())
+                VALUES (@firstname, @lastname, @email, @password, @phone_number, @avatar, GETDATE())
             `);
 
         const inserted_id = userCreated.recordset[0].id;
