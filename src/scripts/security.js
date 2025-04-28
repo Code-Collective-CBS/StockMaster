@@ -130,7 +130,7 @@ async function checkHoldingForSecurity(symbol) {
     let matchedSecurities = [];
 
     portfolioSummary.forEach((portfolio) => {
-      portfolio.holdings.forEach((holding) => {
+      (portfolio.metrics?.holdings || []).forEach((holding) => {
 
         if (holding.symbol === symbol) {
           matchedSecurities.push({

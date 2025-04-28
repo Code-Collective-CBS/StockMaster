@@ -83,7 +83,7 @@ const portfolioController = {
                   }
 
                   return {
-                    securityId: h.securityId,
+                    securityId: h.securityId, 
                     symbol: symbol,
                     security_name: h.security_name,
                     quantity: qty,

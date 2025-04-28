@@ -21,7 +21,7 @@
 <aside class="sideBar">
   <span class="brandName">StockMaster</span>
   <nav class="sideBarNav">
-    
+
     <div class="nav-item" data-href="/src/pages/dashboard.html">
       <svg
         class="icon"
@@ -185,7 +185,9 @@
 
       <section class="portfolio-graph">
         <h2>All Portfolios</h2>
-        <canvas id="portfolioChart"></canvas>
+        <div class="chart-container">
+          <canvas id="portfolioChart"></canvas>
+        </div>
         <select name="portfolio-graph-interval" id="portfolio-graph-interval">
           <option value="day">Day</option>
           <option value="month">Month</option>
@@ -214,8 +216,9 @@
     </section>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module" src="/src/scripts/utilityFunctions/portfolioChartService.js"></script>
   <script type="module" src="/src/scripts/sidebar.js"></script>
   <script type="module" src="/src/scripts/dashboard.js"></script>
 </body>
-
 </html>

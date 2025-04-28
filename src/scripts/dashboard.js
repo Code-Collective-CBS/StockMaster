@@ -1,8 +1,9 @@
 import { stockAPI } from "./stockScripts/api.js";
 import { popUps } from "./utilityFunctions/popup.js";
+import { portfolioChartService } from "./utilityFunctions/portfolioChartService.js";
 
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     // PRESENT IN THE SECURITIES-NEWS.JS MAYBE MOVE IT?
     const topPicksSymbols = [
         {
@@ -54,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     //// NEWS ////
-    // article_url not working even though following documention on Polygon.io 
+    // article_url not working even though following documention on Polygon.io
     const gethNews = async () => {
         try {
             const response = await stockAPI.getNews();
@@ -81,4 +82,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
     gethNews();
+
+    try {
+        const accountId = sessionStorage.getItem("selectedAccountId");
+        if (!accountId) throw new Error("No account selected");
+
+        const portfolios = await stockAPI.getPortfolioSummary(accountId);
+        const ctx = document.getElementById("portfolioChart");
+        portfolioChartService.createPortfolioPieChart(ctx, portfolios);
+      } catch (err) {
+        console.error("Failed to load All Portfolios chart:", err);
+      }
 });

@@ -1,7 +1,7 @@
 // This file handles stock-related HTTP request and uses the Alpha Vantage service file
 // Import alphaVantageService module
-// const alphaVantageService = require("../services/alphaVantageService");
-const alphaVantageService = require("../services/mockAlphaVantageService"); // MOCK DATA
+const alphaVantageService = require("../services/alphaVantageService");
+// const alphaVantageService = require("../services/mockAlphaVantageService"); // MOCK DATA
 const polygonService = require("../services/polygonService");
 
 // CACHE
@@ -57,7 +57,7 @@ const stockController = {
       const { data, source } = await getOrSetCache(
         cacheKey,
         () => alphaVantageService.getDailyTimeSeries(symbol, outputsize),
-        86400000
+        86400000 // 24h
       )
 
       res.json({ data, source });
@@ -99,7 +99,7 @@ const stockController = {
       }
 
       const cacheKey = `indices-${symbol}`;
-      
+
       // Use the cache helper function to get cached or fresh data
       const { data, source } = await getOrSetCache(
         cacheKey,
@@ -119,7 +119,7 @@ const stockController = {
       const cacheKey = 'news';
 
       const { data, source } = await getOrSetCache(
-        cacheKey, 
+        cacheKey,
         () => polygonService.getNews(),
         3600 // 1 hour
       );
