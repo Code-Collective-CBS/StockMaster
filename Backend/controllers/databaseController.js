@@ -6,9 +6,9 @@ const { getOrSetCache } = require('../utilityFunctions/cacheHelper');
 
 const databaseController = {
     createUser: async (req, res) => {
-        const { firstname, lastname, email, password, phone_number, country_code, avatar } = req.body;
+        const { firstname, lastname, email, password, phone_number, avatar } = req.body;
         const body = req.body;
-        if (!firstname || !lastname || !email || !password || !avatar) {
+        if (!firstname || !lastname || !email || !password || !phone_number || !avatar) {
             return res.status(400).json({ message: "Missing information" });
         }
 
@@ -156,12 +156,12 @@ const databaseController = {
     },
 
     createAccount: async (req, res) => {
-        const { accountName, accountCurrency } = req.body;
+        const { accountName, accountCurrency, accountBank } = req.body;
         // Fetches the users id from the session
         const userID = req.session.user_id;
 
         try {
-            const account = await databaseServices.createAccount(userID, accountName, accountCurrency)
+            const account = await databaseServices.createAccount(userID, accountName, accountCurrency, accountBank)
 
             if (!userID) {
                 return res.status(401).json({ message: 'User not found' });
@@ -178,7 +178,8 @@ const databaseController = {
             res.status(201).json({
                 message: "Account created",
                 accountName: account.accountName,
-                accountCurrency: account.accountCurrency
+                accountCurrency: account.accountCurrency,
+                accountBank: account.accountBank
             });
         } catch (err) {
             res.status(500).json({ message: "Failed trying to create account", err });
@@ -451,13 +452,28 @@ const databaseController = {
             if (!changeAcc) return res.status(404).json({ message: 'Account not found' });
 
             res.status(201).json({
-                message: "Account created",
+                message: "Account changed",
                 account_name: changeAcc.account_name,
                 account_currency: changeAcc.account_currency,
                 account_state: changeAcc.account_state
             });
         } catch (err) {
             res.status(500).json({ message: 'Server fail' });
+        }
+    },
+
+    deleteAccount: async(req, res) => {
+        // Saves the user- and account id from the session in variables
+        const user_id = req.session.user_id
+        const account_id = parseInt(req.params.account_id);
+
+        try {
+            const deletedAccount = await databaseServices.deleteAccount(user_id, account_id)
+            if (!deletedAccount) return res.status(404).json({ message: 'Account not found' });
+
+            return res.status(200).json({ message: "Account deleted" });
+        } catch (err) {
+            return res.status(500).json({ message: 'Server fail' });
         }
     }
 };

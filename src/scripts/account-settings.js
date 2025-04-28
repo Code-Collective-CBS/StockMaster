@@ -10,7 +10,7 @@ const account_currency = document.getElementById('account_currency');
 const account_state = document.getElementById('account_state');
 const account_name = document.getElementById('account_name');
 const saveAcc = document.getElementById('changeAcc');
-//const deleteAcc = document.getElementById('deleteAcc');
+const deleteAcc = document.getElementById('deleteAcc');
 
 // Gets the accountID from sidebar.js. Covnerts to number because session-/localStorage always return number.
 const account_id = Number(sessionStorage.getItem('selectedAccountId'));
@@ -63,16 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
             searchContainer.appendChild(currencyElement);
         });
     };
-    // 
 
     /// CHANGE ACCOUNT DETAILS
-
-    // Steps:
-    // 1. Fetch account name and put in placeholder
-    // 2. Make route: databaseRoutes -> databaseController -> databaseServices
-    // 3. Create function in databaseController
-    // 4. Make SQL query in databaseSerivces so its able to change account- name, currency and status in database
-
     saveAcc.addEventListener('click', async () => {
 
         const name = account_name.value;
@@ -96,26 +88,52 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json()
             if (response.status === 201) {
                 alert("Account changes saved");
+                console.log(result)
                 window.location.href = "../pages/dashboard.html" // Redirects user to login-page
             } else {
                 alert("Fail: " + result.message)
             }
         } catch (error) {
-            console.log("Failed to change account settings: " + error)
+            console.error("Failed to change account settings: " + error)
             alert("Failed to change account settings")
         }
     })
+        /// DELETE ACCOUNT
+        deleteAcc.addEventListener('click', async () => {
+            const deleteConfirmed = window.confirm('Are you sure you want to delelte this account? This action can not be undone.')
+    
+            if (deleteConfirmed) {
+                try {
+                    const response = await fetch(`http://localhost:3000/api/database/delete-account/${account_id}`, {
+                        method: "DELETE",
+                        headers: {
+                            "Content-Type": "application/json" // JSON data
+                        },
+                    });
+        
+                    const result = await response.json()
+                    if (response.status === 200) {
+                        alert("Account deleted");
+                        window.location.href = "../pages/dashboard.html" // Redirects user to login-page
+                    } else {
+                        alert("Fail: " + result.message)
+                    }
+                } catch (error) {
+                    console.error("Failed to delete account: " + error)
+                    alert("Failed to delete account")
+                }
+            }
+        })
 });
 
 // Function to display account-info in account-settings.
 const displayAccounts = async () => {
 
+    // Gets the accountinfo from the cache and saves in a variable.
     await loadAccounts();
-
-    // Gets the accountinfo from the cache
     const accounts = window.cachedAccounts;
-    console.log('Accounts: ', accounts)
 
+    // Searches all acounts for the user and finds the one that matches the account_id from the session.
     let selectedAccount;
     accounts.forEach(account => {
         if (account.account_id === account_id)
@@ -126,7 +144,6 @@ const displayAccounts = async () => {
         console.log('Could not find account with id: ', account_id)
         return;
     }
-    console.log('Selected account: ', selectedAccount)
 
     // Sets the value
     account_name.value = selectedAccount.account_name;

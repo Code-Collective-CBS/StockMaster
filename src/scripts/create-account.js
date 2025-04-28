@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Account details
     const accountCurrency = document.getElementById('accountCurrency');
     const accountName = document.getElementById('accountName');
+    const accountBank = document.getElementById('bank');
     const createAccBtn = document.getElementById('createAcc')
 
     //// BUTTONS ////
@@ -59,10 +60,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const name = accountName.value.trim();
         const currency = accountCurrency.value.trim();
+        const bank = accountBank.value;
 
-        if (accountCurrency.value.trim() === 'chooseCurrency' && name === "") return alert('Please fill out all fields')
-        if (accountCurrency.value.trim() === 'chooseCurrency') return alert('You must choose a currency')
-        if (name === "") return alert('You must choose an account name')
+        if (currency === '' && name === '' && bank === '') return alert('Please fill out all fields')
+        if (currency === '') return alert('You must choose a currency')
+        if (name === '') return alert('You must choose an account name')
+        if (bank === '') return alert('You must choose a bank for your account')
 
         try {
 
@@ -74,6 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({
                     accountName: name,
                     accountCurrency: currency,
+                    accountBank: bank
                 })
             });
 

@@ -61,4 +61,7 @@ router.get('/transactions/account/:account_id', databaseController.getTransactio
 // Change account settings (name, currency and status)
 router.put('/update-account-settings/:account_id', databaseController.updateAccountSettings)
 
+// Delete account
+router.delete('/delete-account/:account_id', databaseController.deleteAccount)
+
 module.exports = router;
