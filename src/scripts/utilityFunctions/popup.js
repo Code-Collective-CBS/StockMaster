@@ -164,8 +164,7 @@ export const popUps = {
                 const result = await response.json();
                 if (response.status === 201) {
                     alert("Deposit succesfull");
-
-                    await popUps.accountDetails();
+                    window.location.reload();
                 } else {
                     alert("Failed to deposit", result.message);
                 }
@@ -173,23 +172,22 @@ export const popUps = {
                 console.error("Failed to deposit: ", error);
             }
         };
-
+        
         const withdrawingFromAccount = async (amountInput) => {
             const amount = parseFloat(amountInput.value);
             const selectedAccountId = sessionStorage.getItem('selectedAccountId');
-
+            
             try {
                 const response = await fetch(`/api/database/withdraw-to-account/${selectedAccountId}`, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ amount }),
                 });
-
+                
                 const result = await response.json();
                 if (response.status === 201) {
                     alert("Withdraw succesfull");
-
-                    await popUps.accountDetails();
+                    window.location.reload();
                 } else {
                     alert("Failed to withdraw: " + result.message);
                 }
