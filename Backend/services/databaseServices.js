@@ -152,7 +152,8 @@ const databaseServices = {
                             a.id AS account_id,
                             a.account_name,
                             a.currency,
-                            a.total_balance
+                            a.total_balance,
+                            a.state
                         FROM Accounts a
                         JOIN Users u ON a.user_id = u.id
                         WHERE u.id = @id

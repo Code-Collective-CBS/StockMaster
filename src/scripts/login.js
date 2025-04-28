@@ -27,7 +27,6 @@ document.addEventListener("DOMContentLoaded", function () {
       if (response.ok) {
         // Store user data in localStorage
         sessionStorage.setItem("userId", result.id);
-        localStorage.setItem('userId', result.id)
 
         // store name for display
         sessionStorage.setItem("userFirstname", result.firstname);

@@ -1,18 +1,23 @@
+import { searchFunction } from "../scripts/utilityFunctions/searchFunction.js";
 import { loadAccounts } from "./utilityFunctions/loadAccounts.js";
-import { searchFunction } from "./utilityFunctions/searchFunction.js";
+
+// For currency-search function
+const deleteButton = document.querySelector(".delete-search");
+const searchContainer = document.querySelector(".displaySearch");
+
+// Account details
+const account_currency = document.getElementById('account_currency');
+const account_state = document.getElementById('account_state');
+const account_name = document.getElementById('account_name');
+const saveAcc = document.getElementById('changeAcc');
+//const deleteAcc = document.getElementById('deleteAcc');
+
+// Gets the accountID from sidebar.js. Covnerts to number because session-/localStorage always return number.
+const account_id = Number(sessionStorage.getItem('selectedAccountId'));
 
 document.addEventListener('DOMContentLoaded', () => {
-    // For currency-search function
-    const deleteButton = document.querySelector(".delete-search");
-    const searchContainer = document.querySelector(".displaySearch");
-    // Account details
-    const account_currency = document.getElementById('account_currency');
-    const account_state = document.getElementById('account_state');
-    const account_name = document.getElementById('account_name');
-    const saveAcc = document.getElementById('changeAcc')
-    const deleteAcc = document.getElementById('deleteAcc')
-
-    // Fetch account name and put in placeholder
+    // Display account-info
+    displayAccounts();
 
     //// BUTTONS ////
     deleteButton.addEventListener('click', () => {
@@ -70,9 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     saveAcc.addEventListener('click', async () => {
 
-        // Gets the accountID from sidebar.js
-        const account_id = sessionStorage.getItem('selectedAccountId');
-
         const name = account_name.value;
         const currency = account_currency.value.trim();
         const state = account_state.value
@@ -104,3 +106,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     })
 });
+
+// Function to display account-info in account-settings.
+const displayAccounts = async () => {
+
+    await loadAccounts();
+
+    // Gets the accountinfo from the cache
+    const accounts = window.cachedAccounts;
+    console.log('Accounts: ', accounts)
+
+    let selectedAccount;
+    accounts.forEach(account => {
+        if (account.account_id === account_id)
+            selectedAccount = account
+    });
+
+    if (!selectedAccount) {
+        console.log('Could not find account with id: ', account_id)
+        return;
+    }
+    console.log('Selected account: ', selectedAccount)
+
+    // Sets the value
+    account_name.value = selectedAccount.account_name;
+    account_currency.value = selectedAccount.currency;
+    account_state.value = selectedAccount.state
+};
