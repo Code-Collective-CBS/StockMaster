@@ -491,7 +491,7 @@ const databaseServices = {
 
             if (transaction_type === 'sell') {
                 const quantityHeld = await databaseServices.validateSecurityAmount(symbol, portfolio_id, account_id);
-            
+
                 if (amount > quantityHeld) {
                     throw new Error(`Cannot sell ${amount} shares. You only hold ${quantityHeld} shares in this portfolio.`);
                 }
@@ -607,20 +607,20 @@ const databaseServices = {
 
     updateAccountSettings: async (user_id, account_id, account_name, account_currency, account_state) => {
         try {
-        const pool = await poolPromise;
-        const result = await pool.request()
-            .input('user_id', sql.Int, user_id)
-            .input('id', sql.Int, account_id)
-            .input('account_name', sql.VarChar(100), account_name)
-            .input('currency', sql.VarChar(3), account_currency)
-            .input('state', sql.VarChar(50), account_state)
-            .query(
-                `UPDATE Accounts
+            const pool = await poolPromise;
+            const result = await pool.request()
+                .input('user_id', sql.Int, user_id)
+                .input('id', sql.Int, account_id)
+                .input('account_name', sql.VarChar(100), account_name)
+                .input('currency', sql.VarChar(3), account_currency)
+                .input('state', sql.VarChar(50), account_state)
+                .query(
+                    `UPDATE Accounts
                 SET account_name = @account_name, currency = @currency, state= @state
                 WHERE id = @id
                 AND user_id = @user_id`
-            );
-            
+                );
+
             return { account_name, account_currency, account_state };
         } catch (err) {
             console.log('Failed to update account in database', err)
@@ -631,7 +631,7 @@ const databaseServices = {
     validateSecurityAmount: async (symbol, portfolio_id, account_id) => {
         try {
             const pool = await poolPromise;
-    
+
             // First query: sum of buys
             const buysResult = await pool
                 .request()
@@ -647,12 +647,12 @@ const databaseServices = {
                     AND s.symbol = @symbol
                     AND t.portfolio_id = @portfolio_id
                 `); // USE OF LOWER TO TREAT LEGACCY DATA THAT USES UPPERCASE
-    
-                // NOTE: Use "AND t.account_id = @account_id" When legacy data is wiped
-                const totalBuys = buysResult.recordset[0].total_buys || 0;
-                
-                // Second query: sum of sells
-                const sellsResult = await pool
+
+            // NOTE: Use "AND t.account_id = @account_id" When legacy data is wiped
+            const totalBuys = buysResult.recordset[0].total_buys || 0;
+
+            // Second query: sum of sells
+            const sellsResult = await pool
                 .request()
                 .input('symbol', sql.VarChar(10), symbol)
                 .input('portfolio_id', sql.Int, portfolio_id)
@@ -666,18 +666,36 @@ const databaseServices = {
                     AND s.symbol = @symbol
                     AND t.portfolio_id = @portfolio_id
                     `);
-                    
+
             // NOTE: Use "AND t.account_id = @account_id" When legacy data is wiped
             const totalSells = sellsResult.recordset[0].total_sells || 0;
-    
+
             const netQuantity = totalBuys - totalSells;
-    
+
             return netQuantity;
         } catch (error) {
             console.error('Failed to validate security amount for portfolio', error);
             throw error;
         }
-    }  
+    },
+
+    deleteAccount: async (user_id, account_id) => {
+        try {
+            const pool = await poolPromise;
+            const result = await pool.request()
+                .input('user_id', sql.Int, user_id)
+                .input('id', sql.Int, account_id)
+                .query(
+                    `DELETE FROM Accounts
+                WHERE id = @id
+                AND user_id = @user_id`
+                )
+                return result.rowsAffected[0]
+        } catch (err) {
+            console.error('Failed to delete account', err)
+            throw err
+        }
+    }
 };
 
 module.exports = databaseServices;

@@ -87,32 +87,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const result = await response.json()
             if (response.status === 201) {
-                const accounts = window.cachedAccounts;
-                // Finds and updates the account
-                accounts.forEach(account => {
-                    if (account.account_id === account_id) {
-                        account.account_name = result.account_name;
-                        account.currency = result.account_currency;
-                        account.state = result.account_state;
-                    }
-                });
-
-                sessionStorage.setItem('accounts', JSON.stringify(accounts));
-                window.cachedAccounts = accounts;
-
-                displayAccounts();
                 alert("Account changes saved");
                 console.log(result)
-                //window.location.href = "../pages/dashboard.html" // Redirects user to login-page
+                window.location.href = "../pages/dashboard.html" // Redirects user to login-page
             } else {
                 alert("Fail: " + result.message)
             }
         } catch (error) {
-            console.log("Failed to change account settings: " + error)
+            console.error("Failed to change account settings: " + error)
             alert("Failed to change account settings")
         }
     })
-    /*
         /// DELETE ACCOUNT
         deleteAcc.addEventListener('click', async () => {
             const deleteConfirmed = window.confirm('Are you sure you want to delelte this account? This action can not be undone.')
@@ -124,27 +109,21 @@ document.addEventListener('DOMContentLoaded', () => {
                         headers: {
                             "Content-Type": "application/json" // JSON data
                         },
-                        body: JSON.stringify({
-                            account_name: name,
-                            account_currency: currency,
-                            account_state: state
-                        })
                     });
         
                     const result = await response.json()
-                    if (response.status === 201) {
-                        alert("Account changes saved");
+                    if (response.status === 200) {
+                        alert("Account deleted");
                         window.location.href = "../pages/dashboard.html" // Redirects user to login-page
                     } else {
                         alert("Fail: " + result.message)
                     }
                 } catch (error) {
-                    console.log("Failed to change account settings: " + error)
-                    alert("Failed to change account settings")
+                    console.error("Failed to delete account: " + error)
+                    alert("Failed to delete account")
                 }
             }
         })
-            */
 });
 
 // Function to display account-info in account-settings.
