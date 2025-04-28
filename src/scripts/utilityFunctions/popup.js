@@ -25,7 +25,33 @@ export const popUps = {
         }
     },
 
-    // NEW NEED MORE WORK
+    simplePortfolioList: async (accountId) => {
+        try {
+          const response = await fetch(`/api/database/simple-portfolios/${accountId}`);
+          if (!response.ok) throw new Error('Failed to fetch simple portfolios');
+      
+          const data = await response.json();
+          return data;
+        } catch (error) {
+          console.error('Error fetching simple portfolios', error);
+          return [];
+        }
+    },
+
+    stockQuantitySimple: async (portfolioId, symbol) => {
+        try {
+          const response = await fetch(`/api/database/portfolio/${portfolioId}/stock/${symbol}`);
+          if (!response.ok) throw new Error('Failed to fetch stock quantity');
+      
+          const data = await response.json();
+          return data.quantity || 0;
+        } catch (error) {
+          console.error('Error fetching stock quantity', error);
+          return 0;
+        }
+    },
+      
+
     currencyConverter: async (amount, fromCurrency, toCurrency) => {
         try {
             const reponse = await fetch(`/api/currency/exchange/${fromCurrency}`);
@@ -43,22 +69,6 @@ export const popUps = {
         } catch (error) {
             console.error('Error fetching rates for currency conversion', error);
             throw error;
-        }
-    },
-
-    getStockQuantityInPortfolio: async (symbol, portfolioId) => {
-        try {
-            const selectedAccountId = sessionStorage.getItem('selectedAccountId');
-            const portfolios = await popUps.allPortfolioDetails(selectedAccountId);
-
-            const portfolio = portfolios.find(p => p.id == portfolioId);
-            if (!portfolio) return 0;
-
-            const holding = portfolio.holdings.find(h => h.symbol === symbol);
-            return holding ? holding.quantity : 0;
-        } catch (error) {
-            console.error('Failed to get stock quantity in portfolio', error);
-            return 0;
         }
     },
 
@@ -247,8 +257,8 @@ export const popUps = {
             stockPriceSpan.textContent = `${window.latestStockPrice} ${window.securityCurrency}`;
             accountBalanceSpan.textContent = `${selectedAccount.total_balance} ${selectedAccount.currency}`;
 
-            const allPortfolioDetails = await popUps.allPortfolioDetails(selectedAccount.account_id);
-
+            const allPortfolioDetails = await popUps.simplePortfolioList(selectedAccount.account_id);
+            console.log("Portfolios details", allPortfolioDetails);
             allPortfolioDetails.forEach(portfolio => {
                 const option = document.createElement('option');
                 option.classList.add('popup-portfolios-option');
@@ -357,7 +367,7 @@ export const popUps = {
             const ownedQuantitySpan = tradeModal.querySelector('#owned-quantity');
 
             const selectedAccount = await popUps.accountDetails();
-            const allPortfolioDetails = await popUps.allPortfolioDetails(selectedAccount.account_id);
+            const allPortfolioDetails = await popUps.simplePortfolioList(selectedAccount.account_id);
 
             // Populate dropdown
             allPortfolioDetails.forEach(portfolio => {
@@ -377,7 +387,7 @@ export const popUps = {
             // Update quantity display
             const updateOwnedQuantity = async () => {
                 const portfolioId = dropdown.value;
-                const quantity = await popUps.getStockQuantityInPortfolio(symbol, portfolioId);
+                const quantity = await popUps.stockQuantitySimple(portfolioId, symbol);
                 currentQuantityHeld = quantity; // Cache for later use
                 ownedQuantitySpan.textContent = `${quantity} shares`;
             };

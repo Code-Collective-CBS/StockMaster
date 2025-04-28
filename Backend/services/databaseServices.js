@@ -125,14 +125,35 @@ const databaseServices = {
     createAccount: async (id, accountName, accountCurrency) => {
         try {
             const pool = await poolPromise;
+
+            // 1. Find the matching id based on currency_name from Currrency table
+            const result = await pool
+                .request()
+                .input('currency_name', sql.NVarChar(10), accountCurrency)
+                .query(`
+                    SELECT id 
+                    FROM Currency
+                    WHERE currency_name = @currency_name    
+            `);
+            
+            
+            if(result.recordset.length === 0) {
+                throw new Error(`Invalid currency name: ${accountCurrency}`);
+            }
+            
+            const currency_id = result.recordset[0].id;
+
+            // 2. Create the account
+
             const checkUser = await pool
                 .request()
                 .input("account_name", sql.VarChar(255), accountName)
-                .input("currency", sql.VarChar(3), accountCurrency)
+                .input("currency_id", sql.Int, currency_id)
                 .input("user_id", sql.Int, id)
                 .query(`
-                INSERT INTO Accounts (account_name, currency, user_id)
-                VALUES (@account_name, @currency, @user_id)`);
+                INSERT INTO Accounts (account_name, currency_id, user_id)
+                VALUES (@account_name, @currency_id, @user_id)`
+            );
 
             return { accountName, accountCurrency };
         } catch (err) {
@@ -144,20 +165,23 @@ const databaseServices = {
     getAccountInfo: async (id) => {
         try {
             const pool = await poolPromise;
-            const getAccount = await pool.request().input("id", sql.Int, id).query(`
-                        SELECT
-                            u.id AS user_id,
-                            u.firstname,
-                            u.lastname,
-                            a.id AS account_id,
-                            a.account_name,
-                            a.currency,
-                            a.total_balance,
-                            a.state
-                        FROM Accounts a
-                        JOIN Users u ON a.user_id = u.id
-                        WHERE u.id = @id
-                    `);
+            const getAccount = await pool
+            .request()
+            .input("id", sql.Int, id).query(`
+                SELECT
+                    u.id AS user_id,
+                    u.firstname,
+                    u.lastname,
+                    a.id AS account_id,
+                    a.account_name,
+                    c.currency_name AS currency,
+                    a.total_balance,
+                    a.state
+                FROM Accounts a
+                JOIN Users u ON a.user_id = u.id
+                JOIN Currency c on a.currency_id = c.id
+                WHERE u.id = @id
+            `);
 
             if (getAccount.recordset.length > 0) {
                 return getAccount.recordset;
@@ -177,10 +201,17 @@ const databaseServices = {
                 .request()
                 .input('accountId', sql.Int, accoun_id)
                 .query(`
-                SELECT total_balance, currency
-                FROM Accounts
-                WHERE id = @accountId
+                SELECT 
+                    a.total_balance,
+                    c.currency_name AS currency
+                FROM Accounts a
+                JOIN Currency c ON a.currency_id = c.id
+                WHERE a.id = @accountId
             `);
+            
+            if (!result.recordset[0]) {
+                throw new Error(`Account with id: ${accoun_id} not found`);
+            }
 
             return result.recordset[0]; // { total_balance, currency }
         } catch (error) {
@@ -325,12 +356,13 @@ const databaseServices = {
                 .request()
                 .input('account_id', sql.Int, accountId)
                 .query(`
-                SELECT currency FROM Accounts    
+                SELECT currency_id
+                FROM Accounts    
                 WHERE id = @account_id
             `);
 
-            const accountCurrency = accountQuery.recordset[0]?.currency; // "?.currency" safety to acces currency from recordset[0] only if it exist, otherwise asign undefined to variable 
-            if (!accountCurrency) throw new Error('Account currency not found');
+            const currency_id = accountQuery.recordset[0]?.currency_id; // "?.currency_id" safety to acces currency from recordset[0] only if it exist, otherwise asign undefined to variable 
+            if (!currency_id) throw new Error('Account currency not found');
 
             // 2. Update balance
             const result = await pool
@@ -354,11 +386,11 @@ const databaseServices = {
                 .input("amount", sql.Decimal(37, 2), amount)
                 .input("price_per_share", sql.Decimal(18, 2), 1) // Placeholder 1 maybe change into 0 if no change on gak
                 .input("total_price", sql.Decimal(37, 2), amount)
-                .input('currency', sql.VarChar(10), accountCurrency)
+                .input('currency_id', sql.Int, currency_id)
                 .query(`
                 INSERT INTO Transactions
-                (account_id, portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price, currency)
-                VALUES (@account_id, NULL, NULL, @transaction_type, @amount, @price_per_share, @total_price, @currency)
+                (account_id, portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price, currency_id)
+                VALUES (@account_id, NULL, NULL, @transaction_type, @amount, @price_per_share, @total_price, @currency_id)
             `);
 
             return result.recordset[0];
@@ -377,13 +409,14 @@ const databaseServices = {
                 .request()
                 .input('account_id', sql.Int, accountId)
                 .query(`
-            SELECT currency FROM Accounts    
-            WHERE id = @account_id
+                SELECT currency_id 
+                FROM Accounts    
+                WHERE id = @account_id
             `);
 
 
-            const accountCurrency = accountQuery.recordset[0]?.currency;
-            if (!accountCurrency) throw new Error('Account currency not found');
+            const currency_id = accountQuery.recordset[0]?.currency_id;
+            if (!currency_id) throw new Error('Account currency not found');
 
             // 2. Update balance
             const result = await pool
@@ -409,11 +442,11 @@ const databaseServices = {
                 .input("amount", sql.Decimal(37, 2), amount)
                 .input("price_per_share", sql.Decimal(18, 2), 1) // Placeholder 1 maybe change into 0 if no change on gak
                 .input("total_price", sql.Decimal(37, 2), amount)
-                .input('currency', sql.VarChar(10), accountCurrency)
+                .input('currency_id', sql.Int, currency_id)
                 .query(`
                 INSERT INTO Transactions
-                (account_id, portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price, currency)
-                VALUES (@account_id, NULL, NULL, @transaction_type, @amount, @price_per_share, @total_price, @currency)
+                (account_id, portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price, currency_id)
+                VALUES (@account_id, NULL, NULL, @transaction_type, @amount, @price_per_share, @total_price, @currency_id)
             `);
 
             return result.recordset[0];
@@ -446,7 +479,9 @@ const databaseServices = {
                     SELECT p.id
                     FROM Portfolio p
                     JOIN Accounts a ON p.account_id = a.id
-                    WHERE p.id = @portfolio_id AND a.id = @account_id AND a.user_id = @user_id
+                    WHERE p.id = @portfolio_id
+                        AND a.id = @account_id
+                        AND a.user_id = @user_id
             `);
 
             if (validatePortfolio.recordset.length === 0) {
@@ -462,8 +497,9 @@ const databaseServices = {
                 .request()
                 .input("symbol", sql.VarChar(10), symbol)
                 .query(`
-                SELECT id FROM Securities
-                WHERE symbol = @symbol
+                SELECT s.id 
+                FROM Securities s
+                WHERE s.symbol = @symbol
             `);
 
             if (securityQuery.recordset.length === 0) {
@@ -472,7 +508,23 @@ const databaseServices = {
 
             const securities_id = securityQuery.recordset[0].id;
 
-            // 4. Calculate total price
+            // 4. Lookup currency_id in Currency tabel to get currency_name
+            const currencyResult = await pool
+                .request()
+                .input('currency_name', sql.NVarChar(10), security_currency)
+                .query(`
+                SELECT c.id 
+                FROM Currency c
+                WHERE c.currency_name = @currency_name        
+            `);
+
+            if(currencyResult.recordset.length === 0){
+                throw new Error(`Invalid security currency: ${security_currency}`);
+            }
+
+            const currency_id = currencyResult.recordset[0].id;
+
+            // 5. Calculate total price
             const total_price = amount * price_per_share;
             let convertedTotalPrice = total_price;
 
@@ -498,7 +550,9 @@ const databaseServices = {
                 }
             }
 
-            // 5. Insert into Transactions table
+            console.log("Fail bere inserting");
+
+            // 6. Insert into Transactions table
             const insertQuery = await pool
                 .request()
                 .input("account_id", sql.Int, account_id)
@@ -508,15 +562,15 @@ const databaseServices = {
                 .input("amount", sql.Decimal(37, 2), amount)
                 .input("price_per_share", sql.Decimal(18, 2), price_per_share)
                 .input("total_price", sql.Decimal(37, 2), convertedTotalPrice) // Using account currency
-                .input('currency', sql.VarChar(10), security_currency)
+                .input('currency_id', sql.Int, currency_id)
                 .query(`
                 INSERT INTO Transactions
-                (account_id, portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price, currency)
+                (account_id, portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price, currency_id)
                 OUTPUT INSERTED.id
-                VALUES (@account_id, @portfolio_id, @securities_id, @transaction_type, @amount, @price_per_share, @total_price, @currency)
+                VALUES (@account_id, @portfolio_id, @securities_id, @transaction_type, @amount, @price_per_share, @total_price, @currency_id)
             `);
 
-            // 6. Update account balance if 'buy'
+            // 7. Update account balance if 'buy'
             if (transaction_type === 'buy') {
                 await pool
                     .request()
