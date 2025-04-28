@@ -87,8 +87,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const result = await response.json()
             if (response.status === 201) {
+                const accounts = window.cachedAccounts;
+                // Finds and updates the account
+                accounts.forEach(account => {
+                    if (account.account_id === account_id) {
+                        account.account_name = result.account_name;
+                        account.currency = result.account_currency;
+                        account.state = result.account_state;
+                    }
+                });
+
+                sessionStorage.setItem('accounts', JSON.stringify(accounts));
+                window.cachedAccounts = accounts;
+
+                displayAccounts();
                 alert("Account changes saved");
-                window.location.href = "../pages/dashboard.html" // Redirects user to login-page
+                console.log(result)
+                //window.location.href = "../pages/dashboard.html" // Redirects user to login-page
             } else {
                 alert("Fail: " + result.message)
             }
@@ -97,39 +112,39 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Failed to change account settings")
         }
     })
-/*
-    /// DELETE ACCOUNT
-    deleteAcc.addEventListener('click', async () => {
-        const deleteConfirmed = window.confirm('Are you sure you want to delelte this account? This action can not be undone.')
-
-        if (deleteConfirmed) {
-            try {
-                const response = await fetch(`http://localhost:3000/api/database/delete-account/${account_id}`, {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json" // JSON data
-                    },
-                    body: JSON.stringify({
-                        account_name: name,
-                        account_currency: currency,
-                        account_state: state
-                    })
-                });
+    /*
+        /// DELETE ACCOUNT
+        deleteAcc.addEventListener('click', async () => {
+            const deleteConfirmed = window.confirm('Are you sure you want to delelte this account? This action can not be undone.')
     
-                const result = await response.json()
-                if (response.status === 201) {
-                    alert("Account changes saved");
-                    window.location.href = "../pages/dashboard.html" // Redirects user to login-page
-                } else {
-                    alert("Fail: " + result.message)
+            if (deleteConfirmed) {
+                try {
+                    const response = await fetch(`http://localhost:3000/api/database/delete-account/${account_id}`, {
+                        method: "DELETE",
+                        headers: {
+                            "Content-Type": "application/json" // JSON data
+                        },
+                        body: JSON.stringify({
+                            account_name: name,
+                            account_currency: currency,
+                            account_state: state
+                        })
+                    });
+        
+                    const result = await response.json()
+                    if (response.status === 201) {
+                        alert("Account changes saved");
+                        window.location.href = "../pages/dashboard.html" // Redirects user to login-page
+                    } else {
+                        alert("Fail: " + result.message)
+                    }
+                } catch (error) {
+                    console.log("Failed to change account settings: " + error)
+                    alert("Failed to change account settings")
                 }
-            } catch (error) {
-                console.log("Failed to change account settings: " + error)
-                alert("Failed to change account settings")
             }
-        }
-    })
-        */
+        })
+            */
 });
 
 // Function to display account-info in account-settings.

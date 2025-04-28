@@ -623,7 +623,7 @@ const databaseServices = {
             
             return { account_name, account_currency, account_state };
         } catch (err) {
-            console.log('Failed to update account in database', err) // WHY LOG AND NOT ERROR?
+            console.log('Failed to update account in database', err)
             throw err;
         }
     },

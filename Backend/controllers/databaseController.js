@@ -451,7 +451,7 @@ const databaseController = {
             if (!changeAcc) return res.status(404).json({ message: 'Account not found' });
 
             res.status(201).json({
-                message: "Account created",
+                message: "Account changed",
                 account_name: changeAcc.account_name,
                 account_currency: changeAcc.account_currency,
                 account_state: changeAcc.account_state
