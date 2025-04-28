@@ -198,7 +198,65 @@ const portfolioController = {
       console.error("Error in getPortfolioHistory", err);
       res.status(500).json({ error: "Failed to fetch portfolio history" });
     }
-  }
+  },
+
+  getSimplePortfolios: async (req, res) => {
+    try {
+      const accountId = req.params.accountId;
+      const portfolios = await databaseServices.getPortfoliosByAccount(accountId);
+  
+      if (!portfolios || portfolios.length === 0) {
+        return res.status(404).json([]);
+      }
+  
+      // Only return id and name
+      const simplePortfolios = portfolios.map((p) => ({
+        id: p.id,
+        name: p.name
+      }));
+  
+      res.json(simplePortfolios);
+    } catch (err) {
+      console.error('Error fetching simple portfolios', err);
+      res.status(500).json({ error: 'Failed to fetch simple portfolios' });
+    }
+  },
+
+  getStockQuantityInPortfolio: async (req, res) => {
+    try {
+      const { portfolioId, symbol } = req.params;
+  
+      if (!portfolioId || !symbol) {
+        return res.status(400).json({ error: "Missing portfolioId or symbol" });
+      }
+  
+      const transactions = await databaseServices.getTransactionsForPortfolio(portfolioId);
+  
+      if (!transactions || transactions.length === 0) {
+        return res.json({ quantity: 0 });
+      }
+  
+      // Find the total quantity for the requested stock
+      let quantity = 0;
+      transactions.forEach((tx) => {
+        if (tx.symbol === symbol) {
+          const type = tx.transaction_type.toLowerCase();
+          if (type === "buy") {
+            quantity += tx.amount;
+          } else if (type === "sell") {
+            quantity -= tx.amount;
+          }
+        }
+      });
+  
+      if (quantity < 0) quantity = 0; // Safety: no negative quantity
+  
+      res.json({ quantity });
+    } catch (error) {
+      console.error('Error fetching stock quantity', error);
+      res.status(500).json({ error: 'Failed to fetch stock quantity' });
+    }
+  },  
 };
 
 module.exports = portfolioController;

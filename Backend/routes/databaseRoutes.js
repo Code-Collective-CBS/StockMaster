@@ -32,6 +32,12 @@ router.put('/updateprofileInfo', databaseController.updateUserProfile);
 
 router.get('/portfolio/account/:accountId', portfolioController.getPortfolioSummary);
 
+// Get information for popup buy/sell
+router.get('/simple-portfolios/:accountId', portfolioController.getSimplePortfolios);
+
+// Get quantity in portfolio
+router.get('/portfolio/:portfolioId/stock/:symbol', portfolioController.getStockQuantityInPortfolio);
+
 router.get('/portfolio/account/:accountId/history', portfolioController.getPortfolioHistory);
 
 // Create portfolio
