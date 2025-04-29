@@ -663,18 +663,36 @@ const databaseServices = {
     updateAccountSettings: async (user_id, account_id, account_name, account_currency, account_state) => {
         try {
             const pool = await poolPromise;
-            const result = await pool.request()
+
+            // 1. Lookup currency_id based currency_name
+            const currencyResult = await pool
+                .request()
+                .input('currency_name', sql.NVarChar(50), account_currency)
+                .query(`
+                    SELECT id
+                    FROM Currency
+                    WHERE currency_name = @currency_name
+            `);
+
+            if(currencyResult.recordset.length === 0) {
+                throw new Error(`Invalid currencyname: ${account_currency}`);
+            }
+
+            const currency_id = currencyResult.recordset[0].id
+
+            // 2. Update the account
+            await pool.request()  // ⬅️ no need to assign to `result`
                 .input('user_id', sql.Int, user_id)
                 .input('id', sql.Int, account_id)
                 .input('account_name', sql.VarChar(100), account_name)
-                .input('currency', sql.VarChar(3), account_currency)
+                .input('currency_id', sql.Int, currency_id)
                 .input('state', sql.VarChar(50), account_state)
-                .query(
-                    `UPDATE Accounts
-                SET account_name = @account_name, currency = @currency, state= @state
-                WHERE id = @id
-                AND user_id = @user_id`
-                );
+                .query(`
+                    UPDATE Accounts
+                    SET account_name = @account_name, currency_id = @currency_id, state = @state
+                    WHERE id = @id
+                    AND user_id = @user_id
+            `);
 
             return { account_name, account_currency, account_state };
         } catch (err) {
