@@ -155,54 +155,153 @@ const portfolioController = {
   getPortfolioHistory: async (req, res) => {
     try {
       const accountId = req.params.accountId;
-      // 1) load portfolios and turn txs → holdings
-      const portfolios = await databaseServices.getPortfoliosByAccount(
-        accountId
-      );
-      if (!portfolios.length) return res.json([]);
+      const cacheKey = `portfolio-history-${accountId}`;
+      const cacheTTL = 3600; // 1 hour cache
 
-      const allHoldings = (
-        await Promise.all(
-          portfolios.map(async (p) => {
-            const txs = await databaseServices.getTransactionsForPortfolio(
-              p.id
-            );
-            return calculateHoldings(txs);
-          })
-        )
-      ).flat();
+      // Use cache to avoid repeated calculation
+      const { data: historyData } = await getOrSetCache(
+        cacheKey,
+        async () => {
+          // 1) Get all portfolios for this account
+          const portfolios = await databaseServices.getPortfoliosByAccount(accountId);
+          if (!portfolios.length) return [];
 
-      // 2) fetch each symbol’s time series (1h cache)
-      const seriesData = await Promise.all(
-        allHoldings.map(async (h) => {
-          const { data: tsData } = await getOrSetCache(
-            `timeSeries-${h.symbol}`,
-            () => alphaVantageService.getDailyTimeSeries(h.symbol, "compact"),
-            3600
+          const accountCurrency = portfolios[0].currency || 'DKK';
+
+          // 2) Get all transactions across all portfolios in this account
+          const allTransactions = [];
+          for (const portfolio of portfolios) {
+            const txs = await databaseServices.getTransactionsForPortfolio(portfolio.id);
+            allTransactions.push(...txs);
+          }
+
+          // 3) Calculate daily portfolio state (what stocks were held on each day)
+          // This is better than just using current holdings, as it accounts for changes over time
+          const historyByDate = calculatePortfolioHistoryByDate(allTransactions);
+
+          // 4) Get exchange rates for currency conversion
+          const { data: ratesData } = await getOrSetCache(
+            `rates-${accountCurrency}`,
+            () => exchangeRateService.getCurrency(accountCurrency),
+            86400 // 1 day cache for exchange rates
           );
-          return { qty: h.quantity, series: tsData["Time Series (Daily)"] || {} };
-        })
+          const rates = ratesData.conversion_rates;
+
+          // 5) For each unique security in the portfolio history, get its price history
+          const securities = new Set();
+          Object.values(historyByDate).forEach(holdings =>
+            holdings.forEach(h => securities.add(h.symbol))
+          );
+
+          const priceHistories = {};
+          await Promise.all(Array.from(securities).map(async (symbol) => {
+            try {
+              const { data: tsData } = await getOrSetCache(
+                `timeSeries-${symbol}`,
+                () => alphaVantageService.getDailyTimeSeries(symbol, "compact"),
+                3600 // 1 hour cache
+              );
+
+              const { data: ovData } = await getOrSetCache(
+                `overview-${symbol}`,
+                () => alphaVantageService.getCompanyOverview(symbol),
+                86400 // 1 day cache
+              );
+
+              const currency = ovData?.Currency || accountCurrency;
+              priceHistories[symbol] = {
+                series: tsData["Time Series (Daily)"] || {},
+                currency
+              };
+            } catch (error) {
+              console.warn(`Failed to get price data for ${symbol}:`, error.message);
+              priceHistories[symbol] = { series: {}, currency: accountCurrency };
+            }
+          }));
+
+          // 6) Calculate portfolio value for each day (business days only)
+          const startDate = moment().subtract(180, "days");
+          const endDate = moment();
+          const dailyValues = [];
+
+          // Only use business days (Mon-Fri)
+          for (let day = startDate.clone(); day.isSameOrBefore(endDate); day.add(1, "day")) {
+            // Skip weekends - no market data
+            if (day.day() === 0 || day.day() === 6) continue;
+
+            const dateStr = day.format("YYYY-MM-DD");
+            const holdings = historyByDate[dateStr] || [];
+
+            // If we have no holdings for this date, use the most recent previous date's holdings
+            let effectiveHoldings = holdings;
+            if (holdings.length === 0) {
+              let prevDate = day.clone().subtract(1, "day");
+              while (prevDate.isSameOrAfter(startDate)) {
+                const prevDateStr = prevDate.format("YYYY-MM-DD");
+                if (historyByDate[prevDateStr] && historyByDate[prevDateStr].length > 0) {
+                  effectiveHoldings = historyByDate[prevDateStr];
+                  break;
+                }
+                prevDate.subtract(1, "day");
+              }
+            }
+
+            // Calculate total value for this day
+            let totalValue = 0;
+            for (const holding of effectiveHoldings) {
+              const { symbol, quantity } = holding;
+              const priceData = priceHistories[symbol];
+              if (!priceData) continue;
+
+              const { series, currency } = priceData;
+              // Find the closest previous date with price data
+              let price = null;
+              let checkDate = day.clone();
+              while (checkDate.isSameOrAfter(startDate) && price === null) {
+                const checkDateStr = checkDate.format("YYYY-MM-DD");
+                if (series[checkDateStr]) {
+                  price = parseFloat(series[checkDateStr]["4. close"]);
+                  break;
+                }
+                checkDate.subtract(1, "day");
+              }
+
+              // If no price found, skip this holding
+              if (price === null) continue;
+
+              // Convert to account currency if needed
+              let valueInAccountCurrency = price * quantity;
+              if (currency !== accountCurrency) {
+                const rate = rates[currency];
+                if (rate) {
+                  valueInAccountCurrency = valueInAccountCurrency / rate;
+                }
+              }
+
+              totalValue += valueInAccountCurrency;
+            }
+
+            // Only add days with values
+            if (totalValue > 0) {
+              dailyValues.push({
+                date: dateStr,
+                value: totalValue
+              });
+            }
+          }
+
+          // If we still have days with zero value, apply linear interpolation to fix
+          const result = interpolateMissingDays(dailyValues);
+
+          // Sort by date ascending
+          result.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+          return result;
+        },
+        cacheTTL
       );
 
-      // 3) build date→value for the last 180 days
-      const start = moment().subtract(180, "days"),
-        end = moment();
-      const dailyValues = {};
-
-      for (let m = start.clone(); m.isSameOrBefore(end); m.add(1, "day")) {
-        const d = m.format("YYYY-MM-DD");
-        dailyValues[d] = seriesData.reduce((sum, { qty, series }) => {
-          const day = series[d];
-          return sum + (day ? parseFloat(day["4. close"]) * qty : 0);
-        }, 0);
-      }
-
-      // 4) serialize and send
-      const history = Object.entries(dailyValues).map(([date, value]) => ({
-        date,
-        value,
-      }));
-      res.json(history);
+      res.json(historyData);
     } catch (err) {
       console.error("Error in getPortfolioHistory", err);
       res.status(500).json({ error: "Failed to fetch portfolio history" });
@@ -320,4 +419,95 @@ function calculateHoldings(transactions) {
       ...h,
       gak: h.totalCost / h.quantity, // true average acquisition cost
     }));
+}
+
+// Helper function to calculate portfolio state (holdings) for each day
+function calculatePortfolioHistoryByDate(transactions) {
+  if (!Array.isArray(transactions) || transactions.length === 0) {
+    return {};
+  }
+
+  // Sort transactions by date ascending
+  transactions.sort((a, b) => new Date(a.transaction_date) - new Date(b.transaction_date));
+
+  const historyByDate = {};
+  const portfolio = {}; // Current portfolio state indexed by security_id
+
+  // Process each transaction in chronological order
+  transactions.forEach(tx => {
+    const dateStr = moment(tx.transaction_date).format("YYYY-MM-DD");
+    const id = tx.securities_id;
+    const type = (tx.transaction_type || "").toLowerCase();
+    const qty = Number(tx.amount) || 0;
+
+    // Initialize portfolio entry if needed
+    if (!portfolio[id]) {
+      portfolio[id] = {
+        securityId: id,
+        security_name: tx.security_name,
+        symbol: tx.symbol,
+        quantity: 0
+      };
+    }
+
+    // Update portfolio based on transaction type
+    if (type === "buy") {
+      portfolio[id].quantity += qty;
+    } else if (type === "sell") {
+      portfolio[id].quantity -= qty;
+    }
+
+    // Create a snapshot of the portfolio for this date
+    historyByDate[dateStr] = Object.values(portfolio)
+      .filter(h => h.quantity > 0) // Only include positions with positive quantity
+      .map(h => ({ ...h })); // Clone the holdings to avoid reference issues
+  });
+
+  return historyByDate;
+}
+
+// Helper function to interpolate missing days
+function interpolateMissingDays(dailyValues) {
+  if (dailyValues.length < 2) return dailyValues;
+
+  const result = [...dailyValues];
+  result.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  // Iterate through adjacent days to find gaps
+  for (let i = 0; i < result.length - 1; i++) {
+    const currDate = new Date(result[i].date);
+    const nextDate = new Date(result[i + 1].date);
+
+    // Check if there's a gap (more than 1 day difference)
+    const daysDiff = Math.floor((nextDate - currDate) / (1000 * 60 * 60 * 24));
+    if (daysDiff > 1) {
+      // We have missing days, interpolate values
+      const startValue = result[i].value;
+      const endValue = result[i + 1].value;
+
+      for (let d = 1; d < daysDiff; d++) {
+        const interpolatedDate = new Date(currDate);
+        interpolatedDate.setDate(currDate.getDate() + d);
+
+        // Skip weekends during interpolation too
+        const dayOfWeek = interpolatedDate.getDay();
+        if (dayOfWeek === 0 || dayOfWeek === 6) continue;
+
+        // Linear interpolation formula: start + (d/total) * (end - start)
+        const ratio = d / daysDiff;
+        const interpolatedValue = startValue + ratio * (endValue - startValue);
+
+        // Insert the interpolated day
+        const dateStr = moment(interpolatedDate).format("YYYY-MM-DD");
+        result.push({
+          date: dateStr,
+          value: interpolatedValue
+        });
+      }
+    }
+  }
+
+  // Re-sort after adding interpolated values
+  result.sort((a, b) => new Date(a.date) - new Date(b.date));
+  return result;
 }

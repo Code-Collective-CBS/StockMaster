@@ -4,8 +4,12 @@ export const portfolioChartService = {
     try {
       if (!canvas || !portfolios || portfolios.length === 0) {
         console.warn("Missing canvas or portfolio data");
-        return;
+        return null;
       }
+
+      // Clear any existing chart
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // Extract portfolio names and values
       const portfolioValues = portfolios.map((portfolio) => ({
@@ -19,7 +23,7 @@ export const portfolioChartService = {
         portfolioValues.every((p) => p.value === 0)
       ) {
         console.warn("No portfolio values to display");
-        return;
+        return null;
       }
 
       // Prepare data for chart
@@ -33,8 +37,12 @@ export const portfolioChartService = {
       // Generate colors
       const colors = generateChartColors(labels.length);
 
-      // Create chart
-      new Chart(canvas, {
+      // Ensure proper size before rendering
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
+
+      // Create chart with maintainAspectRatio: false for better sizing
+      const chartInstance = new Chart(canvas, {
         type: "pie",
         data: {
           labels: labels,
@@ -48,6 +56,7 @@ export const portfolioChartService = {
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false,
           plugins: {
             tooltip: {
               callbacks: {
@@ -70,11 +79,15 @@ export const portfolioChartService = {
           },
         },
       });
+
+      return chartInstance;
     } catch (error) {
       console.error("Error creating pie chart:", error);
+      return null;
     }
   },
 
+  // Similar changes to createHoldingsDistributionChart
   createHoldingsDistributionChart: (canvas, portfolio) => {
     try {
       if (
@@ -84,15 +97,19 @@ export const portfolioChartService = {
         !portfolio.metrics.holdings
       ) {
         console.warn("Missing canvas or portfolio holdings data");
-        return;
+        return null;
       }
+
+      // Clear any existing chart
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       const holdings = portfolio.metrics.holdings;
 
       // Skip if no holdings
       if (holdings.length === 0) {
         console.warn("No holdings to display");
-        return;
+        return null;
       }
 
       // Prepare data for chart
@@ -123,7 +140,11 @@ export const portfolioChartService = {
         canvas.chart.destroy();
       }
 
-      // Create chart
+      // Ensure proper size before rendering
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
+
+      // Create chart with maintainAspectRatio: false for better sizing
       canvas.chart = new Chart(canvas, {
         type: "pie",
         data: {
@@ -138,8 +159,7 @@ export const portfolioChartService = {
         },
         options: {
           responsive: true,
-          maintainAspectRatio: true,
-          aspectRatio: 1.5, // Adjust this value to control height (higher = shorter)
+          maintainAspectRatio: false,
           plugins: {
             title: {
               display: true,
@@ -170,64 +190,186 @@ export const portfolioChartService = {
           },
         },
       });
+
+      return canvas.chart;
     } catch (error) {
       console.error("Error creating holdings distribution chart:", error);
+      return null;
     }
   },
 
-  createPortfolioHistoryChart: (canvas, history, currencyCode) => {
-    if (!canvas || !Array.isArray(history) || history.length === 0) {
-      console.warn("Missing canvas or history data");
-      return;
-    }
 
-    // Format labels and data
-    const labels = history.map((p) =>
-      new Date(p.date).toLocaleDateString("da-DK")
-    );
-    const data = history.map((p) => p.value);
+// Enhanced Portfolio History Chart Function
+createPortfolioHistoryChart: (canvas, history, currencyCode) => {
+  if (!canvas || !Array.isArray(history) || history.length === 0) {
+    console.warn("Missing canvas or history data");
+    return null;
+  }
 
-    // Destroy existing chart if any
-    if (canvas.chart) {
-      canvas.chart.destroy();
-    }
+  // Clear any existing chart
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    canvas.chart = new Chart(canvas, {
-      type: "line",
-      data: {
-        labels,
-        datasets: [
-          {
-            label: "Portfolio History Value",
-            data,
-            tension: 0.2,
-            fill: false,
-          },
-        ],
+  // Process and clean the data
+  // Filter out any entries with null or undefined values
+  const cleanHistory = history.filter(entry =>
+    entry && entry.date && entry.value !== undefined && entry.value !== null
+  );
+
+  // Sort by date (ascending)
+  cleanHistory.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  // Format labels and data
+  const labels = cleanHistory.map(entry => {
+    const date = new Date(entry.date);
+    // Format date more compactly (e.g., "Jan 2025" instead of full date)
+    return date.toLocaleDateString("da-DK", { month: 'short', year: 'numeric' });
+  });
+
+  const data = cleanHistory.map(entry => entry.value);
+
+  // Calculate percentage change for the tooltip
+  const startValue = data[0] || 0;
+  const percentageChange = data.map(value => {
+    if (startValue === 0) return 0;
+    return ((value - startValue) / startValue) * 100;
+  });
+
+  // Generate gradient for fill
+  const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  gradient.addColorStop(0, 'rgba(0, 218, 145, 0.5)');  // highlight color with opacity
+  gradient.addColorStop(1, 'rgba(0, 218, 145, 0.05)'); // almost transparent at bottom
+
+  // Destroy existing chart if any
+  if (canvas.chart) {
+    canvas.chart.destroy();
+  }
+
+  // Ensure proper canvas size
+  canvas.style.width = '100%';
+  canvas.style.height = '100%';
+
+  // Create the chart with improved styling
+  canvas.chart = new Chart(canvas, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Portfolio Value",
+          data,
+          borderColor: "#00DA91", // highlight color
+          backgroundColor: gradient,
+          tension: 0.4, // smoother curve
+          fill: true,
+          pointRadius: 0, // hide points for cleaner look
+          pointHoverRadius: 5, // show points on hover
+          pointHoverBackgroundColor: "#00DA91",
+          pointHoverBorderColor: "#FFFFFF",
+          pointHoverBorderWidth: 2,
+          borderWidth: 3,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: {
+        padding: {
+          top: 20,
+          right: 20,
+          bottom: 20,
+          left: 20
+        }
       },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            title: { display: true, text: currencyCode },
-            ticks: {
-              callback: (val) =>
-                new Intl.NumberFormat("da-DK", {
-                  style: "decimal",
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }).format(val) +
-                " " +
-                currencyCode,
+      scales: {
+        x: {
+          grid: {
+            display: false, // cleaner look without x gridlines
+            drawBorder: false
+          },
+          ticks: {
+            maxRotation: 0, // keep labels horizontal
+            font: {
+              size: 10,
             },
-          },
+            color: "rgba(255, 255, 255, 0.7)" // slightly muted text
+          }
         },
-        plugins: {
-          legend: { display: false },
+        y: {
+          title: {
+            display: true,
+            text: currencyCode,
+            color: "rgba(255, 255, 255, 0.9)",
+            font: {
+              size: 12,
+              weight: 'bold'
+            }
+          },
+          grid: {
+            color: "rgba(255, 255, 255, 0.1)" // subtle grid lines
+          },
+          ticks: {
+            callback: (val) =>
+              new Intl.NumberFormat("da-DK", {
+                style: "decimal",
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+              }).format(val) +
+              " " +
+              currencyCode,
+            font: {
+              size: 10,
+            },
+            color: "rgba(255, 255, 255, 0.7)" // slightly muted text
+          },
+          beginAtZero: false,
         },
       },
-    });
-  },
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          backgroundColor: "rgba(23, 37, 64, 0.9)",
+          titleColor: "#FFFFFF",
+          bodyColor: "#FFFFFF",
+          borderColor: "rgba(255, 255, 255, 0.2)",
+          borderWidth: 1,
+          padding: 10,
+          displayColors: false,
+          callbacks: {
+            // Enhanced tooltip showing value and % change
+            label: function(context) {
+              const value = context.raw;
+              const index = context.dataIndex;
+              const formattedValue = new Intl.NumberFormat("da-DK", {
+                style: "decimal",
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              }).format(value);
+
+              const pctChange = percentageChange[index];
+              const pctSign = pctChange >= 0 ? '+' : '';
+              const pctFormatted = pctChange.toFixed(2);
+
+              return [
+                `Value: ${formattedValue} ${currencyCode}`,
+                `Change: ${pctSign}${pctFormatted}%`
+              ];
+            }
+          }
+        }
+      }
+    },
+  });
+
+  return canvas.chart;
+},
 
   createMockGrowthChart: (canvas) => {
     // Create a mock growth chart with random data

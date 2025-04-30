@@ -12,7 +12,41 @@ function formatCurrency(amount, currencyCode = "") {
       }).format(amount) +
       (currencyCode ? ` ${currencyCode}` : "")
     );
+}
+
+// New function to create portfolio selector
+function createPortfolioSelector(portfolios) {
+  const selector = document.getElementById('portfolio-selector');
+  if (!selector) return;
+
+  // Clear any existing options
+  selector.innerHTML = '';
+
+  // Add options for each portfolio
+  portfolios.forEach((portfolio, index) => {
+    const option = document.createElement('option');
+    option.value = index;
+    option.textContent = portfolio.name;
+    selector.appendChild(option);
+  });
+
+  // Add event listener for selection change
+  selector.addEventListener('change', function() {
+    const selectedIndex = parseInt(this.value);
+    const selectedPortfolio = portfolios[selectedIndex];
+    const holdingsCanvas = document.getElementById('holdingsChart');
+
+    // Use the portfolioChartService to create the holdings chart
+    portfolioChartService.createHoldingsDistributionChart(holdingsCanvas, selectedPortfolio);
+  });
+
+  // Initialize with first portfolio if available
+  if (portfolios.length > 0) {
+    const holdingsCanvas = document.getElementById('holdingsChart');
+    portfolioChartService.createHoldingsDistributionChart(holdingsCanvas, portfolios[0]);
   }
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
     // PRESENT IN THE SECURITIES-NEWS.JS MAYBE MOVE IT?
     const topPicksSymbols = [
@@ -102,16 +136,26 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         // 2) Draw pie chart of all portfolios
         const canvas = document.getElementById("portfolioChart");
-        portfolioChartService.createPortfolioPieChart(canvas, portfolios);
 
-        // 3) Update Balance card
+        // Ensure chart responsiveness - destroy any existing chart first
+        if (window.portfolioDistributionChart) {
+          window.portfolioDistributionChart.destroy();
+        }
+
+        // Create and store the chart reference
+        window.portfolioDistributionChart = portfolioChartService.createPortfolioPieChart(canvas, portfolios);
+
+        // 3) Create the portfolio selector and initialize holdings chart
+        createPortfolioSelector(portfolios);
+
+        // 4) Update Balance card
         const totalBalance = portfolios
           .reduce((sum, p) => sum + p.metrics.totalCurrentValue, 0);
         const currency = portfolios[0]?.currency || "";
         const balanceEl = document.querySelector(".overview-value");
         if (balanceEl) balanceEl.textContent = formatCurrency(totalBalance, currency);
 
-        // 4) Flatten all holdings across all portfolios
+        // 5) Flatten all holdings across all portfolios
         const allHoldings = portfolios.flatMap(p =>
           p.metrics.holdings.map(h => ({
             symbol: h.symbol,
@@ -121,17 +165,17 @@ document.addEventListener("DOMContentLoaded", async () => {
           }))
         );
 
-        // 5) Compute Top 5 by value
+        // 6) Compute Top 5 by value
         const topByValue = [...allHoldings]
           .sort((a, b) => b.value - a.value)
           .slice(0, 5);
 
-        // 6) Compute Top 5 by unrealized gain %
+        // 7) Compute Top 5 by unrealized gain %
         const topByGain = [...allHoldings]
           .sort((a, b) => b.gainPct - a.gainPct)
           .slice(0, 5);
 
-        // 7) Render both lists
+        // 8) Render both lists
         function renderList(items, ulId, displayKey, formatter) {
           const ul = document.getElementById(ulId);
           if (!ul) return;

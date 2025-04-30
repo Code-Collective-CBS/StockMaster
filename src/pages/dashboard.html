@@ -173,54 +173,33 @@
       <section class="overview">
         <h2>Balance</h2>
         <p class="overview-value">999999 <span class="currency">[Valuta]</span></p>
-        <p class="overview-change">15%</p>
-        <select name="overview-interval" id="overview-interval">
-          <option value="day">Day</option>
-          <option value="month">Month</option>
-          <option value="current-year">Ytd</option>
-          <option value="year">Year</option>
-        </select>
-      </section>
-
-      <section class="portfolios">
-        <h2>Portfolios</h2>
-        <p><a class="portfolio" href="#">Portfolio 1</a></p>
-        <p><a class="portfolio" href="#">Portfolio 2</a></p>
-        <p><a class="portfolio" href="#">Portfolio 3</a></p>
-      </section>
-
-      <section class="benchmark">
-        <h2>Benchmark</h2>
-        <p class="benchmark-index">OMXC25</p>
-        <p class="benchmark-change">15%</p>
-        <select name="benchmark" id="benchmark-interval">
-          <option value="day">Day</option>
-          <option value="month">Month</option>
-          <option value="current-year">Ytd</option>
-          <option value="year">Year</option>
-        </select>
       </section>
 
       <section class="portfolio-graph">
         <h2>All Portfolios</h2>
 
-        <div class="chart-container">
-          <canvas id="portfolioChart"></canvas>
-        </div>
-
-        <div class="top-holdings">
-          <div class="top-block">
-            <h3>Top 5 by Value</h3>
-            <ul id="top-value-list"></ul>
+        <div class="portfolio-grid">
+          <!-- Left column: Portfolio distribution -->
+          <div class="chart-column">
+            <h3>Portfolio Distribution</h3>
+            <div class="chart-container">
+              <canvas id="portfolioChart"></canvas>
+            </div>
           </div>
-          <div class="top-block">
-            <h3>Top 5 by Gain %</h3>
-            <ul id="top-gain-list"></ul>
+
+          <!-- Right column: Holdings for selected portfolio -->
+          <div class="holdings-column">
+            <h3>Portfolio Holdings</h3>
+            <div id="portfolio-selector-container">
+              <label for="portfolio-selector">Select Portfolio:</label>
+              <select id="portfolio-selector" class="portfolio-selector"></select>
+            </div>
+            <div class="chart-container">
+              <canvas id="holdingsChart"></canvas>
+            </div>
           </div>
         </div>
       </section>
-
-
 
       <section class="news">
         <div class="news-titel-container">

@@ -107,6 +107,9 @@ header{
     background-color: var(--secondary-color);
     border-radius: 10px;
     padding: 25px;
+    .full-width {
+        min-height: 400px;
+    }
 }
 
 .card-label {
