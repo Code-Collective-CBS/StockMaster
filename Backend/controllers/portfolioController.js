@@ -2,7 +2,7 @@ const databaseServices = require("../services/databaseServices");
 const exchangeRateService = require("../services/exchangeRateService");
 const alphaVantageService = require("../services/alphaVantageService");
 const { getOrSetCache } = require("../utilityFunctions/cacheHelper");
-const moment = require('moment');
+const moment = require("moment");
 
 const portfolioController = {
   getPortfolioSummary: async (req, res) => {
@@ -26,7 +26,7 @@ const portfolioController = {
           const accountCurrency = portfolios[0].currency;
           const accountName = portfolios[0].account_name;
 
-          // 2) Pre-cache exchange rates for accountCurrency (daily TTL)
+          // Second cache, seperate) Pre-cache exchange rates for accountCurrency (daily TTL)
           const ratesCacheKey = `rates-${accountCurrency}`;
           const { data: ratesData } = await getOrSetCache(
             ratesCacheKey,
@@ -35,10 +35,10 @@ const portfolioController = {
           );
           const rates = ratesData.conversion_rates;
 
-          // 3) Process each portfolio
+          // 3) Process each portfolio with promise.all
           return Promise.all(
             portfolios.map(async (p) => {
-              // a) Load transactions → holdings
+              // Load transactions from database → holdings
               const txs = await databaseServices.getTransactionsForPortfolio(
                 p.id
               );
@@ -47,12 +47,9 @@ const portfolioController = {
               // b) For each holding, fetch live price & overview
               const enhancedHoldings = await Promise.all(
                 holdings.map(async (h) => {
-                  const symbol = h.symbol;
-                  const qty = h.quantity;
-                  const cost = h.totalCost; // in native currency
-                  const gak = cost / qty;
+                  const { symbol, quantity: qty, totalCost: cost, gak } = h;
 
-                  // — Fetch last close (compact = last 100 days, cached 1h)
+                  // Third cache — Fetch last close (compact = last 100 days, cached 1h)
                   const tsKey = `timeSeries-${symbol}`;
                   const { data: tsData } = await getOrSetCache(
                     tsKey,
@@ -64,7 +61,7 @@ const portfolioController = {
                   const latestDate = Object.keys(daily)[0];
                   const lastClose = parseFloat(daily[latestDate]["4. close"]);
 
-                  // — Fetch company overview (cached 1h)
+                  // Fourth cache — Fetch company overview (cached 1h)
                   const ovKey = `overview-${symbol}`;
                   const { data: ovData } = await getOrSetCache(
                     ovKey,
@@ -83,12 +80,12 @@ const portfolioController = {
                   }
 
                   return {
-                    securityId: h.securityId, 
-                    symbol: symbol,
+                    securityId: h.securityId,
+                    symbol,
                     security_name: h.security_name,
                     quantity: qty,
                     totalCost: cost,
-                    gak: gak, // bought price in native currency
+                    gak, // use the helper’s functions GAK
                     boughtPriceNative: gak,
                     currentPriceNative: lastClose,
                     nativeCurrency,
@@ -154,13 +151,17 @@ const portfolioController = {
     try {
       const accountId = req.params.accountId;
       // 1) load portfolios and turn txs → holdings
-      const portfolios = await databaseServices.getPortfoliosByAccount(accountId);
+      const portfolios = await databaseServices.getPortfoliosByAccount(
+        accountId
+      );
       if (!portfolios.length) return res.json([]);
 
       const allHoldings = (
         await Promise.all(
           portfolios.map(async (p) => {
-            const txs = await databaseServices.getTransactionsForPortfolio(p.id);
+            const txs = await databaseServices.getTransactionsForPortfolio(
+              p.id
+            );
             return calculateHoldings(txs);
           })
         )
@@ -179,26 +180,30 @@ const portfolioController = {
       );
 
       // 3) build date→value for the last 180 days
-      const start = moment().subtract(180, "days"), end = moment();
+      const start = moment().subtract(180, "days"),
+        end = moment();
       const dailyValues = {};
 
       for (let m = start.clone(); m.isSameOrBefore(end); m.add(1, "day")) {
         const d = m.format("YYYY-MM-DD");
-        dailyValues[d] = seriesData.reduce((sum, {qty, series}) => {
+        dailyValues[d] = seriesData.reduce((sum, { qty, series }) => {
           const day = series[d];
           return sum + (day ? parseFloat(day["4. close"]) * qty : 0);
         }, 0);
       }
 
       // 4) serialize and send
-      const history = Object.entries(dailyValues).map(([date, value]) => ({ date, value }));
+      const history = Object.entries(dailyValues).map(([date, value]) => ({
+        date,
+        value,
+      }));
       res.json(history);
-
     } catch (err) {
       console.error("Error in getPortfolioHistory", err);
       res.status(500).json({ error: "Failed to fetch portfolio history" });
     }
   },
+<<<<<<< HEAD
 
   getSimplePortfolios: async (req, res) => {
     try {
@@ -257,75 +262,57 @@ const portfolioController = {
       res.status(500).json({ error: 'Failed to fetch stock quantity' });
     }
   },  
+=======
+>>>>>>> 5166867 (adjusting p controller)
 };
 
 module.exports = portfolioController;
 
 // Helper function to calculate holdings from transactions
+// controllers/portfolioHelpers.js (or wherever you keep it)
 function calculateHoldings(transactions) {
-  // Check if transactions is valid
-  if (
-    !transactions ||
-    !Array.isArray(transactions) ||
-    transactions.length === 0
-  ) {
+  if (!Array.isArray(transactions) || transactions.length === 0) {
     console.warn("No valid transactions data");
     return [];
   }
 
-  const holdingsBySecurityId = {};
+  const bySecurity = {};
 
-  transactions.forEach((transaction) => {
-    // Validate transaction object
-    if (!transaction || typeof transaction !== "object") {
-      console.warn("Invalid transaction object:", transaction);
-      return; // Skip this transaction
-    }
+  transactions.forEach((tx) => {
+    const id = tx.securities_id;
+    const type = (tx.transaction_type || "").toLowerCase();
+    const qty = Number(tx.amount) || 0;
+    const tot = Number(tx.total_price) || 0;
 
-    const securityId = transaction.securities_id;
-
-    // Skip if no security ID
-    if (!securityId) {
-      console.warn("Transaction missing securities_id:", transaction);
-      return;
-    }
-
-    if (!holdingsBySecurityId[securityId]) {
-      holdingsBySecurityId[securityId] = {
-        securityId,
-        security_name: transaction.security_name || "Unknown Security",
-        symbol: transaction.symbol || "UNKNOWN",
-        type: transaction.security_type || "unknown",
+    if (!bySecurity[id]) {
+      bySecurity[id] = {
+        securityId: id,
+        security_name: tx.security_name,
+        symbol: tx.symbol,
         quantity: 0,
         totalCost: 0,
         transactions: [],
       };
     }
+    const h = bySecurity[id];
 
-    const holding = holdingsBySecurityId[securityId];
-    const transactionType = (transaction.transaction_type || "").toLowerCase();
-    const amount =
-      typeof transaction.amount === "number" ? transaction.amount : 0;
-    const totalPrice =
-      typeof transaction.total_price === "number" ? transaction.total_price : 0;
-
-    if (transactionType === "buy") {
-      holding.quantity += amount;
-      holding.totalCost += totalPrice;
-    } else if (transactionType === "sell") {
-      holding.quantity -= amount;
-      // Handle realized gains here if needed
+    if (type === "buy") {
+      h.quantity += qty;
+      h.totalCost += tot;
+    } else if (type === "sell") {
+      const avgCost = h.quantity > 0 ? h.totalCost / h.quantity : 0;
+      h.totalCost -= avgCost * qty; // remove cost basis of sold shares
+      h.quantity -= qty;
     }
 
-    holding.transactions.push(transaction);
+    h.transactions.push(tx);
   });
 
-  // Convert to array and filter out securities with zero quantity
-  return Object.values(holdingsBySecurityId)
-    .filter((holding) => holding.quantity > 0)
-    .map((holding) => ({
-      ...holding,
-      gak: holding.quantity > 0 ? holding.totalCost / holding.quantity : 0,
+  return Object.values(bySecurity)
+    .filter((h) => h.quantity > 0)
+    .map((h) => ({
+      ...h,
+      gak: h.totalCost / h.quantity, // true average acquisition cost
     }));
 }
 
