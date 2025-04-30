@@ -145,27 +145,41 @@ a.portfolio {
 
 /* PORTFOLIO GRAPH SECTION */
 section.portfolio-graph {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* chart on left, lists on right */
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .portfolio-graph .chart-container {
+    /* ensures canvas scales nicely in its column */
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .top-holdings {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    gap: 2rem;
+  }
+
+  .top-block h3 {
+    margin-bottom: 0.5rem;
+  }
+
+  .top-block ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .top-block li {
+    display: flex;
     justify-content: space-between;
-    padding: 20px;
-}
+    padding: 0.25rem 0;
+  }
 
-.portfolio-graph h2 {
-    align-self: flex-start;
-    margin-bottom: 10px;
-}
 
-.portfolio-graph canvas {
-    flex-grow: 1;
-    max-width: 100%;
-}
-
-.portfolio-graph select {
-    align-self: flex-end;
-    margin-top: 10px;
-}
 
 /* News Discription Container  */
 .news-titel-container{

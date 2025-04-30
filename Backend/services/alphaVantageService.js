@@ -70,26 +70,6 @@ const alphaVantageService = {
       throw error;
     }
   },
-
-  // testConnection: async () => {
-  //   try {
-  //     // Direct URL construction since we know this works
-  //     const url = `${config.alphaVantage.baseUrl}?function=GLOBAL_QUOTE&symbol=AAPL&apikey=${config.alphaVantage.apiKey}`;
-  //     console.log("Testing URL:", url); // Log for debugging
-
-  //     const response = await axios.get(url);
-  //     return {
-  //       success: true,
-  //       data: response.data,
-  //     };
-  //   } catch (error) {
-  //     console.error("Error testing Alpha Vantage connection:", error);
-  //     return {
-  //       success: false,
-  //       error: error.message,
-  //     };
-  //   }
-  // },
 };
 
 module.exports = alphaVantageService;

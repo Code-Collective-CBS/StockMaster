@@ -1,12 +1,12 @@
 // This file handles stock-related HTTP request and uses the Alpha Vantage service file
 // Import alphaVantageService module
-// const alphaVantageService = require("../services/alphaVantageService");
-const alphaVantageService = require("../services/mockAlphaVantageService"); // MOCK DATA
+const alphaVantageService = require("../services/alphaVantageService");
+// const alphaVantageService = require("../services/mockAlphaVantageService"); // MOCK DATA
 const polygonService = require("../services/polygonService");
 
 // CACHE
 const cache = require("../utilityFunctions/cache");
-const { getOrSetCache } = require('../utilityFunctions/cacheHelper');
+const { getOrSetCache } = require("../utilityFunctions/cacheHelper");
 
 const stockController = {
   getQuote: async (req, res) => {
@@ -46,6 +46,7 @@ const stockController = {
 
   getDailyTimeSeries: async (req, res) => {
     try {
+      // Pull the ticker symbol and the output-size query from the url
       const { symbol } = req.params;
       const { outputsize } = req.query;
 
@@ -57,8 +58,8 @@ const stockController = {
       const { data, source } = await getOrSetCache(
         cacheKey,
         () => alphaVantageService.getDailyTimeSeries(symbol, outputsize),
-        86400000 // 24h
-      )
+        86400000 // 24h (milliseconds)
+      );
 
       res.json({ data, source });
     } catch (error) {
@@ -75,12 +76,13 @@ const stockController = {
         return res.status(400).json({ error: "Could not find stock symbol" });
       }
 
-      const cacheKey = `symbol-${symbol}`;
+      // Unique cache key for each symbol's overview symbol-(AAPL)
+      const cacheKey = `overview-${symbol}`;
 
       const { data, source } = await getOrSetCache(
         cacheKey,
         () => alphaVantageService.getCompanyOverview(symbol),
-        86400000 // 1 day
+        86400000 // 24 (milliseconds)
       );
 
       res.json({ data, source });
@@ -94,8 +96,10 @@ const stockController = {
     try {
       const { symbol } = req.params;
 
-      if(!symbol) {
-        return res.status(400).json({ error: 'Could not find the indicies', symbol});
+      if (!symbol) {
+        return res
+          .status(400)
+          .json({ error: "Could not find the indicies", symbol });
       }
 
       const cacheKey = `indices-${symbol}`;
@@ -109,14 +113,14 @@ const stockController = {
 
       res.json({ source, data });
     } catch (error) {
-      console.error('Error in getIndicesoverview controller', error);
-      res.status(500).json({ error: 'Failed to fetch data for indicies' });
+      console.error("Error in getIndicesoverview controller", error);
+      res.status(500).json({ error: "Failed to fetch data for indicies" });
     }
   },
 
   getNews: async (req, res) => {
     try {
-      const cacheKey = 'news';
+      const cacheKey = "news";
 
       const { data, source } = await getOrSetCache(
         cacheKey,
@@ -126,8 +130,8 @@ const stockController = {
 
       res.json({ source, data });
     } catch (error) {
-      console.error('Error in getNews', error);
-      res.status(500).json({ error: 'Failed to fetch data for indicies' });
+      console.error("Error in getNews", error);
+      res.status(500).json({ error: "Failed to fetch data for indicies" });
     }
   },
 
@@ -137,10 +141,12 @@ const stockController = {
       const result = await alphaVantageService.testConnection();
       res.json(result);
     } catch (error) {
-      console.error('Error in testConnection controller:', error);
-      res.status(500).json({ error: 'Failed to test Alpha Vantage connection' });
+      console.error("Error in testConnection controller:", error);
+      res
+        .status(500)
+        .json({ error: "Failed to test Alpha Vantage connection" });
     }
-  }
+  },
 };
 
 module.exports = stockController;

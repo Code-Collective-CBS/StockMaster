@@ -198,7 +198,7 @@ export const portfolioChartService = {
         labels,
         datasets: [
           {
-            label: "Portfolio Value",
+            label: "Portfolio History Value",
             data,
             tension: 0.2,
             fill: false,

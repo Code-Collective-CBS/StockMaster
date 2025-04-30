@@ -37,16 +37,38 @@ document.addEventListener("DOMContentLoaded", async () => {
       updatePortfolioUI(portfolioData);
     }
 
-    renderHistoryChart(
-      accountId,
-      portfolioData[0]?.currency || "DKK"
-    );
-
+    renderHistoryChart(accountId, portfolioData[0]?.currency || "DKK");
   } catch (error) {
     console.error("Error loading portfolio data:", error);
     showErrorMessage("Failed to load portfolio data. Please try again later.");
   }
 });
+
+
+function computePctChange(history, daysAgo) {
+  if (!Array.isArray(history) || history.length < 2) return 0;
+
+  const parse = (s) => new Date(s);
+  const now = new Date(history[history.length - 1].date);
+  const targetDate = new Date(now.getTime() - daysAgo * 24 * 3600 * 1000);
+
+  // Find the entry in history with date closest to targetDate
+  let closest = history[0];
+  let minDiff = Infinity;
+  for (const h of history) {
+    const d = parse(h.date);
+    const diff = Math.abs(d - targetDate);
+    if (diff < minDiff) {
+      minDiff = diff;
+      closest = h;
+    }
+  }
+
+  const latest = history[history.length - 1];
+  if (closest.value === 0) return 0;
+
+  return ((latest.value - closest.value) / closest.value) * 100;
+}
 
 // Separate function to fetch data and update cache
 async function fetchPortfolioData(accountId, cacheKey) {
@@ -100,7 +122,7 @@ function showLoadingState() {
   }
 }
 
-function updatePortfolioUI(portfolios) {
+async function updatePortfolioUI(portfolios) {
   const totalValue = document.getElementById("totalValueDisplay");
   const performance7D = document.getElementById("performance7d");
   const performance1M = document.getElementById("performance1m");
@@ -143,10 +165,10 @@ function updatePortfolioUI(portfolios) {
         `portfolios-${account.account_id}`
       );
 
-    account.portfolios.forEach((portfolio) => {
-      const portfolioElement = document.createElement("div");
-      portfolioElement.className = "portfolio-item";
-      portfolioElement.innerHTML = `
+      account.portfolios.forEach((portfolio) => {
+        const portfolioElement = document.createElement("div");
+        portfolioElement.className = "portfolio-item";
+        portfolioElement.innerHTML = `
         <h4>${portfolio.name}</h4>
         <p>Invested Value: ${formatCurrency(
           portfolio.metrics.totalCost,
@@ -157,7 +179,7 @@ function updatePortfolioUI(portfolios) {
           0
         )}</p>
       `;
-      container.appendChild(portfolioElement);
+        container.appendChild(portfolioElement);
       });
     });
   }
@@ -176,18 +198,23 @@ function updatePortfolioUI(portfolios) {
     );
   }
 
-  // Update performance indicators
-  // In a real app, you'd calculate these based on historical data
-  // For now, we'll use the overall unrealized gain percentage
-  const overallPerformance =
-    portfolios.reduce((sum, portfolio) => {
-      return sum + portfolio.metrics.totalUnrealizedGainPercent;
-    }, 0) / portfolios.length;
+  //Fetch real history data for this account
+  const accountId = portfolios[0]?.account_id;
+  let historyData = [];
+  try {
+    historyData = await stockAPI.getPortfolioHistory(accountId);
+  } catch (err) {
+    console.error("History fetch failed, using mock values", err);
+  }
 
-  // Mock performance for different time periods
-  updatePerformanceDisplay(performance7D, overallPerformance * 0.4);
-  updatePerformanceDisplay(performance1M, overallPerformance * 0.6);
-  updatePerformanceDisplay(performance6M, overallPerformance);
+  // 2) Compute real % changes
+  const percent7D = computePctChange(historyData, 7);
+  const percent1M = computePctChange(historyData, 30);
+  const percent6M = computePctChange(historyData, 180);
+
+  updatePerformanceDisplay(performance7D, percent7D);
+  updatePerformanceDisplay(performance1M, percent1M);
+  updatePerformanceDisplay(performance6M, percent6M);
 
   // Populate portfolio list
   if (portfolioList) {
@@ -226,7 +253,6 @@ async function renderHistoryChart(accountId, currencyCode) {
     console.error("Failed to load history chart:", err);
   }
 }
-
 
 // Function to create portfolio selector and holdings distribution chart
 function createPortfolioSelector(portfolios, chartCanvas) {

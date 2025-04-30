@@ -2,7 +2,17 @@ import { stockAPI } from "./stockScripts/api.js";
 import { popUps } from "./utilityFunctions/popup.js";
 import { portfolioChartService } from "./utilityFunctions/portfolioChartService.js";
 
-
+// ─── Utility: format a number as "1.234,56 DKK" ───
+function formatCurrency(amount, currencyCode = "") {
+    return (
+      new Intl.NumberFormat("da-DK", {
+        style: "decimal",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(amount) +
+      (currencyCode ? ` ${currencyCode}` : "")
+    );
+  }
 document.addEventListener("DOMContentLoaded", async () => {
     // PRESENT IN THE SECURITIES-NEWS.JS MAYBE MOVE IT?
     const topPicksSymbols = [
@@ -87,10 +97,56 @@ document.addEventListener("DOMContentLoaded", async () => {
         const accountId = sessionStorage.getItem("selectedAccountId");
         if (!accountId) throw new Error("No account selected");
 
+        // 1) Fetch portfolio summary
         const portfolios = await stockAPI.getPortfolioSummary(accountId);
-        const ctx = document.getElementById("portfolioChart");
-        portfolioChartService.createPortfolioPieChart(ctx, portfolios);
+
+        // 2) Draw pie chart of all portfolios
+        const canvas = document.getElementById("portfolioChart");
+        portfolioChartService.createPortfolioPieChart(canvas, portfolios);
+
+        // 3) Update Balance card
+        const totalBalance = portfolios
+          .reduce((sum, p) => sum + p.metrics.totalCurrentValue, 0);
+        const currency = portfolios[0]?.currency || "";
+        const balanceEl = document.querySelector(".overview-value");
+        if (balanceEl) balanceEl.textContent = formatCurrency(totalBalance, currency);
+
+        // 4) Flatten all holdings across all portfolios
+        const allHoldings = portfolios.flatMap(p =>
+          p.metrics.holdings.map(h => ({
+            symbol: h.symbol,
+            portfolio: p.name,
+            value: h.currentValueAccount,
+            gainPct: h.unrealizedGainPercent
+          }))
+        );
+
+        // 5) Compute Top 5 by value
+        const topByValue = [...allHoldings]
+          .sort((a, b) => b.value - a.value)
+          .slice(0, 5);
+
+        // 6) Compute Top 5 by unrealized gain %
+        const topByGain = [...allHoldings]
+          .sort((a, b) => b.gainPct - a.gainPct)
+          .slice(0, 5);
+
+        // 7) Render both lists
+        function renderList(items, ulId, displayKey, formatter) {
+          const ul = document.getElementById(ulId);
+          if (!ul) return;
+          ul.innerHTML = items.map(item => `
+            <li>
+              <span class="symbol">${item.symbol}</span>
+              <span class="val">${formatter(item[displayKey], currency)}</span>
+            </li>
+          `).join("");
+        }
+
+        renderList(topByValue, "top-value-list", "value", formatCurrency);
+        renderList(topByGain,  "top-gain-list",  "gainPct", val => val.toFixed(2) + "%");
+
       } catch (err) {
-        console.error("Failed to load All Portfolios chart:", err);
+        console.error("Dashboard setup failed:", err);
       }
-});
+    });
