@@ -136,7 +136,7 @@ function handleSignOut() {
   try {
     sessionStorage.clear();
     localStorage.clear();
-    
+
     window.location.href = "/src/pages/login.html";
   } catch (error) {
     console.error("Sign out failed:", error);
@@ -144,13 +144,13 @@ function handleSignOut() {
 }
 
 const getUserInfo = async () => {
-  try{
+  try {
     // Checking for session storrage
     const firstname = sessionStorage.getItem('userFirstname');
     const lastname = sessionStorage.getItem('userLastname');
     const avatarSeed = sessionStorage.getItem('userAvatar');
 
-    if(firstname && lastname && avatarSeed) {
+    if (firstname && lastname && avatarSeed) {
       // If exists in sessionstorrage use it
       const avatarURL = `https://api.dicebear.com/7.x/adventurer/svg?seed=${avatarSeed}`;
       const avatarElement = document.getElementById('profile-avatar');
@@ -158,7 +158,7 @@ const getUserInfo = async () => {
       if (avatarElement) avatarElement.src = avatarURL;
 
       document.getElementById('profile-name').textContent = `${firstname} ${lastname}`;
-    }else{
+    } else {
       // If it dosent exist fetch it
       const response = await fetch('http://localhost:3000/api/database/userInfo');
       const data = await response.ok ? await response.json() : null;
@@ -168,7 +168,7 @@ const getUserInfo = async () => {
         const firstname = data.user.firstname;
         const lastname = data.user.lastname;
         const avatarSeed = data.user.avatar;
-        
+
         // Save in sessionstorrage
         sessionStorage.setItem('userFirstname', firstname);
         sessionStorage.setItem('userLastname', lastname);
@@ -176,7 +176,7 @@ const getUserInfo = async () => {
 
         const avatarURL = `https://api.dicebear.com/7.x/adventurer/svg?seed=${avatarSeed}`;
         const avatarElement = document.getElementById('profile-avatar');
-  
+
         if (avatarElement) avatarElement.src = avatarURL;
 
         document.getElementById('profile-name').textContent = `${firstname} ${lastname}`;
@@ -202,6 +202,7 @@ const loadAccountDropdown = async (dropdown) => {
       alert("You need to create an account");
       return window.location.href = `/src/pages/create-account.html`;
     }
+
     if (!dropdown) return;
 
     dropdown.innerHTML = ''; // Clear existing options
@@ -217,9 +218,23 @@ const loadAccountDropdown = async (dropdown) => {
         option.selected = true;
         sessionStorage.setItem('selectedAccountId', account.account_id);
       }
-
       dropdown.appendChild(option);
     });
+
+    const storedIdNum = Number(storedId);
+    const onSettingsPage = window.location.pathname.endsWith('account-settings.html');
+    // If we're already on the settings page, don't execute the for-loop
+    if (!onSettingsPage) {
+      // Running through all of the users account to find the chosen account
+      for (const account of accounts) {
+        if (account.account_id === storedIdNum && account.state === 'inactive') {
+          alert('You need to activate your account');
+          window.location.href = '/src/pages/account-settings.html';
+          break;  // Stops the loop after being
+        }
+      }
+    }
+
 
     const createAccount = document.createElement('option');
     createAccount.value = 'create-account.html';
