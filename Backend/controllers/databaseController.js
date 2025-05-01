@@ -24,7 +24,7 @@ const databaseController = {
 
             const user = await databaseServices.userInfo(result.user_id);
             if (!user) {
-                return res.status(404).json({ message: 'Couldt find user i database' });
+                return res.status(404).json({ message: 'Could not find user in database' });
             }
 
             res.status(201).json({
@@ -50,7 +50,7 @@ const databaseController = {
                 req.session.user_id = user.user_id;
 
                 res.status(201).json({
-                    message: "Login succesfull",
+                    message: "Login succesful",
                     id: user.user_id,
                     firstname: user.firstname,
                     lastname: user.lastname,
