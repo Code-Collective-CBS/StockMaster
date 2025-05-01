@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
   loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     const email = document.getElementById("email").value;
-    const password = document.getElementById("adgangskode").value;
+    const password = document.getElementById("current-password").value;
 
     try {
       const response = await fetch("http://localhost:3000/api/database/login", {
