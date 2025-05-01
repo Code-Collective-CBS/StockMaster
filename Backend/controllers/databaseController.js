@@ -29,8 +29,8 @@ const databaseController = {
 
             res.status(201).json({
                 message: "User created",
-                fornavn: user.firstname,
-                efternavn: user.lastname,
+                firstname: user.firstname,
+                lastname: user.lastname,
                 avatar: user.avatar
             });
         } catch (err) {

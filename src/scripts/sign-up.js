@@ -21,9 +21,8 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     const lastname = document.getElementById("efternavn").value;
     const email = document.getElementById("email").value;
     const phone_number = document.getElementById("telefon").value;
-    const password = document.getElementById("password").value;
+    const password = document.getElementById("new-password").value;
     const avatar = document.getElementById('selectedAvatar').value;
-    const bank = document.getElementById('bank').value;
 
 
     // Sends sign-up data to backend via fetch
@@ -40,7 +39,6 @@ document.getElementById("registerForm").addEventListener("submit", async functio
                 password,
                 phone_number,
                 avatar,
-                bank
             })
         });
 
