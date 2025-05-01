@@ -14,7 +14,7 @@ export const favoredStocks = {
     headerRow.append(createHeader("GAK"));
     headerRow.append(createHeader("Qty"));
     headerRow.append(createHeader("Value"));
-    headerRow.append(createHeader("Change %"));
+    headerRow.append(createHeader("Change"));
 
     listElement.appendChild(headerRow);
 

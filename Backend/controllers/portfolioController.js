@@ -9,7 +9,16 @@ const portfolioController = {
     try {
       // Set up key + TTL for the entire summary (whole portfolio)
       const accountId = req.params.accountId;
-      const cacheKey = `portfolio-${accountId}`;
+
+      // First, get the current account info to check currency - without caching this part
+      const accountInfo = await databaseServices.getAccountBasicInfo(accountId);
+      if (!accountInfo) {
+        return res.status(404).json({ error: "Account not found" });
+      }
+
+
+      // Include the currency in the cache key
+      const cacheKey = `portfolio-${accountId}-${accountInfo.currency}`;
       const cacheTTL = 3600; // seconds = 1h
 
       // This callback runs if cache is empty or expired.
