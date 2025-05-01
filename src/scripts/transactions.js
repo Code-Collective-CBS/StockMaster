@@ -32,8 +32,9 @@ function displayTransactions(transactionData) {
         'symbol',
         'amount',
         'price_per_share',
-        'currency',
-        'total_price'
+        'security_currency', // currency of the security column name in db named currency_id
+        'total_price',
+        'account_currency' // account_currency at the time of transaction
     ];
 
     transaction.forEach((transactionObject) => {
