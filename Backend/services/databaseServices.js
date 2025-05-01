@@ -650,7 +650,7 @@ const databaseServices = {
                     t.amount,
                     t.price_per_share,
                     t.total_price,
-                    t.currency,
+                    c.currency_name AS currency,
                     t.transaction_date,
                     s.symbol,
                     s.name AS security_name,
@@ -659,6 +659,7 @@ const databaseServices = {
                     a.account_name
                 FROM Transactions t
                 LEFT JOIN Securities s ON t.securities_id = s.id
+                JOIN Currency c ON t.currency_id = c.id
                 LEFT JOIN Portfolio p ON t.portfolio_id = p.id
                 JOIN Accounts a ON t.account_id = a.id
                 WHERE a.id = @account_id
