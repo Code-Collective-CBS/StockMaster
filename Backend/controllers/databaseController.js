@@ -451,6 +451,10 @@ const databaseController = {
 
             if (!changeAcc) return res.status(404).json({ message: 'Account not found' });
 
+            // Clear cache
+            const cacheKey = `accounts-user_id-${user_id}`;
+            cache.del(cacheKey);
+
             res.status(201).json({
                 message: "Account changed",
                 account_name: changeAcc.account_name,
