@@ -121,14 +121,14 @@ const databaseServices = {
         }
     },
 
-    createAccount: async (id, accountName, accountCurrency, accountBank) => {
+    createAccount: async (id, account_name, account_currency, account_bank) => {
         try {
             const pool = await poolPromise;
 
             // 1. Find the matching id based on currency_name from Currrency table
             const result = await pool
                 .request()
-                .input('currency_name', sql.NVarChar(10), accountCurrency)
+                .input('currency_name', sql.NVarChar(10), account_currency)
                 .query(`
                     SELECT id 
                     FROM Currency
@@ -137,7 +137,7 @@ const databaseServices = {
             
             
             if(result.recordset.length === 0) {
-                throw new Error(`Invalid currency name: ${accountCurrency}`);
+                throw new Error(`Invalid currency name: ${account_currency}`);
             }
             
             const currency_id = result.recordset[0].id;
@@ -146,16 +146,16 @@ const databaseServices = {
 
             const checkUser = await pool
                 .request()
-                .input("account_name", sql.VarChar(255), accountName)
+                .input("account_name", sql.VarChar(255), account_name)
                 .input("currency_id", sql.Int, currency_id)
                 .input("user_id", sql.Int, id)
-                .input("bank", sql.NVarChar(100), accountBank)
+                .input("bank", sql.NVarChar(100), account_bank)
                 .query(`
                 INSERT INTO Accounts (account_name, currency_id, user_id, bank)
                 VALUES (@account_name, @currency_id, @user_id, @bank)`
             );
 
-            return { accountName, accountCurrency, accountBank };
+            return { account_name, account_currency, account_bank };
         } catch (err) {
             console.error("Error: Could not create account", err);
             throw err;

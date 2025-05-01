@@ -5,20 +5,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const deleteButton = document.querySelector(".delete-search");
     const searchContainer = document.querySelector(".displaySearch");
     // Account details
-    const accountCurrency = document.getElementById('accountCurrency');
-    const accountName = document.getElementById('accountName');
-    const accountBank = document.getElementById('bank');
+    const account_currency = document.getElementById('accountCurrency');
+    const account_name = document.getElementById('accountName');
+    const account_bank = document.getElementById('bank');
     const createAccBtn = document.getElementById('createAcc')
 
     //// BUTTONS ////
     deleteButton.addEventListener('click', () => {
-        accountCurrency.value = '';
+        account_currency.value = '';
         searchContainer.innerHTML = '';
     });
 
     //// SEARCH CURRENCIES ////
-    accountCurrency.addEventListener('input', async () => {
-        const searchQuery = accountCurrency.value.trim();
+    account_currency.addEventListener('input', async () => {
+        const searchQuery = account_currency.value.trim();
 
         if (searchQuery.length === 0) searchContainer.innerHTML = '';
         if (searchQuery.length < 1) return
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <p class="currency-result-p">${currency.currency_name}</p>
         `;
             currencyElement.addEventListener('click', () => {
-                accountCurrency.value = currency.currency_name;
+                account_currency.value = currency.currency_name;
                 searchContainer.innerHTML = '';
             });
             searchContainer.appendChild(currencyElement);
@@ -58,9 +58,9 @@ document.addEventListener('DOMContentLoaded', () => {
     //// CREATE ACCOUNT ////
     createAccBtn.addEventListener('click', async () => {
 
-        const name = accountName.value.trim();
-        const currency = accountCurrency.value.trim();
-        const bank = accountBank.value;
+        const name = account_name.value.trim();
+        const currency = account_currency.value.trim();
+        const bank = account_bank.value;
 
         if (currency === '' && name === '' && bank === '') return alert('Please fill out all fields')
         if (currency === '') return alert('You must choose a currency')
@@ -75,9 +75,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     "Content-Type": "application/json" // JSON data
                 },
                 body: JSON.stringify({
-                    accountName: name,
-                    accountCurrency: currency,
-                    accountBank: bank
+                    account_name: name,
+                    account_currency: currency,
+                    account_bank: bank
                 })
             });
 

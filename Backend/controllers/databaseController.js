@@ -156,19 +156,19 @@ const databaseController = {
     },
 
     createAccount: async (req, res) => {
-        const { accountName, accountCurrency, accountBank } = req.body;
+        const { account_name, account_currency, account_bank } = req.body;
         // Fetches the users id from the session
-        const userID = req.session.user_id;
+        const user_id = req.session.user_id;
 
         try {
-            const account = await databaseServices.createAccount(userID, accountName, accountCurrency, accountBank)
+            const account = await databaseServices.createAccount(user_id, account_name, account_currency, account_bank)
 
-            if (!userID) {
+            if (!user_id) {
                 return res.status(401).json({ message: 'User not found' });
             }
 
             // Deletes existing cache for accounts-user_id (sets new cache automatically afterwards)
-            const cacheKey = `accounts-user_id-${userID}`;
+            const cacheKey = `accounts-user_id-${user_id}`;
             cache.del(cacheKey);
 
             if (!account) {
@@ -177,9 +177,9 @@ const databaseController = {
 
             res.status(201).json({
                 message: "Account created",
-                accountName: account.accountName,
-                accountCurrency: account.accountCurrency,
-                accountBank: account.accountBank
+                account_name: account.account_name,
+                account_currency: account.account_currency,
+                account_bank: account.account_bank
             });
         } catch (err) {
             res.status(500).json({ message: "Failed trying to create account", err });
