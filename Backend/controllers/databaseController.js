@@ -19,7 +19,7 @@ const databaseController = {
                 return res.status(400).json({ message: result.message });
             }
 
-            // Save the user's ID in the session upon account creation
+            // Save the user's ID in the session upon creating an account
             req.session.user_id = result.user_id;
 
             const user = await databaseServices.userInfo(result.user_id);
