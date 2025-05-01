@@ -130,16 +130,16 @@ const databaseServices = {
                 .request()
                 .input('currency_name', sql.NVarChar(10), account_currency)
                 .query(`
-                    SELECT id 
+                    SELECT id
                     FROM Currency
-                    WHERE currency_name = @currency_name    
+                    WHERE currency_name = @currency_name
             `);
-            
-            
+
+
             if(result.recordset.length === 0) {
                 throw new Error(`Invalid currency name: ${account_currency}`);
             }
-            
+
             const currency_id = result.recordset[0].id;
 
             // 2. Create the account
@@ -201,14 +201,14 @@ const databaseServices = {
                 .request()
                 .input('accountId', sql.Int, accoun_id)
                 .query(`
-                SELECT 
+                SELECT
                     a.total_balance,
                     c.currency_name AS currency
                 FROM Accounts a
                 JOIN Currency c ON a.currency_id = c.id
                 WHERE a.id = @accountId
             `);
-            
+
             if (!result.recordset[0]) {
                 throw new Error(`Account with id: ${accoun_id} not found`);
             }
@@ -265,7 +265,7 @@ const databaseServices = {
             const pool = await poolPromise;
             const result = await pool.request().input("userId", sql.Int, userId)
                 .query(`
-                SELECT 
+                SELECT
                     p.id,
                     p.name,
                     p.account_id,
@@ -305,35 +305,35 @@ const databaseServices = {
         }
     },
 
-    // Add this function to databaseServices.js
-    getTransactionsForMultiplePortfolios: async (portfolioIds) => {
-        try {
-            if (!portfolioIds || portfolioIds.length === 0) {
-                return [];
-            }
+    // // Add this function to databaseServices.js
+    // getTransactionsForMultiplePortfolios: async (portfolioIds) => {
+    //     try {
+    //         if (!portfolioIds || portfolioIds.length === 0) {
+    //             return [];
+    //         }
 
-            const pool = await poolPromise;
+    //         const pool = await poolPromise;
 
-            // SQL Server doesn't directly support array parameters
-            // We'll use a comma-separated string and STRING_SPLIT
-            const portfolioIdsString = portfolioIds.join(',');
+    //         // SQL Server doesn't directly support array parameters
+    //         // We'll use a comma-separated string and STRING_SPLIT
+    //         const portfolioIdsString = portfolioIds.join(',');
 
-            const result = await pool.request()
-                .input('portfolioIds', sql.NVarChar, portfolioIdsString)
-                .query(`
-          SELECT t.*, s.symbol, s.name as security_name, s.type as security_type
-          FROM Transactions t
-          JOIN Securities s ON t.securities_id = s.id
-          WHERE t.portfolio_id IN (SELECT value FROM STRING_SPLIT(@portfolioIds, ','))
-          ORDER BY t.transaction_date DESC
-        `);
+    //         const result = await pool.request()
+    //             .input('portfolioIds', sql.NVarChar, portfolioIdsString)
+    //             .query(`
+    //       SELECT t.*, s.symbol, s.name as security_name, s.type as security_type
+    //       FROM Transactions t
+    //       JOIN Securities s ON t.securities_id = s.id
+    //       WHERE t.portfolio_id IN (SELECT value FROM STRING_SPLIT(@portfolioIds, ','))
+    //       ORDER BY t.transaction_date DESC
+    //     `);
 
-            return result.recordset;
-        } catch (err) {
-            console.error('Error getting transactions for multiple portfolios:', err);
-            throw err;
-        }
-    },
+    //         return result.recordset;
+    //     } catch (err) {
+    //         console.error('Error getting transactions for multiple portfolios:', err);
+    //         throw err;
+    //     }
+    // },
 
     getPortfoliosByAccount: async (accountId) => {
         try {
@@ -370,11 +370,11 @@ const databaseServices = {
                 .input('account_id', sql.Int, accountId)
                 .query(`
                 SELECT currency_id
-                FROM Accounts    
+                FROM Accounts
                 WHERE id = @account_id
             `);
 
-            const currency_id = accountQuery.recordset[0]?.currency_id; // "?.currency_id" safety to acces currency from recordset[0] only if it exist, otherwise asign undefined to variable 
+            const currency_id = accountQuery.recordset[0]?.currency_id; // "?.currency_id" safety to acces currency from recordset[0] only if it exist, otherwise asign undefined to variable
             if (!currency_id) throw new Error('Account currency not found');
 
             // 2. Update balance
@@ -422,8 +422,8 @@ const databaseServices = {
                 .request()
                 .input('account_id', sql.Int, accountId)
                 .query(`
-                SELECT currency_id 
-                FROM Accounts    
+                SELECT currency_id
+                FROM Accounts
                 WHERE id = @account_id
             `);
 
@@ -510,7 +510,7 @@ const databaseServices = {
                 .request()
                 .input("symbol", sql.VarChar(10), symbol)
                 .query(`
-                SELECT s.id 
+                SELECT s.id
                 FROM Securities s
                 WHERE s.symbol = @symbol
             `);
@@ -526,9 +526,9 @@ const databaseServices = {
                 .request()
                 .input('currency_name', sql.NVarChar(10), security_currency)
                 .query(`
-                SELECT c.id 
+                SELECT c.id
                 FROM Currency c
-                WHERE c.currency_name = @currency_name        
+                WHERE c.currency_name = @currency_name
             `);
 
             if(currencyResult.recordset.length === 0){
@@ -592,7 +592,7 @@ const databaseServices = {
                     .query(`
                     UPDATE Accounts
                     SET total_balance = total_balance - @total_price
-                    WHERE id = @account_id        
+                    WHERE id = @account_id
                 `);
             }
 

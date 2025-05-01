@@ -1,9 +1,9 @@
 // portfolio.js - Update to fetch real data
-import { stockAPI } from "./api.js";
-import { favoredStocks } from "../utilityFunctions/favoredStocks.js";
-import { portfolioChartService } from "../utilityFunctions/portfolioChartService.js";
-import { cachingService } from "../utilityFunctions/cachingService.js";
-import { popUps } from "../utilityFunctions/popup.js";
+import { stockAPI } from "./stockScripts/api.js";
+import { favoredStocks } from "./utilityFunctions/favoredStocks.js";
+import { portfolioChartService } from "./utilityFunctions/portfolioChartService.js";
+import { cachingService } from "./utilityFunctions/cachingService.js";
+import { popUps } from "./utilityFunctions/popup.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("Portfolio page loaded!");
