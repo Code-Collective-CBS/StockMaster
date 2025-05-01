@@ -2,10 +2,32 @@ export const favoredStocks = {
   populateStocksList: (listElement, portfolios, formatCurrencyFn) => {
     listElement.innerHTML = "";
 
+    // Add column headers first
+    const headerRow = document.createElement("div");
+    headerRow.className = "stock-header-row";
+
+    // Create headers matching the cell structure below
+    headerRow.append(createHeader("Symbol"));
+    headerRow.append(createHeader("Name"));
+    headerRow.append(createHeader("Bought"));
+    headerRow.append(createHeader("Current"));
+    headerRow.append(createHeader("GAK"));
+    headerRow.append(createHeader("Qty"));
+    headerRow.append(createHeader("Value"));
+    headerRow.append(createHeader("Change %"));
+
+    listElement.appendChild(headerRow);
+
     portfolios.forEach((portfolio) => {
-      // … your header code stays the same …
+      // ... your existing code ...
 
       if (portfolio.metrics && portfolio.metrics.holdings) {
+        // Add a portfolio header/title first
+        const portfolioHeader = document.createElement("div");
+        portfolioHeader.className = "portfolio-header";
+        portfolioHeader.textContent = `${portfolio.name} (${portfolio.currency})`;
+        listElement.appendChild(portfolioHeader);
+
         portfolio.metrics.holdings.forEach((h) => {
           const row = document.createElement("div");
           row.className = "stock-row";
@@ -69,6 +91,13 @@ export const favoredStocks = {
     function createCell(content) {
       const div = document.createElement("div");
       div.className = "stock-cell";
+      div.textContent = content;
+      return div;
+    }
+
+    function createHeader(content) {
+      const div = document.createElement("div");
+      div.className = "stock-header-cell";
       div.textContent = content;
       return div;
     }
