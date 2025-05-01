@@ -5,14 +5,13 @@
 This project is a **Portfolio Management Web Application** designed to help students efficiently manage their stock investments. The goal is to provide a **user-friendly and intuitive platform** where users can track their **investment portfolios, transactions, and account balances** while also visualizing key financial metrics.
 
 The application enables users to:
-
-- Create accounts and manage their personal investments.
+- Create accounts and portfolios and manage their personal investments.
 - Track stock purchases and sales with **real-time market data**.
 - View **portfolio performance** and generate reports.
 - Analyze **unrealized and realized gains/losses**.
 - Access data-driven **visualizations** and key financial insights.
 
-This project is developed as part of the **"Programming and Small Systems Development"** course at **Copenhagen Business School**.
+This project is developed as part of the **"Programming of Small Systems Development"** course at **Copenhagen Business School**.
 
 ---
 
@@ -32,7 +31,7 @@ This project is developed as part of the **"Programming and Small Systems Develo
 ### ✅ User & Account Management
 
 - User **sign-up, login, and authentication**.
-- Ability to **create, update, and delete investment accounts**.
+- Ability to **create, update, and delete accounts**.
 - Secure password handling.
 
 ### 📊 Portfolio Management
@@ -55,6 +54,11 @@ This project is developed as part of the **"Programming and Small Systems Develo
 - Ranking of **top-performing investments**.
 
 ---
+
+### 📈 HOW TO USE?
+- Download **relevant** node_modules. Can be found in the file **package.json**
+- Type 'npm start' or navigate to the backend folder and start the server with the command: 'node backend/server.js' (The server runs on http://localhost:3000)
+- Here you'll be directed to login page where you can login with email and password or **Register as an User**
 
 ### License
 This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details.

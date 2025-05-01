@@ -260,6 +260,28 @@ const databaseServices = {
         }
     },
 
+    getAccountBasicInfo: async (accountId) => {
+        try {
+          const pool = await poolPromise;
+          const result = await pool.request()
+            .input("accountId", sql.Int, accountId)
+            .query(`
+              SELECT
+                a.id,
+                a.account_name,
+                c.currency_name AS currency
+              FROM Accounts a
+              JOIN Currency c ON a.currency_id = c.id
+              WHERE a.id = @accountId
+            `);
+
+          return result.recordset[0]; // Return the first row or undefined
+        } catch (err) {
+          console.error("Error getting account basic info:", err);
+          throw err;
+        }
+      },
+
     getPortfoliosForUser: async (userId) => {
         try {
             const pool = await poolPromise;
@@ -703,7 +725,7 @@ const databaseServices = {
                 .query(`
                 SELECT
                     c.currency_name AS currency
-                    FROM Accounts a    
+                    FROM Accounts a
                     JOIN Currency c ON a.currency_id = c.id
                     WHERE a.id = @account_id
             `);
@@ -718,7 +740,7 @@ const databaseServices = {
                 .request()
                 .input('account_id', sql.Int, account_id)
                 .query(`
-                SELECT total_balance    
+                SELECT total_balance
                 FROM Accounts a
                 WHERE a.id = @account_id
             `);

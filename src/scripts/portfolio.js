@@ -23,18 +23,36 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Show loading state first
     showLoadingState();
 
-    // Try to get data from cache first
+    // First, check if we need to refresh the cache
+    const currentCurrency = sessionStorage.getItem(`accountCurrency-${accountId}`);
+    const cachedCurrency = sessionStorage.getItem(`cachedCurrency-${accountId}`);
+
+    // Create cache key including account ID
     const cacheKey = `portfolioData-${accountId}`;
+
+    // If the currency has changed since last cache, invalidate the cache
+    if (currentCurrency && cachedCurrency && currentCurrency !== cachedCurrency) {
+      console.log(`Currency changed from ${cachedCurrency} to ${currentCurrency}, clearing cache`);
+      cachingService.clear(cacheKey);
+    }
+
+    // Try to get data from cache
     let portfolioData = cachingService.get(cacheKey);
     if (portfolioData) {
       // Update UI with cached data
       updatePortfolioUI(portfolioData);
-      // Optionally refresh in background (not necessar4y, but nice to do)
+      // Refresh in background
       setTimeout(() => refreshDataInBackground(accountId, cacheKey), 100);
     } else {
       // Not in cache, fetch it
       portfolioData = await fetchPortfolioData(accountId, cacheKey);
       updatePortfolioUI(portfolioData);
+
+      // Store the currency we cached
+      if (portfolioData && portfolioData.length > 0) {
+        const currency = portfolioData[0].currency;
+        sessionStorage.setItem(`cachedCurrency-${accountId}`, currency);
+      }
     }
 
     renderHistoryChart(accountId, portfolioData[0]?.currency || "DKK");
@@ -83,6 +101,12 @@ async function fetchPortfolioData(accountId, cacheKey) {
 
     // Store in our frontend cache
     cachingService.set(cacheKey, portfolioData);
+
+    // Store the currency we cached
+    if (portfolioData && portfolioData.length > 0) {
+      const currency = portfolioData[0].currency;
+      sessionStorage.setItem(`cachedCurrency-${accountId}`, currency);
+    }
 
     return portfolioData;
   } catch (error) {
