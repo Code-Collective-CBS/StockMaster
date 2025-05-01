@@ -15,7 +15,7 @@ const portfolioController = {
       // This callback runs if cache is empty or expired.
       const { data: portfolioData, source } = await getOrSetCache(
         cacheKey,
-        async () => {
+        async () => { // If data doesn't exist or is expired, executes the callback function to fetch fresh data
           // 1) Fetch portfolios and basic info
           const portfolios = await databaseServices.getPortfoliosByAccount(
             accountId
@@ -25,17 +25,18 @@ const portfolioController = {
           const accountCurrency = portfolios[0].currency;
           const accountName = portfolios[0].account_name;
 
-          // Second cache, seperate) Pre-cache exchange rates for accountCurrency (daily TTL) to convert currencies
+
+          // (2) Pre-cache exchange rates for accountCurrency (daily TTL) to convert currencies
           const ratesCacheKey = `rates-${accountCurrency}`;
           const { data: ratesData } = await getOrSetCache(
             ratesCacheKey,
             () => exchangeRateService.getCurrency(accountCurrency),
-            86400
+            86400 // 24h
           );
           const rates = ratesData.conversion_rates;
 
           // 3) For each portfolio, build a fully enriched object
-          return Promise.all(
+          return Promise.all( // Promise.all is typically used when there are multiple related asynchronous tasks that the overall code relies on to work successfully — all of whom we want to fulfill before the code execution continues.
             portfolios.map(async (p) => {
               // Load transactions from database - holdings
               const txs = await databaseServices.getTransactionsForPortfolio(
@@ -84,7 +85,7 @@ const portfolioController = {
                     currentValueAccount = currentValueNative / rate;
                   }
 
-                  return {
+                  return { // object containing detailed information of each holding (enhancedHolding)
                     securityId: h.securityId,
                     symbol,
                     security_name: h.security_name,

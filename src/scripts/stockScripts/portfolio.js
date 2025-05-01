@@ -44,30 +44,36 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-
+//calculates the percentage change in portfolio value over a specific time period
 function computePctChange(history, daysAgo) {
+  // Handle error handling
   if (!Array.isArray(history) || history.length < 2) return 0;
 
-  const parse = (s) => new Date(s);
-  const now = new Date(history[history.length - 1].date);
-  const targetDate = new Date(now.getTime() - daysAgo * 24 * 3600 * 1000);
+  // Get the latest date from history
+  const lastEntry = history[history.length - 1];
+  const now = moment(lastEntry.date);
+
+  // Calculate the target date daysAgo days before now
+  const targetDate = moment(now).subtract(daysAgo, 'days');
 
   // Find the entry in history with date closest to targetDate
   let closest = history[0];
   let minDiff = Infinity;
-  for (const h of history) {
-    const d = parse(h.date);
-    const diff = Math.abs(d - targetDate);
+
+  for (const entry of history) {
+    const entryDate = moment(entry.date);
+    const diff = Math.abs(entryDate.diff(targetDate, 'milliseconds'));
+
     if (diff < minDiff) {
       minDiff = diff;
-      closest = h;
+      closest = entry;
     }
   }
 
-  const latest = history[history.length - 1];
+  // Calculate percentage change
   if (closest.value === 0) return 0;
 
-  return ((latest.value - closest.value) / closest.value) * 100;
+  return ((lastEntry.value - closest.value) / closest.value) * 100;
 }
 
 // Separate function to fetch data and update cache
@@ -105,7 +111,6 @@ async function refreshDataInBackground(accountId, cacheKey) {
     }
   } catch (error) {
     console.error("Background refresh failed:", error);
-    // Don't show errors for background refresh
   }
 }
 
@@ -151,8 +156,8 @@ async function updatePortfolioUI(portfolios) {
 
   // Display accounts and their portfolios
   if (portfolioList) {
-    portfolioList.innerHTML = "";
-    Object.values(accountsMap).forEach((account) => {
+    portfolioList.innerHTML = ""; // prevent duplication
+    Object.values(accountsMap).forEach((account) => { // convert to array
       const accountElement = document.createElement("div");
       accountElement.className = "account-group";
       accountElement.innerHTML = `
@@ -198,7 +203,7 @@ async function updatePortfolioUI(portfolios) {
     );
   }
 
-  //Fetch real history data for this account
+  //Fetch real history data
   const accountId = portfolios[0]?.account_id;
   let historyData = [];
   try {
@@ -229,7 +234,7 @@ async function updatePortfolioUI(portfolios) {
     );
   }
 
-  // Create portfolio selector for holdings distribution chart (replacing mock growth chart)
+  // Create portfolio selector for holdings distribution chart
   if (portfolioGrowthChartCanvas) {
     // Create and add the portfolio selector above the chart
     createPortfolioSelector(portfolios, portfolioGrowthChartCanvas);
@@ -240,7 +245,7 @@ async function renderHistoryChart(accountId, currencyCode) {
   try {
     // 1) Fetch history from the server
     const historyData = await stockAPI.getPortfolioHistory(accountId);
-    // stockAPI.getPortfolioHistory should return JSON array [{date, value}, ...]
+    // eturning JSON array [{date, value}, ...]
 
     // 2) Get the canvas and draw
     const historyCanvas = document.getElementById("portfolioHistoryChart");
@@ -282,7 +287,7 @@ function createPortfolioSelector(portfolios, chartCanvas) {
 
   // Create the label
   const label = document.createElement("label");
-  label.textContent = "Vælg portefølje: ";
+  label.textContent = "Choose Portfolio ";
   label.setAttribute("for", "portfolio-selector");
   selectorContainer.appendChild(label);
 
