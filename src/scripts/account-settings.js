@@ -74,9 +74,9 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
 
             const response = await fetch(`http://localhost:3000/api/database/update-account-settings/${account_id}`, {
-                method: "PUT",
+                method: 'PUT',
                 headers: {
-                    "Content-Type": "application/json" // JSON data
+                    'Content-Type': 'application/json' // JSON data
                 },
                 body: JSON.stringify({
                     account_name: name,
@@ -87,15 +87,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const result = await response.json()
             if (response.status === 201) {
-                alert("Account changes saved");
+                alert('Account changes saved');
                 console.log(result)
-                window.location.href = "../pages/dashboard.html" // Redirects user to login-page
+                window.location.href = '../pages/dashboard.html' // Redirects user to login-page
             } else {
-                alert("Fail: " + result.message)
+                alert('Fail: ' + result.message)
             }
         } catch (error) {
-            console.error("Failed to change account settings: " + error)
-            alert("Failed to change account settings")
+            console.error('Failed to change account settings: ' + error)
+            alert('Failed to change account settings')
         }
     })
         /// DELETE ACCOUNT
