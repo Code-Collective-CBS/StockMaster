@@ -399,11 +399,12 @@ const databaseServices = {
                 .input("amount", sql.Decimal(37, 2), amount)
                 .input("price_per_share", sql.Decimal(18, 2), 1) // Placeholder 1 maybe change into 0 if no change on gak
                 .input("total_price", sql.Decimal(37, 2), amount)
-                .input('currency_id', sql.Int, currency_id)
+                .input("currency_id", sql.Int, null)
+                .input("account_currency_id", sql.Int, currency_id)
                 .query(`
                 INSERT INTO Transactions
-                (account_id, portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price, currency_id)
-                VALUES (@account_id, NULL, NULL, @transaction_type, @amount, @price_per_share, @total_price, @currency_id)
+                (account_id, portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price, currency_id, account_currency_id)
+                VALUES (@account_id, NULL, NULL, @transaction_type, @amount, @price_per_share, @total_price, @currency_id, @account_currency_id)
             `);
 
             return result.recordset[0];
@@ -455,11 +456,12 @@ const databaseServices = {
                 .input("amount", sql.Decimal(37, 2), amount)
                 .input("price_per_share", sql.Decimal(18, 2), 1) // Placeholder 1 maybe change into 0 if no change on gak
                 .input("total_price", sql.Decimal(37, 2), amount)
-                .input('currency_id', sql.Int, currency_id)
+                .input("currency_id", sql.Int, null)
+                .input("account_currency_id", sql.Int, currency_id)
                 .query(`
                 INSERT INTO Transactions
-                (account_id, portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price, currency_id)
-                VALUES (@account_id, NULL, NULL, @transaction_type, @amount, @price_per_share, @total_price, @currency_id)
+                (account_id, portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price, currency_id, account_currency_id)
+                VALUES (@account_id, NULL, NULL, @transaction_type, @amount, @price_per_share, @total_price, @currency_id, @account_currency_id)
             `);
 
             return result.recordset[0];
@@ -501,11 +503,26 @@ const databaseServices = {
                 throw new Error("Unauthorized: Portfolio does not belong to this account or user");
             }
 
-            // 2. Get current account balance
+            // 2. Get account currency_id to track currency from account for transaction NEW (01/05)
+            const accountCurrencyQuery = await pool
+                .request()
+                .input("account_id", sql.Int, account_id)
+                .query(`
+                    SELECT currency_id
+                    FROM Accounts
+                    WHERE id = @account_id
+            `);
+
+            if (accountCurrencyQuery.recordset.length === 0) {
+                throw new Error('Account not found');
+            }
+
+            const account_currency_id = accountCurrencyQuery.recordset[0].currency_id;
+
+            // 3. Get current account balance
             const { total_balance, currency: accountCurrency } = await databaseServices.getAccountBalanceAndCurrency(account_id);
 
-
-            // 3. Get security ID from DB table Securities
+            // 4. Get security ID from DB table Securities
             const securityQuery = await pool
                 .request()
                 .input("symbol", sql.VarChar(10), symbol)
@@ -521,7 +538,7 @@ const databaseServices = {
 
             const securities_id = securityQuery.recordset[0].id;
 
-            // 4. Lookup currency_id in Currency tabel to get currency_name
+            // 5. Lookup currency_id in Currency tabel to get currency_name
             const currencyResult = await pool
                 .request()
                 .input('currency_name', sql.NVarChar(10), security_currency)
@@ -537,7 +554,7 @@ const databaseServices = {
 
             const currency_id = currencyResult.recordset[0].id;
 
-            // 5. Calculate total price
+            // 6. Calculate total price
             const total_price = amount * price_per_share;
             let convertedTotalPrice = total_price;
 
@@ -563,9 +580,8 @@ const databaseServices = {
                 }
             }
 
-            console.log("Fail bere inserting");
 
-            // 6. Insert into Transactions table
+            // 7. Insert into Transactions table
             const insertQuery = await pool
                 .request()
                 .input("account_id", sql.Int, account_id)
@@ -576,14 +592,15 @@ const databaseServices = {
                 .input("price_per_share", sql.Decimal(18, 2), price_per_share)
                 .input("total_price", sql.Decimal(37, 2), convertedTotalPrice) // Using account currency
                 .input('currency_id', sql.Int, currency_id)
+                .input('account_currency_id', sql.Int, account_currency_id)
                 .query(`
                 INSERT INTO Transactions
-                (account_id, portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price, currency_id)
+                (account_id, portfolio_id, securities_id, transaction_type, amount, price_per_share, total_price, currency_id, account_currency_id)
                 OUTPUT INSERTED.id
-                VALUES (@account_id, @portfolio_id, @securities_id, @transaction_type, @amount, @price_per_share, @total_price, @currency_id)
+                VALUES (@account_id, @portfolio_id, @securities_id, @transaction_type, @amount, @price_per_share, @total_price, @currency_id, @account_currency_id)
             `);
 
-            // 7. Update account balance if 'buy'
+            // 8. Update account balance if 'buy'
             if (transaction_type === 'buy') {
                 await pool
                     .request()
@@ -644,27 +661,29 @@ const databaseServices = {
                 .input('user_id', sql.Int, user_id)
                 .input('account_id', sql.Int, account_id)
                 .query(`
-                SELECT
-                    t.id AS transaction_id,
-                    t.transaction_type,
-                    t.amount,
-                    t.price_per_share,
-                    t.total_price,
-                    c.currency_name AS currency,
-                    t.transaction_date,
-                    s.symbol,
-                    s.name AS security_name,
-                    s.type AS security_type,
-                    p.name AS portfolio_name,
-                    a.account_name
-                FROM Transactions t
-                LEFT JOIN Securities s ON t.securities_id = s.id
-                JOIN Currency c ON t.currency_id = c.id
-                LEFT JOIN Portfolio p ON t.portfolio_id = p.id
-                JOIN Accounts a ON t.account_id = a.id
-                WHERE a.id = @account_id
+                    SELECT
+                        t.id AS transaction_id,
+                        t.transaction_type,
+                        t.amount,
+                        t.price_per_share,
+                        t.total_price,
+                        c.currency_name AS security_currency,   -- LEFT JOIN now
+                        ac.currency_name AS account_currency,
+                        t.transaction_date,
+                        s.symbol,
+                        s.name AS security_name,
+                        s.type AS security_type,
+                        p.name AS portfolio_name,
+                        a.account_name
+                    FROM Transactions t
+                    LEFT JOIN Securities s ON t.securities_id = s.id
+                    LEFT JOIN Currency c ON t.currency_id = c.id
+                    LEFT JOIN Currency ac ON t.account_currency_id = ac.id
+                    LEFT JOIN Portfolio p ON t.portfolio_id = p.id
+                    JOIN Accounts a ON t.account_id = a.id
+                    WHERE a.id = @account_id
                     AND a.user_id = @user_id
-                ORDER BY t.transaction_date DESC;
+                    ORDER BY t.transaction_date DESC;
             `);
 
             return transactions.recordset; // Not [0] because result is multiple rows
