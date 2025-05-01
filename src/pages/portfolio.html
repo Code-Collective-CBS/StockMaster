@@ -23,7 +23,7 @@
 <aside class="sideBar">
   <span class="brandName">StockMaster</span>
   <nav class="sideBarNav">
-
+    
     <div class="nav-item" data-href="/src/pages/dashboard.html">
       <svg
         class="icon"
@@ -167,10 +167,10 @@
     <main class="main-content">
       <!-- Header section -->
       <header class="page-header">
-        <h1>Portfolio Overview</h1>
+        <h1>Portfolio overview</h1>
         <div class="header-actions">
           <button class="btn btn-secondary" id="addPortfolioButton">
-            Add portfolio
+            Add Portfolio
           </button>
           <button class="btn btn-primary" id="depositButton">
             Deposit/withdraw
@@ -182,27 +182,27 @@
       <section class="dashboard-top">
         <!-- Left card - Total value -->
         <div class="card total-value-card">
-          <p class="card-label">Total value in DKK</p>
-          <h2 class="total-value-number" id="totalValueDisplay">224.542 DKK</h2>
+          <p class="card-label">Total value</p>
+          <h2 class="total-value-number" id="totalValueDisplay">0,00</h2>
 
           <!-- Performance indicators (7D, 1M, 6M) -->
           <div class="performance-indicators">
             <div class="indicator">
               <span class="period">7D</span>
               <div class="value positive" id="performance7d">
-                18.78% <span class="arrow">↗</span>
+                0,00% <span class="arrow">↗</span>
               </div>
             </div>
             <div class="indicator">
               <span class="period">1M</span>
               <div class="value negative" id="performance1m">
-                -15.07% <span class="arrow">↗</span>
+                0,00% <span class="arrow">↗</span>
               </div>
             </div>
             <div class="indicator">
               <span class="period">6M</span>
               <div class="value negative" id="performance6m">
-                -3.15% <span class="arrow">↗</span>
+                0,00% <span class="arrow">↗</span>
               </div>
             </div>
           </div>
@@ -214,7 +214,7 @@
             <!-- Column headers -->
             <div class="portfolio-row headers">
               <span class="col name">Portfolio</span>
-              <span class="col value">Invested Value</span>
+              <span class="col value">Invested value</span>
               <span class="col shares">Shares</span>
             </div>
             <!-- JS will insert .portfolio-row.data rows here -->
@@ -233,7 +233,7 @@
       <section class="dashboard-history">
         <div class="card full-width">
           <div class="card-header">
-            <h2 class="card-title">Portfolio Performance Over Time</h2>
+            <h2 class="card-title">Portfolio performance over time</h2>
           </div>
           <div class="chart-container">
             <canvas id="portfolioHistoryChart"></canvas>
@@ -245,7 +245,7 @@
       <section class="dashboard-bottom">
         <div class="card full-width">
           <div class="card-header">
-            <h2 class="card-title">Holdings Distribution by Portfolio</h2>
+            <h2 class="card-title">Holdings distribution by portfolio</h2>
             <div
               id="portfolio-selector-container"
               class="portfolio-selector-wrapper"

@@ -17,8 +17,8 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     event.preventDefault(); // Prevents standard form-handling
 
     // Load inputs from the sign-up form
-    const firstname = document.getElementById("fornavn").value;
-    const lastname = document.getElementById("efternavn").value;
+    const firstname = document.getElementById("firstname").value;
+    const lastname = document.getElementById("lastname").value;
     const email = document.getElementById("email").value;
     const phone_number = document.getElementById("telefon").value;
     const password = document.getElementById("new-password").value;
