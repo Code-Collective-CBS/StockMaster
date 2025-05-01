@@ -98,12 +98,40 @@ section.overview,
 section.portfolios,
 section.benchmark,
 section.top-stocks {
-    grid-column: span 1;
+    grid-column: span 3;
 }
 
 section.portfolio-graph {
     grid-column: span 3;
 }
+
+/* START Dashboard portfolio */
+
+section.portfolio-graph {
+    background-color: transparent;
+}
+
+div.chart-column, div.holdings-column {
+    display: flex;
+}
+
+.portfolio-grid {
+    display: flex;
+    gap: 30px;
+    width: 100%;
+  }
+  
+  .chart-column,
+  .holdings-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--secondary-color);
+    border-radius: 5px;
+    padding: 10px;
+}
+
+/* END Dashboard portfolio */
 
 section.news {
     grid-column: span 2;
