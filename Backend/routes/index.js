@@ -17,7 +17,7 @@ const currencyRoutes = require('./currencyRoutes');
 // Database routes
 const databaseRoutes = require('./databaseRoutes')
 
-// Main dashboard page route (this is our homepage)
+// Main login page route
 router.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../../src/pages/login.html'));  // Changed this to login instead of dashboard
 });
