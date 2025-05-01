@@ -127,9 +127,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
   gethNews();
 
+<<<<<<< HEAD
   try {
     const accountId = sessionStorage.getItem("selectedAccountId");
     if (!accountId) throw new Error("No account selected");
+=======
+
+    // PORTFOLIO DISPLAY //
+    try {
+        const accountId = sessionStorage.getItem("selectedAccountId");
+        if (!accountId) throw new Error("No account selected");
+>>>>>>> f0cea03 (changed dashboard design and portfolio page, and adde more scripts to dashboard.js)
 
     // 1) Fetch portfolio summary
     const portfolios = await stockAPI.getPortfolioSummary(accountId);
@@ -175,6 +183,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       .sort((a, b) => b.gainPct - a.gainPct)
       .slice(0, 5);
 
+<<<<<<< HEAD
     // 8) Render both lists
     function renderList(items, ulId, displayKey, formatter) {
       const ul = document.getElementById(ulId);
@@ -189,6 +198,42 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     renderList(topByValue, "top-value-list", "value", formatCurrency);
     renderList(topByGain, "top-gain-list", "gainPct", val => val.toFixed(2) + "%");
+=======
+        // 8) Render both lists
+        function renderList(items, ulId, displayKey, formatter) {
+          const ul = document.getElementById(ulId);
+          if (!ul) return;
+
+          ul.innerHTML = items.map(item => {
+            const value = item[displayKey];
+            const formattedValue = (value !== undefined && value !== null)
+              ? formatter(value, currency)
+              : "N/A";
+
+            // For gain percentages, determine which class to use
+            let valueClass = '';
+            if (displayKey === 'gainPct') {
+              valueClass = value >= 0 ? 'positive-change' : 'negative-change';
+            }
+
+            return `
+              <li>
+                <span class="symbol">${item.symbol || 'Unknown'}</span>
+                <span class="val ${valueClass}">${formattedValue}</span>
+              </li>
+            `;
+          }).join("");
+        }
+
+        renderList(topByValue, "top-value-list", "value", formatCurrency);
+        renderList(topByGain,  "top-gain-list",  "gainPct", val => {
+          // Format with 2 decimal places
+          const formatted = Math.abs(val).toFixed(2) + "%";
+
+          // Add a plus sign for positive values (optional)
+          return val >= 0 ? "+" + formatted : "-" + formatted;
+        });
+>>>>>>> f0cea03 (changed dashboard design and portfolio page, and adde more scripts to dashboard.js)
 
   } catch (err) {
     console.error("Dashboard setup failed:", err);

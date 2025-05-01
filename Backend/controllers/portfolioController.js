@@ -85,6 +85,18 @@ const portfolioController = {
                     currentValueAccount = currentValueNative / rate;
                   }
 
+                  // Calculate unrealized gain and gain percent for this holding
+                  let costInAccountCurrency = cost;
+                  if (nativeCurrency !== accountCurrency) {
+                    const rate = rates[nativeCurrency];
+                    costInAccountCurrency = cost / rate;
+                  }
+
+                  const unrealizedGain = currentValueAccount - costInAccountCurrency;
+                  const unrealizedGainPercent = costInAccountCurrency > 0
+                    ? (unrealizedGain / costInAccountCurrency) * 100
+                    : 0;
+
                   return { // object containing detailed information of each holding (enhancedHolding)
                     securityId: h.securityId,
                     symbol,
@@ -97,6 +109,8 @@ const portfolioController = {
                     nativeCurrency,
                     currentValueNative,
                     currentValueAccount,
+                    unrealizedGain,     // holding
+                    unrealizedGainPercent  // holding
                   };
                 })
               );
