@@ -265,12 +265,20 @@ const databaseServices = {
             const pool = await poolPromise;
             const result = await pool.request().input("userId", sql.Int, userId)
                 .query(`
-                    SELECT p.id, p.name, p.account_id, p.create_date, p.balance,
-                           a.currency, a.account_name
-                    FROM Portfolio p
-                    JOIN Accounts a ON p.account_id = a.id
-                    WHERE a.user_id = @userId
-                `);
+                SELECT 
+                    p.id,
+                    p.name,
+                    p.account_id,
+                    p.create_date,
+                    p.balance,
+                    c.currency_name AS currency,
+                    a.account_name
+                FROM Portfolio p
+                JOIN Accounts a ON p.account_id = a.id
+                JOIN Currency c ON a.currency_id = c.id
+                WHERE a.user_id = @userId
+            `);
+
             return result.recordset;
         } catch (err) {
             console.error("Error getting portfolios for user:", err);
@@ -334,10 +342,15 @@ const databaseServices = {
                 .input("accountId", sql.Int, accountId)
                 .query(`
                 SELECT
-                p.id, p.name, p.account_id, p.create_date, p.balance,
-                a.currency, a.account_name
+                    p.id, p.name,
+                    p.account_id,
+                    p.create_date,
+                    p.balance,
+                    c.currency_name AS currency,
+                    a.account_name
                 FROM Portfolio p
                 JOIN Accounts a ON p.account_id = a.id
+                JOIN Currency c ON a.currency_id = c.id
                 WHERE p.account_id = @accountId
       `); // Fixed: Filter by account_id
             return result.recordset;
