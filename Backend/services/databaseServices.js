@@ -678,6 +678,50 @@ const databaseServices = {
         try {
             const pool = await poolPromise;
 
+            const current_account_currency_query = await pool
+                .request()
+                .input('account_id', sql.Int, account_id)
+                .query(`
+                SELECT
+                    c.currency_name AS currency
+                    FROM Accounts a    
+                    JOIN Currency c ON a.currency_id = c.id
+                    WHERE a.id = @account_id
+            `);
+
+            if(current_account_currency_query.recordset.length === 0) {
+                throw new Error('Could not find currency_name for currency account currency');
+            }
+
+            const current_account_currency = current_account_currency_query.recordset[0].currency;
+
+            const account_balance_query = await pool
+                .request()
+                .input('account_id', sql.Int, account_id)
+                .query(`
+                SELECT total_balance    
+                FROM Accounts a
+                WHERE a.id = @account_id
+            `);
+
+            if(account_balance_query.recordset.length === 0) {
+                throw new Error('Could not find total_balance for account');
+            }
+
+            const current_account_balance = account_balance_query.recordset[0].total_balance;
+            let convertedTotalPrice = current_account_balance;
+
+            if(current_account_currency !== account_currency){
+
+                const rates = await exchangeRateService.getCurrency(current_account_currency);
+                convertedTotalPrice = currencyUtils.convertCurrency(
+                    current_account_balance,
+                    current_account_currency,
+                    account_currency, // New currency
+                    rates.conversion_rates
+                );
+            }
+
             // 1. Lookup currency_id based currency_name
             const currencyResult = await pool
                 .request()
@@ -701,9 +745,10 @@ const databaseServices = {
                 .input('account_name', sql.VarChar(100), account_name)
                 .input('currency_id', sql.Int, currency_id)
                 .input('state', sql.VarChar(50), account_state)
+                .input('total_balance', sql.Decimal(18, 2), convertedTotalPrice)
                 .query(`
                     UPDATE Accounts
-                    SET account_name = @account_name, currency_id = @currency_id, state = @state
+                    SET account_name = @account_name, currency_id = @currency_id, state = @state, total_balance = @total_balance
                     WHERE id = @id
                     AND user_id = @user_id
             `);
