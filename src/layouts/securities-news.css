@@ -152,6 +152,10 @@ section {
     border-radius: 0 0px 5px 5px;
 }
 
+.stock-result-p a {
+    color: var(--primary-text);
+}
+
 /* News Discription Container  */
 .news-titel-container{
     padding: 10px;
