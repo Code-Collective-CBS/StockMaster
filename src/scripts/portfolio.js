@@ -2,8 +2,8 @@
 import { stockAPI } from "./stockScripts/api.js";
 import { favoredStocks } from "./utilityFunctions/favoredStocks.js";
 import { portfolioChartService } from "./utilityFunctions/portfolioChartService.js";
-import { cachingService } from "./utilityFunctions/cachingService.js";
 import { popUps } from "./utilityFunctions/popup.js";
+import { loadAccounts } from "../scripts/utilityFunctions/loadAccounts.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("Portfolio page loaded!");
@@ -11,27 +11,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     const accountId = sessionStorage.getItem("selectedAccountId");
 
-    // Check for recent transactions
-    const transactionTimeStamp = sessionStorage.getItem('portfolio_transaction');
-
-    // Create cache key including account ID
-    const cacheKey = `portfolioData-${accountId}`;
-
-    if (transactionTimeStamp) {
-      sessionStorage.removeItem('portfolio_transaction');
-
-      // Force clear the cache
-      console.log("Recent transaction detected, clearing cache");
-
-    if (typeof cachingService !== 'undefined') {
-            cachingService.clear(cacheKey);
-          }
-          // Also clear the in-memory cache by force
-          if (cachingService && cachingService.cache) {
-            delete cachingService.cache[cacheKey];
-          }
-        }
-
+    const selectedAccount = await accountDetails();
+    console.log(selectedAccount);
 
     // POP UP
     popUps.setupDepositPopup();
@@ -45,41 +26,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Show loading state first
     showLoadingState();
 
-    // First, check if we need to refresh the cache
-    const currentCurrency = sessionStorage.getItem(`accountCurrency-${accountId}`);
-    const cachedCurrency = sessionStorage.getItem(`cachedCurrency-${accountId}`);
-
-
-
-    // If the currency has changed since last cache, invalidate the cache
-    if (currentCurrency && cachedCurrency && currentCurrency !== cachedCurrency) {
-      console.log(`Currency changed from ${cachedCurrency} to ${currentCurrency}, clearing cache`);
-      cachingService.clear(cacheKey);
-    }
-
-    // Try to get data from cache
-    let portfolioData = cachingService.get(cacheKey);
-    if (portfolioData) {
-      // Update UI with cached data
-      updatePortfolioUI(portfolioData);
-    } else {
-      // Not in cache, fetch it
-      portfolioData = await fetchPortfolioData(accountId, cacheKey);
+    const portfolioData = await stockAPI.getPortfolioSummary(accountId);
       updatePortfolioUI(portfolioData);
 
-      // Store the currency we cached
-      if (portfolioData && portfolioData.length > 0) {
-        const currency = portfolioData[0].currency;
-        sessionStorage.setItem(`cachedCurrency-${accountId}`, currency);
-      }
-    }
-
-    renderHistoryChart(accountId, portfolioData[0]?.currency || "DKK");
+    renderHistoryChart(accountId, portfolioData[0]?.currency);
   } catch (error) {
     console.error("Error loading portfolio data:", error);
     showErrorMessage("Failed to load portfolio data. Please try again later.");
   }
 });
+
+
+async function accountDetails () {
+  await loadAccounts();
+  const selectedAccountId = sessionStorage.getItem("selectedAccountId");
+  const accounts = window.cachedAccounts || [];
+  return accounts.find((acc) => acc.account_id == selectedAccountId) || null;
+}
 
 //calculates the percentage change in portfolio value over a specific time period
 function computePctChange(history, daysAgo) {
@@ -113,34 +76,6 @@ function computePctChange(history, daysAgo) {
   return ((lastEntry.value - closest.value) / closest.value) * 100;
 }
 
-// Separate function to fetch data and update cache
-async function fetchPortfolioData(accountId, cacheKey) {
-  try {
-    const portfolioData = await stockAPI.getPortfolioSummary(accountId);
-
-    // Store in our frontend cache
-    cachingService.set(cacheKey, portfolioData);
-
-    // Store the currency we cached
-    if (portfolioData && portfolioData.length > 0) {
-      const currency = portfolioData[0].currency;
-      sessionStorage.setItem(`cachedCurrency-${accountId}`, currency);
-    }
-
-    return portfolioData;
-  } catch (error) {
-    console.error("Error fetching portfolio data:", error);
-
-    // Try to fall back to cached data if available
-    const cachedData = cachingService.get(cacheKey);
-    if (cachedData) {
-      console.log("Using cached data due to fetch error");
-      return cachedData;
-    }
-
-    throw error; // Re-throw if no cached data
-  }
-}
 
 // Show a loading state
 function showLoadingState() {
