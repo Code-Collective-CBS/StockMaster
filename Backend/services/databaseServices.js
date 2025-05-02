@@ -292,7 +292,6 @@ const databaseServices = {
                     p.name,
                     p.account_id,
                     p.create_date,
-                    p.balance,
                     c.currency_name AS currency,
                     a.account_name
                 FROM Portfolio p
@@ -367,7 +366,6 @@ const databaseServices = {
                     p.id, p.name,
                     p.account_id,
                     p.create_date,
-                    p.balance,
                     c.currency_name AS currency,
                     a.account_name
                 FROM Portfolio p

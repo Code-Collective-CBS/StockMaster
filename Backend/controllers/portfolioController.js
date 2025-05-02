@@ -157,7 +157,6 @@ const portfolioController = {
                 name: p.name,
                 account_id: p.account_id,
                 create_date: p.create_date,
-                balance: p.balance,
                 account_name: accountName,
                 currency: accountCurrency,
                 metrics,
