@@ -3,7 +3,6 @@ const exchangeRateService = require("../services/exchangeRateService");
 const alphaVantageService = require("../services/alphaVantageService");
 const { getOrSetCache } = require("../utilityFunctions/cacheHelper");
 const moment = require("moment");
-const cache = require('../utilityFunctions/cache');
 
 const portfolioController = {
   // Get portfolio summary for an account
