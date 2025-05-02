@@ -896,7 +896,7 @@ const databaseServices = {
             throw error;
         }
     },
-
+    /*
     deleteAccount: async (user_id, account_id) => {
         try {
             const pool = await poolPromise;
@@ -914,6 +914,7 @@ const databaseServices = {
             throw err
         }
     }
+    */
 };
 
 module.exports = databaseServices;

@@ -10,7 +10,7 @@ const account_currency = document.getElementById("account_currency");
 const account_state = document.getElementById("account_state");
 const account_name = document.getElementById("account_name");
 const saveAcc = document.getElementById("changeAcc");
-const deleteAcc = document.getElementById("deleteAcc");
+// const deleteAcc = document.getElementById("deleteAcc");
 
 // Gets the accountID from sidebar.js. Covnerts to number because session-/localStorage always return number.
 const account_id = Number(sessionStorage.getItem("selectedAccountId"));
@@ -105,6 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
   /// DELETE ACCOUNT
+  /*
   deleteAcc.addEventListener("click", async () => {
     const deleteConfirmed = window.confirm(
       "Are you sure you want to delelte this account? This action can not be undone."
@@ -135,6 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   });
+  */
 });
 
 // Function to display account-info in account-settings.

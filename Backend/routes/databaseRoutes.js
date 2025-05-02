@@ -62,6 +62,6 @@ router.get('/transactions/account/:account_id', databaseController.getTransactio
 router.put('/update-account-settings/:account_id', databaseController.updateAccountSettings)
 
 // Delete account
-router.delete('/delete-account/:account_id', databaseController.deleteAccount)
+// router.delete('/delete-account/:account_id', databaseController.deleteAccount)
 
 module.exports = router;

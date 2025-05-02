@@ -198,224 +198,178 @@ export const portfolioChartService = {
     }
   },
 
-
-// Enhanced Portfolio History Chart Function
-createPortfolioHistoryChart: (canvas, history, currencyCode) => {
-  if (!canvas || !Array.isArray(history) || history.length === 0) {
-    console.warn("Missing canvas or history data");
-    return null;
-  }
-
-  // Clear any existing chart
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  // Process and clean the data
-  // Filter out any entries with null or undefined values
-  const cleanHistory = history.filter(entry =>
-    entry && entry.date && entry.value !== undefined && entry.value !== null
-  );
-
-  // Sort by date (ascending)
-  cleanHistory.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-  // Format labels and data
-  const labels = cleanHistory.map(entry => {
-    const date = new Date(entry.date);
-    // Format date more compactly (e.g., "Jan 2025" instead of full date)
-    return date.toLocaleDateString("da-DK", { month: 'short', year: 'numeric' });
-  });
-
-  const data = cleanHistory.map(entry => entry.value);
-
-  // Calculate percentage change for the tooltip
-  const startValue = data[0] || 0;
-  const percentageChange = data.map(value => {
-    if (startValue === 0) return 0;
-    return ((value - startValue) / startValue) * 100;
-  });
-
-  // Generate gradient for fill
-  const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-  gradient.addColorStop(0, 'rgba(0, 218, 145, 0.5)');  // highlight color with opacity
-  gradient.addColorStop(1, 'rgba(0, 218, 145, 0.05)'); // almost transparent at bottom
-
-  // Destroy existing chart if any
-  if (canvas.chart) {
-    canvas.chart.destroy();
-  }
-
-  // Ensure proper canvas size
-  canvas.style.width = '100%';
-  canvas.style.height = '100%';
-
-  // Create the chart with improved styling
-  canvas.chart = new Chart(canvas, {
-    type: "line",
-    data: {
-      labels,
-      datasets: [
-        {
-          label: "Portfolio Value",
-          data,
-          borderColor: "#00DA91", // highlight color
-          backgroundColor: gradient,
-          tension: 0.4, // smoother curve
-          fill: true,
-          pointRadius: 0, // hide points for cleaner look
-          pointHoverRadius: 5, // show points on hover
-          pointHoverBackgroundColor: "#00DA91",
-          pointHoverBorderColor: "#FFFFFF",
-          pointHoverBorderWidth: 2,
-          borderWidth: 3,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      layout: {
-        padding: {
-          top: 20,
-          right: 20,
-          bottom: 20,
-          left: 20
-        }
-      },
-      scales: {
-        x: {
-          grid: {
-            display: false, // cleaner look without x gridlines
-            drawBorder: false
-          },
-          ticks: {
-            maxRotation: 0, // keep labels horizontal
-            font: {
-              size: 10,
-            },
-            color: "rgba(255, 255, 255, 0.7)" // slightly muted text
-          }
-        },
-        y: {
-          title: {
-            display: true,
-            text: currencyCode,
-            color: "rgba(255, 255, 255, 0.9)",
-            font: {
-              size: 12,
-              weight: 'bold'
-            }
-          },
-          grid: {
-            color: "rgba(255, 255, 255, 0.1)" // subtle grid lines
-          },
-          ticks: {
-            callback: (val) =>
-              new Intl.NumberFormat("da-DK", {
-                style: "decimal",
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0,
-              }).format(val) +
-              " " +
-              currencyCode,
-            font: {
-              size: 10,
-            },
-            color: "rgba(255, 255, 255, 0.7)" // slightly muted text
-          },
-          beginAtZero: false,
-        },
-      },
-      interaction: {
-        mode: 'index',
-        intersect: false,
-      },
-      plugins: {
-        legend: {
-          display: false
-        },
-        tooltip: {
-          backgroundColor: "rgba(23, 37, 64, 0.9)",
-          titleColor: "#FFFFFF",
-          bodyColor: "#FFFFFF",
-          borderColor: "rgba(255, 255, 255, 0.2)",
-          borderWidth: 1,
-          padding: 10,
-          displayColors: false,
-          callbacks: {
-            // Enhanced tooltip showing value and % change
-            label: function(context) {
-              const value = context.raw;
-              const index = context.dataIndex;
-              const formattedValue = new Intl.NumberFormat("da-DK", {
-                style: "decimal",
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              }).format(value);
-
-              const pctChange = percentageChange[index];
-              const pctSign = pctChange >= 0 ? '+' : '';
-              const pctFormatted = pctChange.toFixed(2);
-
-              return [
-                `Value: ${formattedValue} ${currencyCode}`,
-                `Change: ${pctSign}${pctFormatted}%`
-              ];
-            }
-          }
-        }
-      }
-    },
-  });
-
-  return canvas.chart;
-},
-
-  createMockGrowthChart: (canvas) => {
-    // Create a mock growth chart with random data
-    // In a real app, you'd use historical data
-
-    const labels = [];
-    const data = [];
-
-    // Generate data for the last 12 months
-    const now = new Date();
-    for (let i = 11; i >= 0; i--) {
-      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      labels.push(
-        date.toLocaleDateString("da-DK", { month: "short", year: "numeric" })
-      );
-
-      // Generate a random value that trends upward
-      const value = 10000 + i * 500 + Math.random() * 1000;
-      data.push(value);
+  // Enhanced Portfolio History Chart Function
+  createPortfolioHistoryChart: (canvas, history, currencyCode) => {
+    if (!canvas || !Array.isArray(history) || history.length === 0) {
+      console.warn("Missing canvas or history data");
+      return null;
     }
 
-    new Chart(canvas, {
+    // Clear any existing chart
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Process and clean the data
+    // Filter out any entries with null or undefined values
+    const cleanHistory = history.filter(entry =>
+      entry && entry.date && entry.value !== undefined && entry.value !== null
+    );
+
+    // Sort by date (ascending)
+    cleanHistory.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    // Format labels and data
+    const labels = cleanHistory.map(entry => {
+      const date = new Date(entry.date);
+      // Format date more compactly (e.g., "Jan 2025" instead of full date)
+      return date.toLocaleDateString("da-DK", { month: 'short', year: 'numeric' });
+    });
+
+    const data = cleanHistory.map(entry => entry.value);
+
+    // Calculate percentage change for the tooltip
+    const startValue = data[0] || 0;
+    const percentageChange = data.map(value => {
+      if (startValue === 0) return 0;
+      return ((value - startValue) / startValue) * 100;
+    });
+
+    // Generate gradient for fill
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, 'rgba(0, 218, 145, 0.5)');  // highlight color with opacity
+    gradient.addColorStop(1, 'rgba(0, 218, 145, 0.05)'); // almost transparent at bottom
+
+    // Destroy existing chart if any
+    if (canvas.chart) {
+      canvas.chart.destroy();
+    }
+
+    // Ensure proper canvas size
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+
+    // Create the chart with improved styling
+    canvas.chart = new Chart(canvas, {
       type: "line",
       data: {
-        labels: labels,
+        labels,
         datasets: [
           {
             label: "Portfolio Value",
-            data: data,
-            borderColor: "#00DA91",
-            backgroundColor: "rgba(0, 218, 145, 0.1)",
-            tension: 0.1,
+            data,
+            borderColor: "#00DA91", // highlight color
+            backgroundColor: gradient,
+            tension: 0.4, // smoother curve
             fill: true,
+            pointRadius: 0, // hide points for cleaner look
+            pointHoverRadius: 5, // show points on hover
+            pointHoverBackgroundColor: "#00DA91",
+            pointHoverBorderColor: "#FFFFFF",
+            pointHoverBorderWidth: 2,
+            borderWidth: 3,
           },
         ],
       },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
+        layout: {
+          padding: {
+            top: 20,
+            right: 20,
+            bottom: 20,
+            left: 20
+          }
+        },
         scales: {
+          x: {
+            grid: {
+              display: false, // cleaner look without x gridlines
+              drawBorder: false
+            },
+            ticks: {
+              maxRotation: 0, // keep labels horizontal
+              font: {
+                size: 10,
+              },
+              color: "rgba(255, 255, 255, 0.7)" // slightly muted text
+            }
+          },
           y: {
+            title: {
+              display: true,
+              text: currencyCode,
+              color: "rgba(255, 255, 255, 0.9)",
+              font: {
+                size: 12,
+                weight: 'bold'
+              }
+            },
+            grid: {
+              color: "rgba(255, 255, 255, 0.1)" // subtle grid lines
+            },
+            ticks: {
+              callback: (val) =>
+                new Intl.NumberFormat("da-DK", {
+                  style: "decimal",
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                }).format(val) +
+                " " +
+                currencyCode,
+              font: {
+                size: 10,
+              },
+              color: "rgba(255, 255, 255, 0.7)" // slightly muted text
+            },
             beginAtZero: false,
           },
         },
+        interaction: {
+          mode: 'index',
+          intersect: false,
+        },
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            backgroundColor: "rgba(23, 37, 64, 0.9)",
+            titleColor: "#FFFFFF",
+            bodyColor: "#FFFFFF",
+            borderColor: "rgba(255, 255, 255, 0.2)",
+            borderWidth: 1,
+            padding: 10,
+            displayColors: false,
+            callbacks: {
+              // Enhanced tooltip showing value and % change
+              label: function (context) {
+                const value = context.raw;
+                const index = context.dataIndex;
+                const formattedValue = new Intl.NumberFormat("da-DK", {
+                  style: "decimal",
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }).format(value);
+
+                const pctChange = percentageChange[index];
+                const pctSign = pctChange >= 0 ? '+' : '';
+                const pctFormatted = pctChange.toFixed(2);
+
+                return [
+                  `Value: ${formattedValue} ${currencyCode}`,
+                  `Change: ${pctSign}${pctFormatted}%`
+                ];
+              }
+            }
+          }
+        }
       },
     });
+
+    return canvas.chart;
   },
+
 };
 
 // Helper function to generate chart colors
