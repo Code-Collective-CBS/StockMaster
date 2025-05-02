@@ -173,11 +173,7 @@ async function calculatePortfolioData(accountId) {
         currentValueAccount = currentValueNative / rates[nativeCurrency];
       }
 
-      // Calculate cost in account currency
-      let costInAccountCurrency = holding.totalCost;
-      if (nativeCurrency !== accountCurrency) {
-        costInAccountCurrency = holding.totalCost / rates[nativeCurrency];
-      }
+      const costInAccountCurrency = holding.totalCost;
 
       // Calculate gain/loss
       const unrealizedGain = currentValueAccount - costInAccountCurrency;
