@@ -230,7 +230,7 @@ const loadAccountDropdown = async (dropdown) => {
         if (account.account_id === storedIdNum && account.state === 'inactive') {
           alert('You need to activate your account');
           window.location.href = '/src/pages/account-settings.html';
-          break; 
+          break;
         }
       }
     }

@@ -136,7 +136,7 @@ const databaseServices = {
             `);
 
 
-            if(result.recordset.length === 0) {
+            if (result.recordset.length === 0) {
                 throw new Error(`Invalid currency name: ${account_currency}`);
             }
 
@@ -153,7 +153,7 @@ const databaseServices = {
                 .query(`
                 INSERT INTO Accounts (account_name, currency_id, user_id, bank)
                 VALUES (@account_name, @currency_id, @user_id, @bank)`
-            );
+                );
 
             return { account_name, account_currency, account_bank };
         } catch (err) {
@@ -166,8 +166,8 @@ const databaseServices = {
         try {
             const pool = await poolPromise;
             const getAccount = await pool
-            .request()
-            .input("id", sql.Int, id).query(`
+                .request()
+                .input("id", sql.Int, id).query(`
                 SELECT
                     u.id AS user_id,
                     u.firstname,
@@ -262,10 +262,10 @@ const databaseServices = {
 
     getAccountBasicInfo: async (accountId) => {
         try {
-          const pool = await poolPromise;
-          const result = await pool.request()
-            .input("accountId", sql.Int, accountId)
-            .query(`
+            const pool = await poolPromise;
+            const result = await pool.request()
+                .input("accountId", sql.Int, accountId)
+                .query(`
               SELECT
                 a.id,
                 a.account_name,
@@ -275,12 +275,12 @@ const databaseServices = {
               WHERE a.id = @accountId
             `);
 
-          return result.recordset[0]; // Return the first row or undefined
+            return result.recordset[0]; // Return the first row or undefined
         } catch (err) {
-          console.error("Error getting account basic info:", err);
-          throw err;
+            console.error("Error getting account basic info:", err);
+            throw err;
         }
-      },
+    },
 
     getPortfoliosForUser: async (userId) => {
         try {
@@ -568,7 +568,7 @@ const databaseServices = {
                 WHERE c.currency_name = @currency_name
             `);
 
-            if(currencyResult.recordset.length === 0){
+            if (currencyResult.recordset.length === 0) {
                 throw new Error(`Invalid security currency: ${security_currency}`);
             }
 
@@ -717,23 +717,25 @@ const databaseServices = {
         try {
             const pool = await poolPromise;
 
+            // Selects the current currency_name of the account.
             const current_account_currency_query = await pool
                 .request()
                 .input('account_id', sql.Int, account_id)
                 .query(`
                 SELECT
-                    c.currency_name AS currency
+                    c.currency_name AS currency,
                     FROM Accounts a
                     JOIN Currency c ON a.currency_id = c.id
                 WHERE a.id = @account_id
             `);
 
-            if(current_account_currency_query.recordset.length === 0) {
+            if (current_account_currency_query.recordset.length === 0) {
                 throw new Error('Could not find currency_name for currency account currency');
             }
-
+            // Saves the current account currency in a variable.
             const current_account_currency = current_account_currency_query.recordset[0].currency;
 
+            // Selects the total_balance from the account
             const account_balance_query = await pool
                 .request()
                 .input('account_id', sql.Int, account_id)
@@ -743,14 +745,16 @@ const databaseServices = {
                 WHERE a.id = @account_id
             `);
 
-            if(account_balance_query.recordset.length === 0) {
+            if (account_balance_query.recordset.length === 0) {
                 throw new Error('Could not find total_balance for account');
             }
 
+            // Saves the current account balance in a variable.
             const current_account_balance = account_balance_query.recordset[0].total_balance;
             let convertedTotalPrice = current_account_balance;
 
-            if(current_account_currency !== account_currency){
+            // If the currenct account currency is different from the new currency that has been chosen, it has to convert.
+            if (current_account_currency !== account_currency) {
 
                 const rates = await exchangeRateService.getCurrency(current_account_currency);
                 convertedTotalPrice = currencyUtils.convertCurrency(
@@ -761,7 +765,7 @@ const databaseServices = {
                 );
             }
 
-            // 1. Lookup currency_id based currency_name
+            // Looks up the currency_id based on currency_name
             const currencyResult = await pool
                 .request()
                 .input('currency_name', sql.NVarChar(50), account_currency)
@@ -771,14 +775,40 @@ const databaseServices = {
                     WHERE currency_name = @currency_name
             `);
 
-            if(currencyResult.recordset.length === 0) {
-                throw new Error(`Invalid currencyname: ${account_currency}`);
+            if (currencyResult.recordset.length === 0) {
+                throw new Error(`Invalid currency name: ${account_currency}`);
             }
 
             const currency_id = currencyResult.recordset[0].id
 
-            // 2. Update the account
-            await pool.request()  // ⬅️ no need to assign to `result`
+            // Check the last updated state for the account
+            const result = await pool
+                .request()
+                .input('account_id', sql.Int, account_id)
+                .query(`
+                    SELECT state_change
+                    FROM AccountHistory
+                    WHERE account_id = @account_id
+                    ORDER BY create_date DESC
+                    `)
+
+            const latestAccountState = result.recordset[0].state_change
+
+            // If the current state is different from the one in the database, insert data into AccountHistory
+            if (latestAccountState !== account_state) {
+                await pool
+                    .request()
+                    .input('account_id', sql.Int, account_id)
+                    .input('state_change', sql.NVarChar(10), account_state)
+                    .query(`
+                    INSERT INTO AccountHistory (account_id, state_change)
+                    VALUES (@account_id, @state_change)
+                    `)
+            }
+
+            // Update the account
+            await pool
+                .request()
                 .input('user_id', sql.Int, user_id)
                 .input('id', sql.Int, account_id)
                 .input('account_name', sql.VarChar(100), account_name)
@@ -861,7 +891,7 @@ const databaseServices = {
                 WHERE id = @id
                 AND user_id = @user_id`
                 )
-                return result.rowsAffected[0]
+            return result.rowsAffected[0]
         } catch (err) {
             console.error('Failed to delete account', err)
             throw err
