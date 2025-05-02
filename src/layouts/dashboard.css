@@ -184,6 +184,7 @@ a.portfolio {
   justify-content: space-between;
   margin-top: 30px;
   gap: 15px;
+  width: 100%;
 }
 
 .top-holdings {
