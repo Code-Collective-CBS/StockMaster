@@ -75,7 +75,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   popUps.setupDepositPopup()
   popUps.createPortfolio();
 
-  profitLoss.realizedPL();
+  const realizedPLData = await profitLoss.realizedPL();
+  const totalRealizedEl = document.querySelector('.overview-realized-value');
+
+  if (realizedPLData) {
+    totalRealizedEl.textContent = formatCurrency(
+      Number(realizedPLData.realizedSum),
+      realizedPLData.currency
+    );
+  } else {
+    totalRealizedEl.textContent = '-';
+  }
+
 
   const newsContainerAuthor = document.getElementById("news-author");
   const newsContainerDescription = document.getElementById("news-description");
@@ -166,8 +177,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const allHoldings = portfolios.flatMap(p =>
       p.metrics.holdings.map(h => ({
         symbol: h.symbol,
-        currentValueNative:   h.currentValueNative,
-        nativeCurrency:       h.nativeCurrency,
+        currentValueNative: h.currentValueNative,
+        nativeCurrency: h.nativeCurrency,
         unrealizedGainPercent: h.unrealizedGainPercent
       }))
     );
@@ -198,8 +209,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (ulGain) {
       ulGain.innerHTML = topByGain.map(h => {
         const sign = h.unrealizedGainPercent >= 0 ? "+" : "-";
-        const pct  = Math.abs(h.unrealizedGainPercent).toFixed(2) + "%";
-        const cls  = h.unrealizedGainPercent >= 0 ? "positive-change" : "negative-change";
+        const pct = Math.abs(h.unrealizedGainPercent).toFixed(2) + "%";
+        const cls = h.unrealizedGainPercent >= 0 ? "positive-change" : "negative-change";
         return `
           <li>
             <span class="symbol">${h.symbol}</span>
@@ -208,19 +219,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         `;
       }).join("");
     }
-
-    renderList(topByValue, "top-value-list", "value", formatCurrency);
-    renderList(topByGain, "top-gain-list", "gainPct", val => {
-      // Format with 2 decimal places
-      const formatted = Math.abs(val).toFixed(2) + "%";
-
-      // Add a plus sign for positive values (optional)
-      return val >= 0 ? "+" + formatted : "-" + formatted;
-    });
-
-    // Display total realized by all portfolios
-    const totalRealizedPara = document.querySelector('.overview-realized-value')
-    totalRealizedPara.textContent = null;
   } catch (err) {
     console.error("Dashboard setup failed:", err);
   }

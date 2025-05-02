@@ -14,6 +14,8 @@ export const profitLoss = {
         const transactions = loadedTransactions.data;
         let sumOfBoughtTransactions = 0;
         let sumOfSoldTransactions = 0;
+        const accountCurrency = selectedAccount.currency;
+        const currencyRates = await stockAPI.getCurrency(accountCurrency);
 
         // List for unique currencies for the transactions from our accounts
         // Loops through transactions to identify different currencies
@@ -53,11 +55,7 @@ export const profitLoss = {
                     }
                 }
             };
-            console.log('currencyList for account:', currencyList);
 
-            const accountCurrency = selectedAccount.currency;
-            const currencyRates = await stockAPI.getCurrency(accountCurrency);
-            console.log('currencyRates: ', currencyRates.conversion_rates)
 
             if (type === 'buy') {
                 for (let i = 0; i < currencyList.length; i++) {
@@ -72,11 +70,8 @@ export const profitLoss = {
         console.log('sum of buy transactions', sumOfBoughtTransactions);
         console.log('sum of sold transactions', sumOfSoldTransactions);
         if (sumOfSoldTransactions !== 0) {
-            const realizedPL = sumOfSoldTransactions - sumOfBoughtTransactions
-            console.log('Realized profit/loss: ', realizedPL.toFixed(2))
-        } else {
-            //wtf
-            console.log('det fungerer')
+            const realizedProfitLoss = (sumOfSoldTransactions - sumOfBoughtTransactions).toFixed(2)
+            return { realizedSum: realizedProfitLoss, currency: accountCurrency };
         }
     }
 };
