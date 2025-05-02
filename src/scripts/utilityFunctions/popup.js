@@ -108,6 +108,7 @@ export const popUps = {
                 </div>
                 <div class="modal-form">
                     <p class="account-name"></p>
+                    <p class="account-balance-info">Available balance: <span id="account-balance"></span></p>
                     <p class="modal-instruction">Enter amount to deposit:</p>
                     <div class="input-group">
                         <input id="popup-amount" type="number" placeholder="Amount" />
@@ -120,13 +121,34 @@ export const popUps = {
       document.body.appendChild(modal);
 
       const selectedAccount = await popUps.accountDetails();
-
+      const amountInputElement = modal.querySelector("#popup-amount");
+      
       const accountNamePara = modal.querySelector(".account-name");
       accountNamePara.innerHTML = `Account: ${selectedAccount.account_name}`;
-
+      
+      
       const currencySpan = modal.querySelector("#accountCurrency");
       const userCurrency = selectedAccount.currency;
       currencySpan.textContent = userCurrency;
+      
+      const accountBalanceSpan = modal.querySelector("#account-balance");
+      accountBalanceSpan.textContent = `${selectedAccount.total_balance} ${selectedAccount.currency}`;
+
+      // Update available balance in accountBalanceSpan
+      amountInputElement.addEventListener('input', () => {
+        const amount = parseFloat(amountInputElement.value) || 0;
+        const isDeposit = modal.querySelector(".toggle-btn.active").dataset.type === "deposit";
+        
+        let updatedBalance = selectedAccount.total_balance;
+
+        if(isDeposit) {
+          updatedBalance = selectedAccount.total_balance + amount;
+        } else {
+          updatedBalance = selectedAccount.total_balance - amount;
+        }
+      
+        accountBalanceSpan.textContent = `${updatedBalance.toFixed(2)} ${selectedAccount.currency}`;
+      });
 
       // Close modal
       modal
