@@ -8,9 +8,7 @@ const cache = require('../utilityFunctions/cache');
 const portfolioController = {
   getPortfolioSummary: async (req, res) => {
     try {
-//req.query.refresh accesses a query parameter named "refresh" from the URL
-// The double exclamation marks (!!) convert the value to a boolean:
-      // const refresh = !!req.query.refresh; // c
+      
       // Set up key + TTL for the entire summary (whole portfolio)
       const accountId = req.params.accountId;
 
@@ -23,11 +21,6 @@ const portfolioController = {
         // Include the currency in the cache key
         const cacheKey = `portfolio-${accountId}-${accountInfo.currency}`;
         const cacheTTL = 3600; // seconds = 1h
-
-        // if (refresh) {
-        //   console.log(`Refreshed requested, clearing cache for ${cacheKey}`);
-        //   cache.del(cacheKey);
-        // }
 
 
       // This callback runs if cache is empty or expired.

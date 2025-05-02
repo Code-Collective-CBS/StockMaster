@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           }
         }
 
-        
+
     // POP UP
     popUps.setupDepositPopup();
     popUps.createPortfolio();
@@ -387,7 +387,7 @@ function updateHoldingsTable(portfolio) {
   );
 
   sorted.forEach((h) => {
-    const boughtPriceNative = h.firstPurchasePriceNative ?? h.gak;
+    const boughtPriceNative = h.boughtPriceNative;
     const currentPriceNative = h.currentPriceNative;
     const avgCostNative = h.gak;
     const qty = h.quantity;

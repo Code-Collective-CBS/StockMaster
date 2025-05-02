@@ -110,22 +110,9 @@ export const stockAPI = {
         return mockPortfolioData;
       }
 
-      // // Check if the portfolio has a recent transaction flag
-      // const hasRecentTransaction = sessionStorage.getItem(
-      //   "portfolio_transaction"
-      // );
-
-      // // Add a refresh parameter if needed (pretty smart, not sure if needed though);
-      // const refreshParam = hasRecentTransaction ? `?refresh=true` : "";
-      // const url = `${PORTFOLIO_URL}/${accountId}${refreshParam}`;
-
       // Make API call
       const url = `${PORTFOLIO_URL}/${accountId}`;
       const response = await fetch(url);
-
-      // if (hasRecentTransaction) {
-      //   sessionStorage.removeItem('portfolio_transaction');
-      // }
 
       if (!response.ok) {
         throw new Error(
