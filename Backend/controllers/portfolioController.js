@@ -19,7 +19,6 @@ const portfolioController = {
 
       // 2. Set up cache key with account ID and currency
       const cacheKey = `portfolio-${accountId}-${accountInfo.currency}-${Date.now()}`;
-      console.log("portfolioController cachekey:", cacheKey);
 
       // 3. Try to get data from cache, or calculate it if not available
       const { data: portfolioData } = await getOrSetCache(
