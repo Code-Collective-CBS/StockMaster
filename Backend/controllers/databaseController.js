@@ -357,7 +357,7 @@ const databaseController = {
             const cacheKeyTransactions = `transactions-account_id-${account_id}`;
             cache.del(cacheKeyTransactions);
             // Portfolio cache
-            const cacheKeyPortfolios = `portfolio-${account_id}-${accountCurrency}-${Date.now()}`;
+            const cacheKeyPortfolios = `portfolio-${account_id}-${accountCurrency}`;
             cache.del(cacheKeyPortfolios);
 
             res.status(201).json({
@@ -403,7 +403,7 @@ const databaseController = {
             const cacheKeyTransactions = `transactions-account_id-${account_id}`;
             cache.del(cacheKeyTransactions);
             // Portfolio cache
-            const cacheKeyPortfolios = `portfolio-${account_id}-${accountCurrency}-${Date.now()}`;
+            const cacheKeyPortfolios = `portfolio-${account_id}-${accountCurrency}`;
             cache.del(cacheKeyPortfolios);
 
             res.status(201).json({
@@ -459,6 +459,11 @@ const databaseController = {
             // Clear cache
             const cacheKey = `accounts-user_id-${user_id}`;
             cache.del(cacheKey);
+
+            const cacheKeyPortfolios = `portfolio-${account_id}-${account_currency}`;
+            cache.del(cacheKeyPortfolios);
+
+
 
             res.status(201).json({
                 message: "Account changed",
