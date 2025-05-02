@@ -1,319 +1,324 @@
 body {
-    display: flex;
-    margin: 0;
-    padding: 0;
-    font-family: var(--font-primary);
-    background-color: var(--primary-color);
-    color: var(--primary-text);
-    min-height: 100vh;
-    overflow-x: hidden;
+  display: flex;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-primary);
+  background-color: var(--primary-color);
+  color: var(--primary-text);
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
 header {
-    padding: 20px;
+  padding: 20px;
 }
 
 .dashboard-content {
-    flex: 1;
-    margin-left: 250px;
-    /*same as sidebar width*/
-    padding: 30px;
-    box-sizing: border-box;
+  flex: 1;
+  margin-left: 250px;
+  /*same as sidebar width*/
+  padding: 30px;
+  box-sizing: border-box;
 }
 
 /* Header */
 .page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
 }
 
 .page-header h1 {
-    font-size: var(--h1-size);
-    font-weight: var(--h1-weight);
-    margin: 0;
+  font-size: var(--h1-size);
+  font-weight: var(--h1-weight);
+  margin: 0;
 }
 
 .header-actions {
-    display: flex;
-    gap: 15px;
+  display: flex;
+  gap: 15px;
 }
 
 /* Buttons */
 .btn {
-    padding: 12px 20px;
-    border-radius: 10px;
-    font-size: var(--text-size);
-    font-weight: var(--text-size);
-    cursor: pointer;
-    border: none;
-    transition: background-color 0.3s, transform 0.2s;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: var(--text-size);
+  font-weight: var(--text-size);
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s, transform 0.2s;
 }
 
 .btn:hover {
-    transform: translateY(-2px);
-    /* lift the button slightly on hover*/
+  transform: translateY(-2px);
+  /* lift the button slightly on hover*/
 }
 
 .btn-primary {
-    background-color: var(--highlight);
-    color: var(--secondary-color);
+  background-color: var(--highlight);
+  color: var(--secondary-color);
 }
 
 .btn-primary:hover {
-    background-color: #00c080;
-    /* Darker shade of highlight */
+  background-color: #00c080;
+  /* Darker shade of highlight */
 }
 
 .btn-secondary {
-    background-color: var(--secondary-color);
-    color: var(--primary-text);
-    border: 1px solid var(--grey);
+  background-color: var(--secondary-color);
+  color: var(--primary-text);
+  border: 1px solid var(--grey);
 }
 
 .btn-secondary:hover {
-    background-color: var(--grey);
+  background-color: var(--grey);
 }
 
 
 /* DASHBOARD LAYOUT */
 main.dashboard-content {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    margin-left: 250px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  margin-left: 250px;
 }
 
 /* GRID LAYOUT */
 section.dashboard-grid {
-    display: grid;
-    gap: 20px;
-    grid-template-columns: repeat(3, 1fr);
-    background-color: transparent;
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(3, 1fr);
+  background-color: transparent;
 }
 
 /* GRID LAYOUT: Define Spans */
-section.overview,
 section.portfolios,
 section.benchmark,
 section.top-stocks {
-    grid-column: span 3;
+  grid-column: span 3;
 }
 
 section.portfolio-graph {
-    grid-column: span 3;
+  grid-column: span 3;
 }
 
 /* START Dashboard portfolio */
 
 section.portfolio-graph {
-    background-color: transparent;
+  background-color: transparent;
 }
 
-div.chart-column, div.holdings-column {
-    display: flex;
+div.chart-column,
+div.holdings-column {
+  display: flex;
 }
 
 .portfolio-grid {
-    display: flex;
-    gap: 30px;
-    width: 100%;
-  }
+  display: flex;
+  gap: 30px;
+  width: 100%;
+}
 
-  .positive-change {
-    color: var(--highlight) !important;
-  }
+.positive-change {
+  color: var(--highlight) !important;
+}
 
-  .negative-change {
-    color: var(--red) !important;
-  }
+.negative-change {
+  color: var(--red) !important;
+}
 
-  .chart-column,
-  .holdings-column {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    background-color: var(--secondary-color);
-    border-radius: 5px;
-    padding: 10px;
+.chart-column,
+.holdings-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--secondary-color);
+  border-radius: 5px;
+  padding: 10px;
 }
 
 /* END Dashboard portfolio */
 
 section.news {
-    grid-column: span 2;
+  grid-column: span 2;
 }
 
 /* DASHBOARD CONTENT STYLING */
 section {
-    background-color: var(--secondary-color);
-    border-radius: 5px;
-    padding: 20px;
+  background-color: var(--secondary-color);
+  border-radius: 5px;
+  padding: 20px;
 }
 
 /* SELECT ELEMENTS */
 #overview-interval,
 #benchmark-interval,
 #portfolio-graph-interval {
-    color: var(--highlight);
-    background-color: transparent;
-    border: none;
-    outline: none;
-    font-weight: var(--text-weight-bold);
+  color: var(--highlight);
+  background-color: transparent;
+  border: none;
+  outline: none;
+  font-weight: var(--text-weight-bold);
 }
 
 /* OVERVIEW */
 .overview-value {
-    font-size: var(--h5-size);
+  font-size: var(--h5-size);
 }
 
 /* PORTFOLIOS */
 a.portfolio {
-    color: #BADFEE;
-    text-decoration: none;
+  color: #BADFEE;
+  text-decoration: none;
 }
 
 /* BENCHMARK */
 .benchmark-index {
-    font-size: var(--h5-size);
+  font-size: var(--h5-size);
 }
+
 /* Portfolio Grid Layout */
 .portfolio-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    margin-top: 20px;
-    width: 100%;
-  }
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-top: 20px;
+  width: 100%;
+}
 
-  .top-holdings-container {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 30px;
-  }
+.top-holdings-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+}
 
-  .top-holdings {
-    flex: 1;
-    margin: 0 10px;
-    background-color: var(--secondary-color);
-    border-radius: 8px;
-    padding: 15px;
-  }
+.top-holdings {
+  flex: 1;
+  margin: 0 10px;
+  background-color: var(--secondary-color);
+  border-radius: 8px;
+  padding: 15px;
+}
 
-  .top-list {
-    list-style: none;
-    padding: 0;
-  }
+.top-list {
+  list-style: none;
+  padding: 0;
+}
 
-  .top-list li {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  }
+.top-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
 
-  .top-list li:last-child {
-    border-bottom: none;
-  }
+.top-list li:last-child {
+  border-bottom: none;
+}
 
-  .top-list .symbol {
-    font-weight: bold;
-  }
+.top-list .symbol {
+  font-weight: bold;
+}
 
-  .top-list .val {
-    color: var(--highlight);
-  }
+.top-list .val {
+  color: var(--highlight);
+}
 
-  .chart-column, .holdings-column {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-  }
+.chart-column,
+.holdings-column {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
 
-  .chart-column h3, .holdings-column h3 {
-    margin-bottom: 15px;
-    font-size: var(--h5-size);
-    font-weight: var(--h4-weight);
-  }
+.chart-column h3,
+.holdings-column h3 {
+  margin-bottom: 15px;
+  font-size: var(--h5-size);
+  font-weight: var(--h4-weight);
+}
 
-  #portfolio-selector-container {
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-  }
+#portfolio-selector-container {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+}
 
-  .portfolio-selector {
-    background-color: var(--secondary-color);
-    color: var(--primary-text);
-    border: 1px solid var(--grey);
-    padding: 8px 12px;
-    border-radius: 5px;
-    font-size: var(--text-size);
-    margin-left: 10px;
-  }
+.portfolio-selector {
+  background-color: var(--secondary-color);
+  color: var(--primary-text);
+  border: 1px solid var(--grey);
+  padding: 8px 12px;
+  border-radius: 5px;
+  font-size: var(--text-size);
+  margin-left: 10px;
+}
 
-  .chart-container {
-    width: 100%;
-    min-height: 400px; /* Increased height */
-    aspect-ratio: 1 / 1; /* Square aspect ratio for pie charts */
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+.chart-container {
+  width: 100%;
+  min-height: 400px;
+  /* Increased height */
+  aspect-ratio: 1 / 1;
+  /* Square aspect ratio for pie charts */
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-  /* Make sure charts maintain a good size */
-  .chart-container canvas {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto !important;
-    height: auto !important;
-  }
+/* Make sure charts maintain a good size */
+.chart-container canvas {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto !important;
+  height: auto !important;
+}
 
 
 /* News Discription Container  */
-.news-titel-container{
-    padding: 10px;
+.news-titel-container {
+  padding: 10px;
 }
 
 .news-titel-container h2 {
-    font-size: var(--h4-size);
-    font-weight: var(--h4-weight);
-    margin-bottom: 15px;
-    color: var(--primary-text);
+  font-size: var(--h4-size);
+  font-weight: var(--h4-weight);
+  margin-bottom: 15px;
+  color: var(--primary-text);
 }
 
 .news-description-container {
-    max-height: 200px;
-    overflow-y: auto;
-    padding-right: 10px;
-    line-height: 1.6;
-    color: var(--primary-text);
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 10px;
+  line-height: 1.6;
+  color: var(--primary-text);
 }
 
 /* Paragraph inside scroll box */
 #news-description-container p {
-    margin: 0;
-    font-size: 0.95rem;
-    text-align: justify;
+  margin: 0;
+  font-size: 0.95rem;
+  text-align: justify;
 }
 
 /* Style the scrollbar */
 .news-description-container::-webkit-scrollbar {
-    width: 8px;
+  width: 8px;
 }
 
 .news-description-container::-webkit-scrollbar-track {
-    background: var(--secondary-color);
-    border-radius: 4px;
+  background: var(--secondary-color);
+  border-radius: 4px;
 }
 
 .news-description-container::-webkit-scrollbar-thumb {
-    background: var(--grey);
-    border-radius: 4px;
+  background: var(--grey);
+  border-radius: 4px;
 }
 
 .news-description-container::-webkit-scrollbar-thumb:hover {
-    background: var(--highlight);
+  background: var(--highlight);
 }

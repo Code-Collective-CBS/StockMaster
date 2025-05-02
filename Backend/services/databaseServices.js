@@ -211,12 +211,12 @@ const databaseServices = {
         }
     },
 
-    getAccountBalanceAndCurrency: async (accoun_id) => {
+    getAccountBalanceAndCurrency: async (account_id) => {
         try {
             const pool = await poolPromise;
             const result = await pool
                 .request()
-                .input('accountId', sql.Int, accoun_id)
+                .input('accountId', sql.Int, account_id)
                 .query(`
                 SELECT
                     a.total_balance,
@@ -227,7 +227,7 @@ const databaseServices = {
             `);
 
             if (!result.recordset[0]) {
-                throw new Error(`Account with id: ${accoun_id} not found`);
+                throw new Error(`Account with id: ${account_id} not found`);
             }
 
             return result.recordset[0]; // { total_balance, currency }
