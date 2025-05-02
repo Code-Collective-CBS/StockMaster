@@ -5,73 +5,71 @@ import { currencyHandler } from "./currencyConverter.js";
 
 export const profitLoss = {
     realizedPL: async () => {
-        // Dashboard Realized and Unrealized Profit/Loss variables
+        // Fetch accounts and transactions
         await loadAccounts();
         const selectedAccountId = sessionStorage.getItem("selectedAccountId");
-        const accounts = window.cachedAccounts;
-        const selectedAccount = accounts.find((acc) => acc.account_id == selectedAccountId) || null;
-        const loadedTransactions = await loadTransactions();
-        const transactions = loadedTransactions.data;
-        let sumOfBoughtTransactions = 0;
-        let sumOfSoldTransactions = 0;
+        const selectedAccount = window.cachedAccounts
+            .find(acc => acc.account_id == selectedAccountId);
         const accountCurrency = selectedAccount.currency;
         const currencyRates = await stockAPI.getCurrency(accountCurrency);
 
-        // List for unique currencies for the transactions from our accounts
-        // Loops through transactions to identify different currencies
-        for (let i = 0; i < 2; i++) {
-            const type = i === 0 ? 'buy' : 'sell'; // First time looping check for 'buy'
-            const currencyList = [];
+        const loadedTransactions = await loadTransactions();
+        const transactions = loadedTransactions.data
+            // Sort chronologically for FIFO calculation
+            .sort((a, b) => new Date(a.date) - new Date(b.date));
 
-            transactions.forEach(trans => {
-                const currency = trans.account_currency;
-                if (!currency) return;
+        // Map per symbol to track current position and cost basis
+        const positionMap = {};
+        let totalRealizedPL = 0;
 
-                // Variable to check if the currency exists
-                let exists = false;
+        for (const trans of transactions) {
+            const type = trans.transaction_type.toLowerCase(); // 'buy' or 'sell'
+            const symbol = trans.symbol;
+            const qty = trans.quantity;
+            const priceRaw = trans.total_price;                   // local currency amount
+            const curr = trans.account_currency;
 
-                // Loops through our currencyList to see if we already have the currency
-                for (const index in currencyList) {
-                    if (currencyList[index].currency === currency) {
-                        exists = true;
-                        break; // If yes - break
-                    }
-                }
-                // If no - add the currency to our list with sum
-                if (!exists) {
-                    currencyList.push({ currency, sum: 0 });
-                }
-            });
+            // Convert to account currency
+            const amount = currencyHandler.convertCurrency(
+                priceRaw, curr, accountCurrency, currencyRates
+            );
 
-            // Loops through all transactions for the account
-            for (let i = 0; i < transactions.length; i++) {
-                if (transactions[i].transaction_type === type) {
-                    // We loop through our currencyList
-                    for (let j = 0; j < currencyList.length; j++) {
-                        // If the currency in our currencyList is equal to the currency for the transaction
-                        if (currencyList[j].currency === transactions[i].account_currency)
-                            // We add it to our list
-                            currencyList[j].sum += transactions[i].total_price
-                    }
-                }
-            };
-
+            // Initialize new symbol entry if needed
+            if (!positionMap[symbol]) {
+                positionMap[symbol] = { totalQty: 0, totalCost: 0 };
+            }
+            const pos = positionMap[symbol];
 
             if (type === 'buy') {
-                for (let i = 0; i < currencyList.length; i++) {
-                    sumOfBoughtTransactions += currencyHandler.convertCurrency(currencyList[i].sum, currencyList[i].currency, accountCurrency, currencyRates)
+                // Add purchase
+                pos.totalQty += qty;
+                pos.totalCost += amount;
+            }
+            else if (type === 'sell') {
+                if (pos.totalQty <= 0) {
+                    console.warn(`Sale of ${symbol} without position!`);
+                    continue;
                 }
-            } else if (type === 'sell') {
-                for (let i = 0; i < currencyList.length; i++) {
-                    sumOfSoldTransactions += currencyHandler.convertCurrency(currencyList[i].sum, currencyList[i].currency, accountCurrency, currencyRates)
-                }
+                // Calculate average cost basis
+                const avgCostPerUnit = pos.totalCost / pos.totalQty;
+                // Cost basis for this sale
+                const costBasis = avgCostPerUnit * qty;
+                // Realized P/L = sale proceeds − cost basis
+                const realized = amount - costBasis;
+                totalRealizedPL += realized;
+
+                // Update position
+                pos.totalQty -= qty;
+                pos.totalCost -= costBasis;
             }
         }
-        console.log('sum of buy transactions', sumOfBoughtTransactions);
-        console.log('sum of sold transactions', sumOfSoldTransactions);
-        if (sumOfSoldTransactions !== 0) {
-            const realizedProfitLoss = (sumOfSoldTransactions - sumOfBoughtTransactions).toFixed(2)
-            return { realizedSum: realizedProfitLoss, currency: accountCurrency };
+
+        // Return only if there is realized P/L
+        if (totalRealizedPL !== 0) {
+            return {
+                realizedSum: totalRealizedPL.toFixed(2),
+                currency: accountCurrency
+            };
         }
     }
 };
