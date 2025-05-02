@@ -308,10 +308,14 @@ export const popUps = {
       stockPriceSpan.textContent = `${window.latestStockPrice} ${window.securityCurrency}`;
       accountBalanceSpan.textContent = `${selectedAccount.total_balance} ${selectedAccount.currency}`;
 
-      const allPortfolioDetails = await popUps.simplePortfolioList(
-        selectedAccount.account_id
-      );
-      console.log("Portfolios details", allPortfolioDetails);
+      const allPortfolioDetails = await popUps.simplePortfolioList(selectedAccount.account_id);
+
+      if(!allPortfolioDetails || allPortfolioDetails.length === 0) {
+        alert("You must create a portfolio before you can buy securities.");
+        tradeModal.remove();
+        return;
+      }
+
       allPortfolioDetails.forEach((portfolio) => {
         const option = document.createElement("option");
         option.classList.add("popup-portfolios-option");
@@ -438,9 +442,13 @@ export const popUps = {
       const ownedQuantitySpan = tradeModal.querySelector("#owned-quantity");
 
       const selectedAccount = await popUps.accountDetails();
-      const allPortfolioDetails = await popUps.simplePortfolioList(
-        selectedAccount.account_id
-      );
+      const allPortfolioDetails = await popUps.simplePortfolioList(selectedAccount.account_id);
+
+      if(!allPortfolioDetails || allPortfolioDetails.length === 0) {
+        alert("You must create a portfolio before you can buy securities.");
+        tradeModal.remove();
+        return;
+      }
 
       // Populate dropdown
       allPortfolioDetails.forEach((portfolio) => {
@@ -585,8 +593,9 @@ export const popUps = {
   createPortfolio: () => {
     const addPortfolioButton = document.getElementById("addPortfolioButton");
 
-    if (!addPortfolioButton)
+    if (!addPortfolioButton) {
       return console.log("Could not find #addPortfolioButton");
+    }
 
     addPortfolioButton.addEventListener("click", () => {
       // If pop-up already exists - do nothing.
