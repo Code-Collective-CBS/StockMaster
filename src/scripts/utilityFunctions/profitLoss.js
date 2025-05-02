@@ -14,57 +14,57 @@ export const profitLoss = {
         const currencyRates = await stockAPI.getCurrency(accountCurrency);
 
         const loadedTransactions = await loadTransactions();
-        const transactions = loadedTransactions.data
-            // Sort chronologically for FIFO calculation
-            .sort((a, b) => new Date(a.date) - new Date(b.date));
+        const transactions = loadedTransactions.data;
 
-        // Map per symbol to track current position and cost basis
-        const positionMap = {};
-        let totalRealizedPL = 0;
-
-        for (const trans of transactions) {
+        // Aggregate buy/sell quantities and values per symbol
+        const symbolMap = {};
+        transactions.forEach(trans => {
             const type = trans.transaction_type.toLowerCase(); // 'buy' or 'sell'
             const symbol = trans.symbol;
             const qty = trans.quantity;
-            const priceRaw = trans.total_price;                   // local currency amount
+            const priceRaw = trans.total_price;          // local currency amount
             const curr = trans.account_currency;
 
-            // Convert to account currency
+            // Convert transaction amount to account currency
             const amount = currencyHandler.convertCurrency(
                 priceRaw, curr, accountCurrency, currencyRates
             );
 
-            // Initialize new symbol entry if needed
-            if (!positionMap[symbol]) {
-                positionMap[symbol] = { totalQty: 0, totalCost: 0 };
+            // Initialize map entry for symbol if missing
+            if (!symbolMap[symbol]) {
+                symbolMap[symbol] = {
+                    buyQty: 0,
+                    buyValue: 0,
+                    sellQty: 0,
+                    sellValue: 0
+                };
             }
-            const pos = positionMap[symbol];
+            const entry = symbolMap[symbol];
 
             if (type === 'buy') {
-                // Add purchase
-                pos.totalQty += qty;
-                pos.totalCost += amount;
+                // Accumulate buy quantity and value
+                entry.buyQty += qty;
+                entry.buyValue += amount;
+            } else if (type === 'sell') {
+                // Accumulate sell quantity and value
+                entry.sellQty += qty;
+                entry.sellValue += amount;
             }
-            else if (type === 'sell') {
-                if (pos.totalQty <= 0) {
-                    console.warn(`Sale of ${symbol} without position!`);
-                    continue;
-                }
-                // Calculate average cost basis
-                const avgCostPerUnit = pos.totalCost / pos.totalQty;
-                // Cost basis for this sale
-                const costBasis = avgCostPerUnit * qty;
-                // Realized P/L = sale proceeds − cost basis
-                const realized = amount - costBasis;
-                totalRealizedPL += realized;
+        });
 
-                // Update position
-                pos.totalQty -= qty;
-                pos.totalCost -= costBasis;
+        // Calculate realized P/L using average entry/exit prices per symbol
+        let totalRealizedPL = 0;
+        Object.values(symbolMap).forEach(({ buyQty, buyValue, sellQty, sellValue }) => {
+            // Only compute if there were buys and sells
+            if (buyQty > 0 && sellQty > 0) {
+                const avgEntryPrice = buyValue / buyQty;
+                const avgExitPrice = sellValue / sellQty;
+                // Realized P/L = (avg exit price − avg entry price) × quantity sold
+                totalRealizedPL += (avgExitPrice - avgEntryPrice) * sellQty;
             }
-        }
+        });
 
-        // Return only if there is realized P/L
+        // Return realized sum if non-zero
         if (totalRealizedPL !== 0) {
             return {
                 realizedSum: totalRealizedPL.toFixed(2),
