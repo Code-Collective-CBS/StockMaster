@@ -3,15 +3,6 @@ import { currencyHandler } from "./currencyConverter.js";
 import { cachingService } from "./cachingService.js";
 
 export const popUps = {
-  clearPortfolioCache: (accountId) => {
-    try {
-        const portfolioDataKey = `portfolioData-${accountId}`;
-        cachingService.clear(portfolioDataKey);
-        console.log(`Cleared portfolio cache for account ${accountId}`);
-    } catch (e) {
-      console.error("Error clearing portfolio cache:", e);
-    }
-  },
 
   accountDetails: async () => {
     await loadAccounts(); // Refresh window.cachedAccounts
@@ -122,15 +113,15 @@ export const popUps = {
 
       const selectedAccount = await popUps.accountDetails();
       const amountInputElement = modal.querySelector("#popup-amount");
-      
+
       const accountNamePara = modal.querySelector(".account-name");
       accountNamePara.innerHTML = `Account: ${selectedAccount.account_name}`;
-      
-      
+
+
       const currencySpan = modal.querySelector("#accountCurrency");
       const userCurrency = selectedAccount.currency;
       currencySpan.textContent = userCurrency;
-      
+
       const accountBalanceSpan = modal.querySelector("#account-balance");
       accountBalanceSpan.textContent = `${selectedAccount.total_balance} ${selectedAccount.currency}`;
 
@@ -138,7 +129,7 @@ export const popUps = {
       amountInputElement.addEventListener('input', () => {
         const amount = parseFloat(amountInputElement.value) || 0;
         const isDeposit = modal.querySelector(".toggle-btn.active").dataset.type === "deposit";
-        
+
         let updatedBalance = selectedAccount.total_balance;
 
         if(isDeposit) {
@@ -146,7 +137,7 @@ export const popUps = {
         } else {
           updatedBalance = selectedAccount.total_balance - amount;
         }
-      
+
         accountBalanceSpan.textContent = `${updatedBalance.toFixed(2)} ${selectedAccount.currency}`;
       });
 
@@ -378,12 +369,6 @@ export const popUps = {
                 `Successfully bought ${amount} shares of ${symbol} at ${latestPrice} per share.`
               );
 
-            //   // Set transaction flag
-            //   sessionStorage.setItem('portfolio_transaction', 'true');
-
-            //   // Clear cache for this account
-            //     popUps.clearPortfolioCache(selectedAccount.account_id);
-
               const refreshedAccount = await popUps.accountDetails();
               accountBalanceSpan.textContent = `${refreshedAccount.total_balance} ${refreshedAccount.currency}`;
               window.location.reload(); // MAYBE SMOTHER UX LATER - BUT NEED FOR UPDATING HOLDINGS OF SECURITY
@@ -567,12 +552,6 @@ export const popUps = {
               alert(
                 `Successfully sold ${amount} shares of ${symbol} at ${latestPrice} per share.`
               );
-
-              // Clear cache for this account
-              await new Promise((resolve) => {
-                popUps.clearPortfolioCache(selectedAccount.account_id);
-                setTimeout(resolve, 100); // Small delay to ensure cache is cleared
-              });
 
               const refreshedAccount = await popUps.accountDetails();
               accountBalanceSpan.textContent = `${refreshedAccount.total_balance} ${refreshedAccount.currency}`;
