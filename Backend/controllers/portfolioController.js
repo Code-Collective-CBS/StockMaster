@@ -191,7 +191,7 @@ async function calculatePortfolioData(accountId) {
         quantity: holding.quantity,
         totalCost: holding.totalCost,
         gak: holding.gak,
-        boughtPriceNative: holding.gak,  // This is actually the price per share
+        boughtPriceNative: holding.lastPrice,  // This is actually the price per share
         currentPriceNative: currentPrice,
         nativeCurrency,
         currentValueNative,
@@ -546,12 +546,23 @@ function calculateHoldings(transactions) {
     h.transactions.push(tx);
   });
 
-  return Object.values(bySecurity)
-    .filter((h) => h.quantity > 0)
-    .map((h) => ({
+  
+return Object.values(bySecurity)
+  .filter(h => h.quantity > 0)
+  .map(h => {
+    const avgCost = h.totalCost / h.quantity;
+    // find the last 'buy' transaction
+    const lastBuy = h.transactions
+      .filter(tx => tx.transaction_type.toLowerCase() === 'buy')
+      .slice(-1)[0];
+
+    return {
       ...h,
-      gak: h.totalCost / h.quantity, // true average acquisition cost
-    }));
+      gak: avgCost,
+      lastPrice: lastBuy ? Number(lastBuy.price_per_share) : avgCost
+    };
+  });
+
 }
 
 module.exports = portfolioController;
