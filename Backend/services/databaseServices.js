@@ -725,7 +725,7 @@ const databaseServices = {
                     c.currency_name AS currency
                     FROM Accounts a
                     JOIN Currency c ON a.currency_id = c.id
-                    WHERE a.id = @account_id
+                WHERE a.id = @account_id
             `);
 
             if(current_account_currency_query.recordset.length === 0) {
