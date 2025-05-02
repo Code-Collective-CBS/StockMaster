@@ -188,6 +188,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       .sort((a, b) => b.currentValueNative - a.currentValueNative)
       .slice(0, 5);
 
+    const topAllValue = allHoldings
+    .sort((a, b) => b.currentValueNative - a.currentValueNative);
+
     // 7) Compute Top 5 by unrealized gain %
     const topByGain = allHoldings
       .sort((a, b) => b.unrealizedGainPercent - a.unrealizedGainPercent)
@@ -203,6 +206,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         </li>
       `).join("");
     }
+
+        // 8 Render Top All native values
+        const AllValue = document.querySelector(".overview-unrealized-value");
+        if (AllValue) {
+          AllValue.innerHTML = topAllValue.map(h => `
+              <span class="val">${formatCurrency(h.currentValueNative, h.nativeCurrency)}</span>
+          `).join("");
+        }
 
     // 9) Render Top 5 unrealized gain %
     const ulGain = document.getElementById("top-gain-list");
