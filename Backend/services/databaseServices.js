@@ -664,7 +664,7 @@ const databaseServices = {
 
             const transaction_id = insertQuery.recordset[0].id; // OUTPUT from "OUTPUT INSERTED.id"
 
-            return { success: true, transaction_id }
+            return { success: true, transaction_id, accountCurrency }
         } catch (error) {
             console.error("Failed to buy security to portfolio", error);
             throw error;

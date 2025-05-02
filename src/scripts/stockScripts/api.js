@@ -99,7 +99,7 @@ export const stockAPI = {
   getPortfolioSummary: async (accountId) => {
     try {
       if (!accountId) {
-        throw new Error('Account ID is required');
+        throw new Error("Account ID is required");
       }
 
       const USE_MOCK_DATA = false;
@@ -110,12 +110,27 @@ export const stockAPI = {
         return mockPortfolioData;
       }
 
+      // // Check if the portfolio has a recent transaction flag
+      // const hasRecentTransaction = sessionStorage.getItem(
+      //   "portfolio_transaction"
+      // );
+
+      // // Add a refresh parameter if needed (pretty smart, not sure if needed though);
+      // const refreshParam = hasRecentTransaction ? `?refresh=true` : "";
+      // const url = `${PORTFOLIO_URL}/${accountId}${refreshParam}`;
+
       // Make API call
       const url = `${PORTFOLIO_URL}/${accountId}`;
       const response = await fetch(url);
 
+      // if (hasRecentTransaction) {
+      //   sessionStorage.removeItem('portfolio_transaction');
+      // }
+
       if (!response.ok) {
-        throw new Error(`HTTP error, could not get the portfolio url! Status: ${response.status}`);
+        throw new Error(
+          `HTTP error, could not get the portfolio url! Status: ${response.status}`
+        );
       }
 
       const result = await response.json();
@@ -143,19 +158,16 @@ export const stockAPI = {
 
   getTransactionsSummary: async () => {
     try {
-      const accountId = sessionStorage.getItem('selectedAccountId');
+      const accountId = sessionStorage.getItem("selectedAccountId");
 
-      if(!accountId) {
-        throw new Error('Account id missing');
+      if (!accountId) {
+        throw new Error("Account id missing");
       }
-
-
-
     } catch (error) {
-      console.error('Error fetching transactions', error);
+      console.error("Error fetching transactions", error);
       throw error;
     }
-  }
+  },
 
   // Test connection
   // testConnection: async () => {

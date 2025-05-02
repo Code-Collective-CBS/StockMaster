@@ -11,6 +11,28 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     const accountId = sessionStorage.getItem("selectedAccountId");
 
+    // Check for recent transactions
+    const transactionTimeStamp = sessionStorage.getItem('portfolio_transaction');
+
+    // Create cache key including account ID
+    const cacheKey = `portfolioData-${accountId}`;
+
+    if (transactionTimeStamp) {
+      sessionStorage.removeItem('portfolio_transaction');
+
+      // Force clear the cache
+      console.log("Recent transaction detected, clearing cache");
+
+    if (typeof cachingService !== 'undefined') {
+            cachingService.clear(cacheKey);
+          }
+          // Also clear the in-memory cache by force
+          if (cachingService && cachingService.cache) {
+            delete cachingService.cache[cacheKey];
+          }
+        }
+
+        
     // POP UP
     popUps.setupDepositPopup();
     popUps.createPortfolio();
@@ -27,8 +49,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const currentCurrency = sessionStorage.getItem(`accountCurrency-${accountId}`);
     const cachedCurrency = sessionStorage.getItem(`cachedCurrency-${accountId}`);
 
-    // Create cache key including account ID
-    const cacheKey = `portfolioData-${accountId}`;
+
 
     // If the currency has changed since last cache, invalidate the cache
     if (currentCurrency && cachedCurrency && currentCurrency !== cachedCurrency) {

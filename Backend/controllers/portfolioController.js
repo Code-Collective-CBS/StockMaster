@@ -3,28 +3,38 @@ const exchangeRateService = require("../services/exchangeRateService");
 const alphaVantageService = require("../services/alphaVantageService");
 const { getOrSetCache } = require("../utilityFunctions/cacheHelper");
 const moment = require("moment");
+const cache = require('../utilityFunctions/cache');
 
 const portfolioController = {
   getPortfolioSummary: async (req, res) => {
     try {
+//req.query.refresh accesses a query parameter named "refresh" from the URL
+// The double exclamation marks (!!) convert the value to a boolean:
+      // const refresh = !!req.query.refresh; // c
       // Set up key + TTL for the entire summary (whole portfolio)
       const accountId = req.params.accountId;
 
-      // First, get the current account info to check currency - without caching this part
-      const accountInfo = await databaseServices.getAccountBasicInfo(accountId);
-      if (!accountInfo) {
-        return res.status(404).json({ error: "Account not found" });
-      }
+        // First, get the current account info to check currency - without caching this part
+        const accountInfo = await databaseServices.getAccountBasicInfo(accountId);
+        if (!accountInfo) {
+          return res.status(404).json({ error: "Account not found" });
+        }
 
+        // Include the currency in the cache key
+        const cacheKey = `portfolio-${accountId}-${accountInfo.currency}`;
+        const cacheTTL = 3600; // seconds = 1h
 
-      // Include the currency in the cache key
-      const cacheKey = `portfolio-${accountId}-${accountInfo.currency}`;
-      const cacheTTL = 3600; // seconds = 1h
+        // if (refresh) {
+        //   console.log(`Refreshed requested, clearing cache for ${cacheKey}`);
+        //   cache.del(cacheKey);
+        // }
+
 
       // This callback runs if cache is empty or expired.
       const { data: portfolioData, source } = await getOrSetCache(
         cacheKey,
-        async () => { // If data doesn't exist or is expired, executes the callback function to fetch fresh data
+        async () => {
+          // If data doesn't exist or is expired, executes the callback function to fetch fresh data
           // 1) Fetch portfolios and basic info
           const portfolios = await databaseServices.getPortfoliosByAccount(
             accountId
@@ -33,7 +43,6 @@ const portfolioController = {
 
           const accountCurrency = portfolios[0].currency;
           const accountName = portfolios[0].account_name;
-
 
           // (2) Pre-cache exchange rates for accountCurrency (daily TTL) to convert currencies
           const ratesCacheKey = `rates-${accountCurrency}`;
@@ -45,7 +54,8 @@ const portfolioController = {
           const rates = ratesData.conversion_rates;
 
           // 3) For each portfolio, build a fully enriched object
-          return Promise.all( // Promise.all is typically used when there are multiple related asynchronous tasks that the overall code relies on to work successfully — all of whom we want to fulfill before the code execution continues.
+          return Promise.all(
+            // Promise.all is typically used when there are multiple related asynchronous tasks that the overall code relies on to work successfully — all of whom we want to fulfill before the code execution continues.
             portfolios.map(async (p) => {
               // Load transactions from database - holdings
               const txs = await databaseServices.getTransactionsForPortfolio(
@@ -101,12 +111,15 @@ const portfolioController = {
                     costInAccountCurrency = cost / rate;
                   }
 
-                  const unrealizedGain = currentValueAccount - costInAccountCurrency;
-                  const unrealizedGainPercent = costInAccountCurrency > 0
-                    ? (unrealizedGain / costInAccountCurrency) * 100
-                    : 0;
+                  const unrealizedGain =
+                    currentValueAccount - costInAccountCurrency;
+                  const unrealizedGainPercent =
+                    costInAccountCurrency > 0
+                      ? (unrealizedGain / costInAccountCurrency) * 100
+                      : 0;
 
-                  return { // object containing detailed information of each holding (enhancedHolding)
+                  return {
+                    // object containing detailed information of each holding (enhancedHolding)
                     securityId: h.securityId,
                     symbol,
                     security_name: h.security_name,
@@ -118,8 +131,8 @@ const portfolioController = {
                     nativeCurrency,
                     currentValueNative,
                     currentValueAccount,
-                    unrealizedGain,     // holding
-                    unrealizedGainPercent  // holding
+                    unrealizedGain, // holding
+                    unrealizedGainPercent, // holding
                   };
                 })
               );
@@ -186,21 +199,26 @@ const portfolioController = {
         cacheKey,
         async () => {
           // 1) Get all portfolios for this account
-          const portfolios = await databaseServices.getPortfoliosByAccount(accountId);
+          const portfolios = await databaseServices.getPortfoliosByAccount(
+            accountId
+          );
           if (!portfolios.length) return [];
 
-          const accountCurrency = portfolios[0].currency || 'DKK';
+          const accountCurrency = portfolios[0].currency || "DKK";
 
           // 2) Get all transactions across all portfolios in this account
           const allTransactions = [];
           for (const portfolio of portfolios) {
-            const txs = await databaseServices.getTransactionsForPortfolio(portfolio.id);
+            const txs = await databaseServices.getTransactionsForPortfolio(
+              portfolio.id
+            );
             allTransactions.push(...txs);
           }
 
           // 3) Calculate daily portfolio state (what stocks were held on each day)
           // This is better than just using current holdings, as it accounts for changes over time
-          const historyByDate = calculatePortfolioHistoryByDate(allTransactions);
+          const historyByDate =
+            calculatePortfolioHistoryByDate(allTransactions);
 
           // 4) Get exchange rates for currency conversion
           const { data: ratesData } = await getOrSetCache(
@@ -212,35 +230,44 @@ const portfolioController = {
 
           // 5) For each unique security in the portfolio history, get its price history
           const securities = new Set();
-          Object.values(historyByDate).forEach(holdings =>
-            holdings.forEach(h => securities.add(h.symbol))
+          Object.values(historyByDate).forEach((holdings) =>
+            holdings.forEach((h) => securities.add(h.symbol))
           );
 
           const priceHistories = {};
-          await Promise.all(Array.from(securities).map(async (symbol) => {
-            try {
-              const { data: tsData } = await getOrSetCache(
-                `timeSeries-${symbol}`,
-                () => alphaVantageService.getDailyTimeSeries(symbol, "compact"),
-                3600 // 1 hour cache
-              );
+          await Promise.all(
+            Array.from(securities).map(async (symbol) => {
+              try {
+                const { data: tsData } = await getOrSetCache(
+                  `timeSeries-${symbol}`,
+                  () =>
+                    alphaVantageService.getDailyTimeSeries(symbol, "compact"),
+                  3600 // 1 hour cache
+                );
 
-              const { data: ovData } = await getOrSetCache(
-                `overview-${symbol}`,
-                () => alphaVantageService.getCompanyOverview(symbol),
-                86400 // 1 day cache
-              );
+                const { data: ovData } = await getOrSetCache(
+                  `overview-${symbol}`,
+                  () => alphaVantageService.getCompanyOverview(symbol),
+                  86400 // 1 day cache
+                );
 
-              const currency = ovData?.Currency || accountCurrency;
-              priceHistories[symbol] = {
-                series: tsData["Time Series (Daily)"] || {},
-                currency
-              };
-            } catch (error) {
-              console.warn(`Failed to get price data for ${symbol}:`, error.message);
-              priceHistories[symbol] = { series: {}, currency: accountCurrency };
-            }
-          }));
+                const currency = ovData?.Currency || accountCurrency;
+                priceHistories[symbol] = {
+                  series: tsData["Time Series (Daily)"] || {},
+                  currency,
+                };
+              } catch (error) {
+                console.warn(
+                  `Failed to get price data for ${symbol}:`,
+                  error.message
+                );
+                priceHistories[symbol] = {
+                  series: {},
+                  currency: accountCurrency,
+                };
+              }
+            })
+          );
 
           // 6) Calculate portfolio value for each day (business days only)
           const startDate = moment().subtract(180, "days");
@@ -248,7 +275,11 @@ const portfolioController = {
           const dailyValues = [];
 
           // Only use business days (Mon-Fri)
-          for (let day = startDate.clone(); day.isSameOrBefore(endDate); day.add(1, "day")) {
+          for (
+            let day = startDate.clone();
+            day.isSameOrBefore(endDate);
+            day.add(1, "day")
+          ) {
             // Skip weekends - no market data
             if (day.day() === 0 || day.day() === 6) continue;
 
@@ -261,7 +292,10 @@ const portfolioController = {
               let prevDate = day.clone().subtract(1, "day");
               while (prevDate.isSameOrAfter(startDate)) {
                 const prevDateStr = prevDate.format("YYYY-MM-DD");
-                if (historyByDate[prevDateStr] && historyByDate[prevDateStr].length > 0) {
+                if (
+                  historyByDate[prevDateStr] &&
+                  historyByDate[prevDateStr].length > 0
+                ) {
                   effectiveHoldings = historyByDate[prevDateStr];
                   break;
                 }
@@ -308,7 +342,7 @@ const portfolioController = {
             if (totalValue > 0) {
               dailyValues.push({
                 date: dateStr,
-                value: totalValue
+                value: totalValue,
               });
             }
           }
@@ -451,13 +485,15 @@ function calculatePortfolioHistoryByDate(transactions) {
   }
 
   // Sort transactions by date ascending
-  transactions.sort((a, b) => new Date(a.transaction_date) - new Date(b.transaction_date));
+  transactions.sort(
+    (a, b) => new Date(a.transaction_date) - new Date(b.transaction_date)
+  );
 
   const historyByDate = {};
   const portfolio = {}; // Current portfolio state indexed by security_id
 
   // Process each transaction in chronological order
-  transactions.forEach(tx => {
+  transactions.forEach((tx) => {
     const dateStr = moment(tx.transaction_date).format("YYYY-MM-DD");
     const id = tx.securities_id;
     const type = (tx.transaction_type || "").toLowerCase();
@@ -469,7 +505,7 @@ function calculatePortfolioHistoryByDate(transactions) {
         securityId: id,
         security_name: tx.security_name,
         symbol: tx.symbol,
-        quantity: 0
+        quantity: 0,
       };
     }
 
@@ -482,8 +518,8 @@ function calculatePortfolioHistoryByDate(transactions) {
 
     // Create a snapshot of the portfolio for this date
     historyByDate[dateStr] = Object.values(portfolio)
-      .filter(h => h.quantity > 0) // Only include positions with positive quantity
-      .map(h => ({ ...h })); // Clone the holdings to avoid reference issues
+      .filter((h) => h.quantity > 0) // Only include positions with positive quantity
+      .map((h) => ({ ...h })); // Clone the holdings to avoid reference issues
   });
 
   return historyByDate;
@@ -524,7 +560,7 @@ function interpolateMissingDays(dailyValues) {
         const dateStr = moment(interpolatedDate).format("YYYY-MM-DD");
         result.push({
           date: dateStr,
-          value: interpolatedValue
+          value: interpolatedValue,
         });
       }
     }

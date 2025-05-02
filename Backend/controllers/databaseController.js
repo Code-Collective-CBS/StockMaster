@@ -3,6 +3,7 @@ const databaseServices = require('../services/databaseServices');
 // CACHE
 const cache = require("../utilityFunctions/cache");
 const { getOrSetCache } = require('../utilityFunctions/cacheHelper');
+const { ReturnStatusToken } = require('tedious/lib/token/token');
 
 const databaseController = {
     createUser: async (req, res) => {
@@ -347,6 +348,8 @@ const databaseController = {
                 security_currency
             });
 
+            const accountCurrency = result.accountCurrency;
+
             // Acounts cache
             const cacheKeyAccounts = `accounts-user_id-${user_id}`;
             cache.del(cacheKeyAccounts);
@@ -354,7 +357,7 @@ const databaseController = {
             const cacheKeyTransactions = `transactions-account_id-${account_id}`;
             cache.del(cacheKeyTransactions);
             // Portfolio cache
-            const cacheKeyPortfolios = `portfolio-${account_id}`;
+            const cacheKeyPortfolios = `portfolio-${account_id}-${accountCurrency}`;
             cache.del(cacheKeyPortfolios);
 
             res.status(201).json({

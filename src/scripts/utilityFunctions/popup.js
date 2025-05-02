@@ -1,89 +1,104 @@
-import { loadAccounts } from './loadAccounts.js';
-import { currencyHandler } from './currencyConverter.js'
+import { loadAccounts } from "./loadAccounts.js";
+import { currencyHandler } from "./currencyConverter.js";
+import { cachingService } from "./cachingService.js";
 
 export const popUps = {
-    accountDetails: async () => {
-        await loadAccounts(); // Refresh window.cachedAccounts
+  clearPortfolioCache: (accountId) => {
+    try {
+        const portfolioDataKey = `portfolioData-${accountId}`;
+        cachingService.clear(portfolioDataKey);
+        console.log(`Cleared portfolio cache for account ${accountId}`);
+    } catch (e) {
+      console.error("Error clearing portfolio cache:", e);
+    }
+  },
 
-        const selectedAccountId = sessionStorage.getItem('selectedAccountId');
-        const accounts = window.cachedAccounts || [];
-        return accounts.find(acc => acc.account_id == selectedAccountId) || null;
-    },
+  accountDetails: async () => {
+    await loadAccounts(); // Refresh window.cachedAccounts
 
-    allPortfolioDetails: async (accountId) => {
-        const selectedAccountId = accountId;
+    const selectedAccountId = sessionStorage.getItem("selectedAccountId");
+    const accounts = window.cachedAccounts || [];
+    return accounts.find((acc) => acc.account_id == selectedAccountId) || null;
+  },
 
-        try {
-            const response = await fetch(`/api/database/portfolio/account/${selectedAccountId}`);
-            if (!response.ok) throw new Error('Failed to fetch account portfolios');
+  allPortfolioDetails: async (accountId) => {
+    const selectedAccountId = accountId;
 
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error('Error fetching portfolios', error);
-            return [];
-        }
-    },
+    try {
+      const response = await fetch(
+        `/api/database/portfolio/account/${selectedAccountId}`
+      );
+      if (!response.ok) throw new Error("Failed to fetch account portfolios");
 
-    simplePortfolioList: async (accountId) => {
-        try {
-          const response = await fetch(`/api/database/simple-portfolios/${accountId}`);
-          if (!response.ok) throw new Error('Failed to fetch simple portfolios');
-      
-          const data = await response.json();
-          return data;
-        } catch (error) {
-          console.error('Error fetching simple portfolios', error);
-          return [];
-        }
-    },
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching portfolios", error);
+      return [];
+    }
+  },
 
-    stockQuantitySimple: async (portfolioId, symbol) => {
-        try {
-          const response = await fetch(`/api/database/portfolio/${portfolioId}/stock/${symbol}`);
-          if (!response.ok) throw new Error('Failed to fetch stock quantity');
-      
-          const data = await response.json();
-          return data.quantity || 0;
-        } catch (error) {
-          console.error('Error fetching stock quantity', error);
-          return 0;
-        }
-    },
-      
+  simplePortfolioList: async (accountId) => {
+    try {
+      const response = await fetch(
+        `/api/database/simple-portfolios/${accountId}`
+      );
+      if (!response.ok) throw new Error("Failed to fetch simple portfolios");
 
-    currencyConverter: async (amount, fromCurrency, toCurrency) => {
-        try {
-            const reponse = await fetch(`/api/currency/exchange/${fromCurrency}`);
-            const data = await reponse.json();
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching simple portfolios", error);
+      return [];
+    }
+  },
 
-            const converted = await currencyHandler.convertCurrency(
-                amount,
-                fromCurrency,
-                toCurrency,
-                data
-            );
+  stockQuantitySimple: async (portfolioId, symbol) => {
+    try {
+      const response = await fetch(
+        `/api/database/portfolio/${portfolioId}/stock/${symbol}`
+      );
+      if (!response.ok) throw new Error("Failed to fetch stock quantity");
 
-            return converted;
+      const data = await response.json();
+      return data.quantity || 0;
+    } catch (error) {
+      console.error("Error fetching stock quantity", error);
+      return 0;
+    }
+  },
 
-        } catch (error) {
-            console.error('Error fetching rates for currency conversion', error);
-            throw error;
-        }
-    },
+  currencyConverter: async (amount, fromCurrency, toCurrency) => {
+    try {
+      const reponse = await fetch(`/api/currency/exchange/${fromCurrency}`);
+      const data = await reponse.json();
 
-    setupDepositPopup: () => {
-        const button = document.getElementById("depositButton");
+      const converted = await currencyHandler.convertCurrency(
+        amount,
+        fromCurrency,
+        toCurrency,
+        data
+      );
 
-        if (!button) return console.log("Could not find #depositButton button");
+      return converted;
+    } catch (error) {
+      console.error("Error fetching rates for currency conversion", error);
+      throw error;
+    }
+  },
 
-        button.addEventListener("click", async () => {
-            if (document.getElementById("depositModal")) return;
+  setupDepositPopup: () => {
+    const button = document.getElementById("depositButton");
 
-            const modal = document.createElement("div");
-            modal.id = "depositModal";
-            modal.classList.add("modal-wrapper");
-            modal.innerHTML = `
+    if (!button) return console.log("Could not find #depositButton button");
+
+    button.addEventListener("click", async () => {
+      if (document.getElementById("depositModal")) return;
+
+      const modal = document.createElement("div");
+      modal.id = "depositModal";
+      modal.classList.add("modal-wrapper");
+      modal.innerHTML = `
             <div class="modal-overlay"></div>
             <div class="modal-content">
                 <span class="modal-close">&times;</span>
@@ -102,113 +117,123 @@ export const popUps = {
                 </div>
             </div>
             `;
-            document.body.appendChild(modal);
+      document.body.appendChild(modal);
 
-            const selectedAccount = await popUps.accountDetails();
+      const selectedAccount = await popUps.accountDetails();
 
-            const accountNamePara = modal.querySelector('.account-name');
-            accountNamePara.innerHTML = `Account: ${selectedAccount.account_name}`;
+      const accountNamePara = modal.querySelector(".account-name");
+      accountNamePara.innerHTML = `Account: ${selectedAccount.account_name}`;
 
-            const currencySpan = modal.querySelector("#accountCurrency");
-            const userCurrency = selectedAccount.currency;
-            currencySpan.textContent = userCurrency;
+      const currencySpan = modal.querySelector("#accountCurrency");
+      const userCurrency = selectedAccount.currency;
+      currencySpan.textContent = userCurrency;
 
-            // Close modal
-            modal.querySelector(".modal-close").addEventListener("click", () => modal.remove());
-            modal.querySelector(".modal-overlay").addEventListener("click", () => modal.remove());
+      // Close modal
+      modal
+        .querySelector(".modal-close")
+        .addEventListener("click", () => modal.remove());
+      modal
+        .querySelector(".modal-overlay")
+        .addEventListener("click", () => modal.remove());
 
-            // Toggle logic
-            const toggleButtons = modal.querySelectorAll(".toggle-btn");
-            const instruction = modal.querySelector(".modal-instruction");
+      // Toggle logic
+      const toggleButtons = modal.querySelectorAll(".toggle-btn");
+      const instruction = modal.querySelector(".modal-instruction");
 
-            toggleButtons.forEach((btn) => {
-                btn.addEventListener("click", () => {
-                    toggleButtons.forEach((b) => b.classList.remove("active"));
-                    btn.classList.add("active");
+      toggleButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          toggleButtons.forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
 
-                    const type = btn.getAttribute("data-type");
-                    instruction.textContent = `Enter amount to ${type}:`;
-                });
-            });
-
-            // Confirm logic (you can expand this)
-            modal.querySelector("#confirmAction").addEventListener("click", () => {
-                const activeType = modal.querySelector(".toggle-btn.active").dataset.type;
-                const amount = modal.querySelector('#popup-amount');
-
-                if (activeType == 'deposit') {
-                    depositToAccount(amount);
-                    amount.value = '';
-                } else if (activeType == 'withdraw') {
-                    withdrawingFromAccount(amount);
-                    amount.value = '';
-                }
-
-                console.log(`User wants to ${activeType} ${amount.value}`);
-                modal.remove(); // Optional: auto-close after action
-            });
+          const type = btn.getAttribute("data-type");
+          instruction.textContent = `Enter amount to ${type}:`;
         });
+      });
 
+      // Confirm logic (you can expand this)
+      modal.querySelector("#confirmAction").addEventListener("click", () => {
+        const activeType =
+          modal.querySelector(".toggle-btn.active").dataset.type;
+        const amount = modal.querySelector("#popup-amount");
 
-        const depositToAccount = async (amountInput) => {
-            const amount = parseFloat(amountInput.value);
-            const selectedAccountId = sessionStorage.getItem('selectedAccountId');
-
-            try {
-                const response = await fetch(`/api/database/deposit-to-account/${selectedAccountId}`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ amount }),
-                });
-
-                const result = await response.json();
-                if (response.status === 201) {
-                    alert("Deposit succesfull");
-                    window.location.reload();
-                } else {
-                    alert("Failed to deposit", result.message);
-                }
-            } catch (error) {
-                console.error("Failed to deposit: ", error);
-            }
-        };
-        
-        const withdrawingFromAccount = async (amountInput) => {
-            const amount = parseFloat(amountInput.value);
-            const selectedAccountId = sessionStorage.getItem('selectedAccountId');
-            
-            try {
-                const response = await fetch(`/api/database/withdraw-to-account/${selectedAccountId}`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ amount }),
-                });
-                
-                const result = await response.json();
-                if (response.status === 201) {
-                    alert("Withdraw succesfull");
-                    window.location.reload();
-                } else {
-                    alert("Failed to withdraw: " + result.message);
-                }
-            } catch (error) {
-                console.error("Failed to Withdraw", error);
-            }
+        if (activeType == "deposit") {
+          depositToAccount(amount);
+          amount.value = "";
+        } else if (activeType == "withdraw") {
+          withdrawingFromAccount(amount);
+          amount.value = "";
         }
-    },
 
-    buySecurity: () => {
-        const buyButton = document.getElementById('buyButton');
+        console.log(`User wants to ${activeType} ${amount.value}`);
+        modal.remove(); // Optional: auto-close after action
+      });
+    });
 
-        if (!buyButton) return console.log('Could not find #buyButton');
+    const depositToAccount = async (amountInput) => {
+      const amount = parseFloat(amountInput.value);
+      const selectedAccountId = sessionStorage.getItem("selectedAccountId");
 
-        buyButton.addEventListener('click', async () => {
-            if (document.getElementById('tradeModal')) return;
+      try {
+        const response = await fetch(
+          `/api/database/deposit-to-account/${selectedAccountId}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ amount }),
+          }
+        );
 
-            const tradeModal = document.createElement('div');
-            tradeModal.id = 'tradeModal';
-            tradeModal.classList.add('modal-wrapper');
-            tradeModal.innerHTML = `
+        const result = await response.json();
+        if (response.status === 201) {
+          alert("Deposit succesfull");
+          window.location.reload();
+        } else {
+          alert("Failed to deposit", result.message);
+        }
+      } catch (error) {
+        console.error("Failed to deposit: ", error);
+      }
+    };
+
+    const withdrawingFromAccount = async (amountInput) => {
+      const amount = parseFloat(amountInput.value);
+      const selectedAccountId = sessionStorage.getItem("selectedAccountId");
+
+      try {
+        const response = await fetch(
+          `/api/database/withdraw-to-account/${selectedAccountId}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ amount }),
+          }
+        );
+
+        const result = await response.json();
+        if (response.status === 201) {
+          alert("Withdraw succesfull");
+          window.location.reload();
+        } else {
+          alert("Failed to withdraw: " + result.message);
+        }
+      } catch (error) {
+        console.error("Failed to Withdraw", error);
+      }
+    };
+  },
+
+  buySecurity: () => {
+    const buyButton = document.getElementById("buyButton");
+
+    if (!buyButton) return console.log("Could not find #buyButton");
+
+    buyButton.addEventListener("click", async () => {
+      if (document.getElementById("tradeModal")) return;
+
+      const tradeModal = document.createElement("div");
+      tradeModal.id = "tradeModal";
+      tradeModal.classList.add("modal-wrapper");
+      tradeModal.innerHTML = `
             <div class="modal-overlay"></div>
             <div class="modal-content">
                 <span class="modal-close">&times;</span>
@@ -226,116 +251,142 @@ export const popUps = {
                 </div>
             </div>
             `;
-            document.body.appendChild(tradeModal);
+      document.body.appendChild(tradeModal);
 
-            const dropdown = tradeModal.querySelector('#popup-portfolios-select');
-            const amountInput = tradeModal.querySelector('#buy-amount');
-            const totalPriceSpan = tradeModal.querySelector('#total-price')
+      const dropdown = tradeModal.querySelector("#popup-portfolios-select");
+      const amountInput = tradeModal.querySelector("#buy-amount");
+      const totalPriceSpan = tradeModal.querySelector("#total-price");
 
-            const selectedAccount = await popUps.accountDetails();
-            const stockPriceSpan = tradeModal.querySelector("#stock-price");
-            const accountBalanceSpan = tradeModal.querySelector("#account-balance");
+      const selectedAccount = await popUps.accountDetails();
+      const stockPriceSpan = tradeModal.querySelector("#stock-price");
+      const accountBalanceSpan = tradeModal.querySelector("#account-balance");
 
-            amountInput.addEventListener("input", async () => {
-                const amount = parseFloat(amountInput.value);
-                let total = amount * window.latestStockPrice;
+      amountInput.addEventListener("input", async () => {
+        const amount = parseFloat(amountInput.value);
+        let total = amount * window.latestStockPrice;
 
-                // Currency conversion for display
-                if(window.securityCurrency !==  selectedAccount.currency) {
-                    total = await popUps.currencyConverter(total, window.securityCurrency, selectedAccount.currency);
-                }
+        // Currency conversion for display
+        if (window.securityCurrency !== selectedAccount.currency) {
+          total = await popUps.currencyConverter(
+            total,
+            window.securityCurrency,
+            selectedAccount.currency
+          );
+        }
 
-                if (!isNaN(total)) {
-                    totalPriceSpan.textContent = `${total.toFixed(2)} ${selectedAccount.currency}`;
-                } else {
-                    totalPriceSpan.textContent = `0 ${selectedAccount.currency}`;
-                }
-            });
+        if (!isNaN(total)) {
+          totalPriceSpan.textContent = `${total.toFixed(2)} ${
+            selectedAccount.currency
+          }`;
+        } else {
+          totalPriceSpan.textContent = `0 ${selectedAccount.currency}`;
+        }
+      });
 
-            stockPriceSpan.textContent = `${window.latestStockPrice} ${window.securityCurrency}`;
-            accountBalanceSpan.textContent = `${selectedAccount.total_balance} ${selectedAccount.currency}`;
+      stockPriceSpan.textContent = `${window.latestStockPrice} ${window.securityCurrency}`;
+      accountBalanceSpan.textContent = `${selectedAccount.total_balance} ${selectedAccount.currency}`;
 
-            const allPortfolioDetails = await popUps.simplePortfolioList(selectedAccount.account_id);
-            console.log("Portfolios details", allPortfolioDetails);
-            allPortfolioDetails.forEach(portfolio => {
-                const option = document.createElement('option');
-                option.classList.add('popup-portfolios-option');
-                option.value = portfolio.id;
-                option.textContent = portfolio.name;
+      const allPortfolioDetails = await popUps.simplePortfolioList(
+        selectedAccount.account_id
+      );
+      console.log("Portfolios details", allPortfolioDetails);
+      allPortfolioDetails.forEach((portfolio) => {
+        const option = document.createElement("option");
+        option.classList.add("popup-portfolios-option");
+        option.value = portfolio.id;
+        option.textContent = portfolio.name;
 
-                dropdown.appendChild(option);
-            });
+        dropdown.appendChild(option);
+      });
 
-            const accountNamePara = tradeModal.querySelector('.account-name');
-            accountNamePara.innerHTML = `Account: ${selectedAccount.account_name}`;
+      const accountNamePara = tradeModal.querySelector(".account-name");
+      accountNamePara.innerHTML = `Account: ${selectedAccount.account_name}`;
 
-            // Close modal
-            tradeModal.querySelector('.modal-close').addEventListener('click', () => tradeModal.remove());
-            tradeModal.querySelector('.modal-overlay').addEventListener('click', () => tradeModal.remove());
+      // Close modal
+      tradeModal
+        .querySelector(".modal-close")
+        .addEventListener("click", () => tradeModal.remove());
+      tradeModal
+        .querySelector(".modal-overlay")
+        .addEventListener("click", () => tradeModal.remove());
 
-            tradeModal.querySelector('#confirmAction').addEventListener('click', async () => {
-                const amount = parseFloat(amountInput.value);
-                const latestPrice = window.latestStockPrice; // Saved in security.js
+      tradeModal
+        .querySelector("#confirmAction")
+        .addEventListener("click", async () => {
+          const amount = parseFloat(amountInput.value);
+          const latestPrice = window.latestStockPrice; // Saved in security.js
 
-                const selectedPortfolio = tradeModal.querySelector('#popup-portfolios-select').value;
-                const symbol = window.urlParams.get("symbol");
+          const selectedPortfolio = tradeModal.querySelector(
+            "#popup-portfolios-select"
+          ).value;
+          const symbol = window.urlParams.get("symbol");
 
-                if (!amount || isNaN(latestPrice) || !selectedPortfolio || !symbol) {
-                    alert('Missing or invalid input');
-                }
+          if (!amount || isNaN(latestPrice) || !selectedPortfolio || !symbol) {
+            alert("Missing or invalid input");
+          }
 
-                // HELPER VARIABLE TO SEND BODY AS OBJECT
-                const payload = {
-                    account_id: selectedAccount.account_id,
-                    symbol,
-                    amount,
-                    price_per_share: latestPrice,
-                    security_currency: window.securityCurrency
-                };
+          // HELPER VARIABLE TO SEND BODY AS OBJECT
+          const payload = {
+            account_id: selectedAccount.account_id,
+            symbol,
+            amount,
+            price_per_share: latestPrice,
+            security_currency: window.securityCurrency,
+          };
 
-                try {
-                    const response = await fetch(`/api/database/buy-security/${selectedPortfolio}`, {
-                        method: "PUT",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(payload)
-                    });
+          try {
+            const response = await fetch(
+              `/api/database/buy-security/${selectedPortfolio}`,
+              {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              }
+            );
 
-                    const result = await response.json();
-                    console.log("Transaction ID: ", result.transaction_id)
+            const result = await response.json();
+            console.log("Transaction ID: ", result.transaction_id);
 
+            if (response.status === 201) {
+              alert(
+                `Successfully bought ${amount} shares of ${symbol} at ${latestPrice} per share.`
+              );
 
-                    if (response.status === 201) {
-                        alert(`Successfully bought ${amount} shares of ${symbol} at ${latestPrice} per share.`);
+            //   // Set transaction flag
+            //   sessionStorage.setItem('portfolio_transaction', 'true');
 
-                        const refreshedAccount = await popUps.accountDetails();
-                        accountBalanceSpan.textContent = `${refreshedAccount.total_balance} ${refreshedAccount.currency}`;
-                        window.location.reload(); // MAYBE SMOTHER UX LATER - BUT NEED FOR UPDATING HOLDINGS OF SECURITY
-                    } else {
-                        alert('Transaction failed: ', result.message);
-                    }
-                } catch (error) {
-                    console.error('Buy request failed: ', result.message);
-                }
+            //   // Clear cache for this account
+            //     popUps.clearPortfolioCache(selectedAccount.account_id);
 
-                tradeModal.remove();
-                console.log(`User wants to buy paylod: `, payload);
-            });
+              const refreshedAccount = await popUps.accountDetails();
+              accountBalanceSpan.textContent = `${refreshedAccount.total_balance} ${refreshedAccount.currency}`;
+              window.location.reload(); // MAYBE SMOTHER UX LATER - BUT NEED FOR UPDATING HOLDINGS OF SECURITY
+            } else {
+              alert("Transaction failed: ", result.message);
+            }
+          } catch (error) {
+            console.error("Buy request failed: ", result.message);
+          }
+
+          tradeModal.remove();
+          console.log(`User wants to buy paylod: `, payload);
         });
-    },
+    });
+  },
 
-    sellSecurity: () => {
-        const sellButton = document.getElementById('sellButton');
-        if (!sellButton) return console.log('Could not find #sellButton');
+  sellSecurity: () => {
+    const sellButton = document.getElementById("sellButton");
+    if (!sellButton) return console.log("Could not find #sellButton");
 
-        sellButton.addEventListener('click', async () => {
-            if (document.getElementById('tradeModal')) return;
+    sellButton.addEventListener("click", async () => {
+      if (document.getElementById("tradeModal")) return;
 
-            let currentQuantityHeld = 0; // To cache amount
+      let currentQuantityHeld = 0; // To cache amount
 
-            const tradeModal = document.createElement('div');
-            tradeModal.id = 'tradeModal';
-            tradeModal.classList.add('modal-wrapper');
-            tradeModal.innerHTML = `
+      const tradeModal = document.createElement("div");
+      tradeModal.id = "tradeModal";
+      tradeModal.classList.add("modal-wrapper");
+      tradeModal.innerHTML = `
             <div class="modal-overlay"></div>
             <div class="modal-content">
                 <span class="modal-close">&times;</span>
@@ -354,148 +405,177 @@ export const popUps = {
                 </div>
             </div>
             `;
-            document.body.appendChild(tradeModal);
+      document.body.appendChild(tradeModal);
 
-            const symbol = urlParams.get("symbol");
-            const dropdown = tradeModal.querySelector('#popup-portfolios-select');
-            const amountInput = tradeModal.querySelector('#sell-amount');
-            const totalPriceSpan = tradeModal.querySelector('#total-price');
-            const stockPriceSpan = tradeModal.querySelector("#stock-price");
-            const accountBalanceSpan = tradeModal.querySelector("#account-balance");
-            const ownedQuantitySpan = tradeModal.querySelector('#owned-quantity');
+      const symbol = urlParams.get("symbol");
+      const dropdown = tradeModal.querySelector("#popup-portfolios-select");
+      const amountInput = tradeModal.querySelector("#sell-amount");
+      const totalPriceSpan = tradeModal.querySelector("#total-price");
+      const stockPriceSpan = tradeModal.querySelector("#stock-price");
+      const accountBalanceSpan = tradeModal.querySelector("#account-balance");
+      const ownedQuantitySpan = tradeModal.querySelector("#owned-quantity");
 
-            const selectedAccount = await popUps.accountDetails();
-            const allPortfolioDetails = await popUps.simplePortfolioList(selectedAccount.account_id);
+      const selectedAccount = await popUps.accountDetails();
+      const allPortfolioDetails = await popUps.simplePortfolioList(
+        selectedAccount.account_id
+      );
 
-            // Populate dropdown
-            allPortfolioDetails.forEach(portfolio => {
-                const option = document.createElement('option');
-                option.classList.add('popup-portfolios-option');
-                option.value = portfolio.id;
-                option.textContent = portfolio.name;
-                dropdown.appendChild(option);
-            });
+      // Populate dropdown
+      allPortfolioDetails.forEach((portfolio) => {
+        const option = document.createElement("option");
+        option.classList.add("popup-portfolios-option");
+        option.value = portfolio.id;
+        option.textContent = portfolio.name;
+        dropdown.appendChild(option);
+      });
 
-            // Initial UI setup
-            stockPriceSpan.textContent = `${window.latestStockPrice} ${window.securityCurrency}`;
-            accountBalanceSpan.textContent = `${selectedAccount.total_balance} ${selectedAccount.currency}`;
-            const accountNamePara = tradeModal.querySelector('.account-name');
-            accountNamePara.innerHTML = `Account: ${selectedAccount.account_name}`;
+      // Initial UI setup
+      stockPriceSpan.textContent = `${window.latestStockPrice} ${window.securityCurrency}`;
+      accountBalanceSpan.textContent = `${selectedAccount.total_balance} ${selectedAccount.currency}`;
+      const accountNamePara = tradeModal.querySelector(".account-name");
+      accountNamePara.innerHTML = `Account: ${selectedAccount.account_name}`;
 
-            // Update quantity display
-            const updateOwnedQuantity = async () => {
-                const portfolioId = dropdown.value;
-                const quantity = await popUps.stockQuantitySimple(portfolioId, symbol);
-                currentQuantityHeld = quantity; // Cache for later use
-                ownedQuantitySpan.textContent = `${quantity} shares`;
-            };
+      // Update quantity display
+      const updateOwnedQuantity = async () => {
+        const portfolioId = dropdown.value;
+        const quantity = await popUps.stockQuantitySimple(portfolioId, symbol);
+        currentQuantityHeld = quantity; // Cache for later use
+        ownedQuantitySpan.textContent = `${quantity} shares`;
+      };
 
-            await updateOwnedQuantity();
-            dropdown.addEventListener('change', updateOwnedQuantity);
+      await updateOwnedQuantity();
+      dropdown.addEventListener("change", updateOwnedQuantity);
 
-            // Calculate total on input
-            amountInput.addEventListener("input", async () => {
-                const amount = parseFloat(amountInput.value);
-                let total = amount * window.latestStockPrice;
+      // Calculate total on input
+      amountInput.addEventListener("input", async () => {
+        const amount = parseFloat(amountInput.value);
+        let total = amount * window.latestStockPrice;
 
-                // Currency conversion for display
-                if(window.securityCurrency !==  selectedAccount.currency) {
-                    total = await popUps.currencyConverter(total, window.securityCurrency, selectedAccount.currency);
-                }
+        // Currency conversion for display
+        if (window.securityCurrency !== selectedAccount.currency) {
+          total = await popUps.currencyConverter(
+            total,
+            window.securityCurrency,
+            selectedAccount.currency
+          );
+        }
 
-                if (!isNaN(total)) {
-                    totalPriceSpan.textContent = `${total.toFixed(2)} ${selectedAccount.currency}`;
-                } else {
-                    totalPriceSpan.textContent = `0 ${selectedAccount.currency}`;
-                }
+        if (!isNaN(total)) {
+          totalPriceSpan.textContent = `${total.toFixed(2)} ${
+            selectedAccount.currency
+          }`;
+        } else {
+          totalPriceSpan.textContent = `0 ${selectedAccount.currency}`;
+        }
 
-                // Clear any previous error
-                const existingError = tradeModal.querySelector("#sell-error-message");
-                if (existingError) existingError.remove();
+        // Clear any previous error
+        const existingError = tradeModal.querySelector("#sell-error-message");
+        if (existingError) existingError.remove();
 
-                // Add error if amount is too high
-                if (!isNaN(amount) && amount > currentQuantityHeld) {
-                    const errorMsg = document.createElement("p");
-                    errorMsg.id = "sell-error-message";
-                    errorMsg.style.color = "red";
-                    errorMsg.style.marginTop = "6px";
-                    errorMsg.textContent = `You only own ${currentQuantityHeld} shares in this portfolio.`;
+        // Add error if amount is too high
+        if (!isNaN(amount) && amount > currentQuantityHeld) {
+          const errorMsg = document.createElement("p");
+          errorMsg.id = "sell-error-message";
+          errorMsg.style.color = "red";
+          errorMsg.style.marginTop = "6px";
+          errorMsg.textContent = `You only own ${currentQuantityHeld} shares in this portfolio.`;
 
-                    amountInput.parentElement.appendChild(errorMsg);
-                }
-            });
+          amountInput.parentElement.appendChild(errorMsg);
+        }
+      });
 
-            // Close modal
-            tradeModal.querySelector('.modal-close').addEventListener('click', () => tradeModal.remove());
-            tradeModal.querySelector('.modal-overlay').addEventListener('click', () => tradeModal.remove());
+      // Close modal
+      tradeModal
+        .querySelector(".modal-close")
+        .addEventListener("click", () => tradeModal.remove());
+      tradeModal
+        .querySelector(".modal-overlay")
+        .addEventListener("click", () => tradeModal.remove());
 
-            // Confirm sell
-            tradeModal.querySelector('#confirmAction').addEventListener('click', async () => {
-                const amount = parseFloat(amountInput.value);
-                const selectedPortfolio = dropdown.value;
-                const latestPrice = window.latestStockPrice;
+      // Confirm sell
+      tradeModal
+        .querySelector("#confirmAction")
+        .addEventListener("click", async () => {
+          const amount = parseFloat(amountInput.value);
+          const selectedPortfolio = dropdown.value;
+          const latestPrice = window.latestStockPrice;
 
-                if (!amount || isNaN(latestPrice) || !selectedPortfolio || !symbol) {
-                    alert('Missing or invalid input');
-                    return;
-                }
+          if (!amount || isNaN(latestPrice) || !selectedPortfolio || !symbol) {
+            alert("Missing or invalid input");
+            return;
+          }
 
-                if (amount > currentQuantityHeld) {
-                    alert(`You only own ${currentQuantityHeld} shares in this portfolio.`);
-                    return;
-                }
+          if (amount > currentQuantityHeld) {
+            alert(
+              `You only own ${currentQuantityHeld} shares in this portfolio.`
+            );
+            return;
+          }
 
-                const payload = {
-                    account_id: selectedAccount.account_id,
-                    symbol,
-                    amount,
-                    price_per_share: latestPrice,
-                    security_currency: window.securityCurrency
-                };
+          const payload = {
+            account_id: selectedAccount.account_id,
+            symbol,
+            amount,
+            price_per_share: latestPrice,
+            security_currency: window.securityCurrency,
+          };
 
-                try {
-                    const response = await fetch(`/api/database/sell-security/${selectedPortfolio}`, {
-                        method: "PUT",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(payload)
-                    });
+          try {
+            const response = await fetch(
+              `/api/database/sell-security/${selectedPortfolio}`,
+              {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              }
+            );
 
-                    const result = await response.json();
-                    console.log("Transaction ID:", result.transaction_id);
+            const result = await response.json();
+            console.log("Transaction ID:", result.transaction_id);
 
-                    if (response.status === 201) {
-                        alert(`Successfully sold ${amount} shares of ${symbol} at ${latestPrice} per share.`);
-                        const refreshedAccount = await popUps.accountDetails();
-                        accountBalanceSpan.textContent = `${refreshedAccount.total_balance} ${refreshedAccount.currency}`;
-                        window.location.reload();
-                    } else {
-                        alert('Transaction failed: ' + result.message);
-                    }
-                } catch (error) {
-                    console.error('Sell request failed:', error);
-                    alert('An error occurred while processing your sell request.');
-                }
+            if (response.status === 201) {
+              alert(
+                `Successfully sold ${amount} shares of ${symbol} at ${latestPrice} per share.`
+              );
 
-                tradeModal.remove();
-            });
+              // Clear cache for this account
+              await new Promise((resolve) => {
+                popUps.clearPortfolioCache(selectedAccount.account_id);
+                setTimeout(resolve, 100); // Small delay to ensure cache is cleared
+              });
+
+              const refreshedAccount = await popUps.accountDetails();
+              accountBalanceSpan.textContent = `${refreshedAccount.total_balance} ${refreshedAccount.currency}`;
+              window.location.reload();
+            } else {
+              alert("Transaction failed: " + result.message);
+            }
+          } catch (error) {
+            console.error("Sell request failed:", error);
+            alert("An error occurred while processing your sell request.");
+          }
+
+          tradeModal.remove();
         });
-    },
+    });
+  },
 
-    createPortfolio: () => {
-        const addPortfolioButton = document.getElementById('addPortfolioButton');
+  createPortfolio: () => {
+    const addPortfolioButton = document.getElementById("addPortfolioButton");
 
-        if (!addPortfolioButton) return console.log('Could not find #addPortfolioButton');
+    if (!addPortfolioButton)
+      return console.log("Could not find #addPortfolioButton");
 
-        addPortfolioButton.addEventListener('click', () => {
-            // If pop-up already exists - do nothing.
-            if (document.getElementById('portfolioPopupModal')) return;
+    addPortfolioButton.addEventListener("click", () => {
+      // If pop-up already exists - do nothing.
+      if (document.getElementById("portfolioPopupModal")) return;
 
-            // Otherwise - build modal
-            const modal = document.createElement('div');
-            modal.id = 'portfolioPopupModal';
-            modal.classList.add('modal-wrapper');
+      // Otherwise - build modal
+      const modal = document.createElement("div");
+      modal.id = "portfolioPopupModal";
+      modal.classList.add("modal-wrapper");
 
-            modal.innerHTML = `
+      modal.innerHTML = `
             <div class="modal-overlay"></div>
             <div class="modal-content">
               <span class="modal-close">&times;</span>
@@ -507,47 +587,56 @@ export const popUps = {
             </div>
           `;
 
-            document.body.appendChild(modal);
+      document.body.appendChild(modal);
 
-            // Close pop-up
-            modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
-            modal.querySelector('.modal-overlay').addEventListener('click', () => modal.remove());
+      // Close pop-up
+      modal
+        .querySelector(".modal-close")
+        .addEventListener("click", () => modal.remove());
+      modal
+        .querySelector(".modal-overlay")
+        .addEventListener("click", () => modal.remove());
 
-            // Save portfolio
-            modal.querySelector('#savePortfolioButton').addEventListener('click', async () => {
-                const nameInput = modal.querySelector('#portfolioNameInput');
-                const portfolioName = nameInput.value.trim();
+      // Save portfolio
+      modal
+        .querySelector("#savePortfolioButton")
+        .addEventListener("click", async () => {
+          const nameInput = modal.querySelector("#portfolioNameInput");
+          const portfolioName = nameInput.value.trim();
 
-                if (portfolioName === '') {
-                    alert('Please enter a portfolio name');
-                    return;
-                }
+          if (portfolioName === "") {
+            alert("Please enter a portfolio name");
+            return;
+          }
 
-                const selectedAccountId = sessionStorage.getItem('selectedAccountId');
+          const selectedAccountId = sessionStorage.getItem("selectedAccountId");
 
-                try {
-                    const response = await fetch(`/api/database/createPortfolio/${selectedAccountId}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ portfolioName })
-                    });
+          try {
+            const response = await fetch(
+              `/api/database/createPortfolio/${selectedAccountId}`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ portfolioName }),
+              }
+            );
 
-                    const result = await response.json();
+            const result = await response.json();
 
-                    if (response.status === 201) {
-                        alert('Portfolio successfully created');
-                        modal.remove();
-                    } else {
-                        alert('Failed: ' + result.message);
-                    }
-                } catch (err) {
-                    console.error('Failed to create portfolio:', err);
-                    alert('Failed to create portfolio');
-                }
-            });
+            if (response.status === 201) {
+              alert("Portfolio successfully created");
+              modal.remove();
+            } else {
+              alert("Failed: " + result.message);
+            }
+          } catch (err) {
+            console.error("Failed to create portfolio:", err);
+            alert("Failed to create portfolio");
+          }
         });
-    }
+    });
+  },
 };
-// >&times is an HTML entity and represents x 
+// >&times is an HTML entity and represents x
