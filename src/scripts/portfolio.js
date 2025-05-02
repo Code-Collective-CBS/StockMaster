@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     showLoadingState();
 
     const portfolioData = await stockAPI.getPortfolioSummary(accountId);
-      updatePortfolioUI(portfolioData);
+    updatePortfolioUI(portfolioData);
 
     renderHistoryChart(accountId, portfolioData[0]?.currency);
   } catch (error) {
@@ -36,8 +36,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-
-async function accountDetails () {
+async function accountDetails() {
   await loadAccounts();
   const selectedAccountId = sessionStorage.getItem("selectedAccountId");
   const accounts = window.cachedAccounts || [];
@@ -54,7 +53,7 @@ function computePctChange(history, daysAgo) {
   const now = moment(lastEntry.date);
 
   // Calculate the target date daysAgo days before now
-  const targetDate = moment(now).subtract(daysAgo, 'days');
+  const targetDate = moment(now).subtract(daysAgo, "days");
 
   // Find the entry in history with date closest to targetDate
   let closest = history[0];
@@ -62,7 +61,7 @@ function computePctChange(history, daysAgo) {
 
   for (const entry of history) {
     const entryDate = moment(entry.date);
-    const diff = Math.abs(entryDate.diff(targetDate, 'milliseconds'));
+    const diff = Math.abs(entryDate.diff(targetDate, "milliseconds"));
 
     if (diff < minDiff) {
       minDiff = diff;
@@ -75,7 +74,6 @@ function computePctChange(history, daysAgo) {
 
   return ((lastEntry.value - closest.value) / closest.value) * 100;
 }
-
 
 // Show a loading state
 function showLoadingState() {
@@ -120,7 +118,8 @@ async function updatePortfolioUI(portfolios) {
   // Display accounts and their portfolios
   if (portfolioList) {
     portfolioList.innerHTML = ""; // prevent duplication
-    Object.values(accountsMap).forEach((account) => { // convert to array
+    Object.values(accountsMap).forEach((account) => {
+      // convert to array
       const accountElement = document.createElement("div");
       accountElement.className = "account-group";
       accountElement.innerHTML = `
@@ -305,15 +304,10 @@ function updateHoldingsTable(portfolio) {
   );
 
   sorted.forEach((h) => {
-    console.log(`Holding ${h.symbol}:`, {
-      boughtPriceNative: h.boughtPriceNative,
-      currentPriceNative: h.currentPriceNative,
-      nativeCurrency: h.nativeCurrency,
-      gak: h.gak
-    });
-    const boughtPriceNative = h.boughtPriceNative;
+    console.log("Holding payload", h);
+    const lastBoughtPricePerShare = h.lastBoughtPricePerShare;
     const currentPriceNative = h.currentPriceNative;
-    const avgCostNative = h.gak;
+    const avgCostNative = h.avgCostNative;
     const qty = h.quantity;
     const valueNative = h.currentValueNative;
     const valueAccount = h.currentValueAccount;
@@ -321,7 +315,7 @@ function updateHoldingsTable(portfolio) {
     const row = document.createElement("tr");
     row.innerHTML = `
     <td>${h.symbol}</td>
-    <td>${formatCurrency(boughtPriceNative, h.nativeCurrency)}</td>
+    <td>${formatCurrency(lastBoughtPricePerShare, h.nativeCurrency)}</td>
     <td>${formatCurrency(currentPriceNative, h.nativeCurrency)}</td>
     <td>${formatCurrency(avgCostNative, h.nativeCurrency)}</td>
     <td>${qty}</td>

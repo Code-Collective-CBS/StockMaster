@@ -9,7 +9,7 @@ export const favoredStocks = {
     // Create headers matching the cell structure below
     headerRow.append(createHeader("Symbol"));
     headerRow.append(createHeader("Name"));
-    headerRow.append(createHeader("Bought"));
+    headerRow.append(createHeader("Last Bought"));
     headerRow.append(createHeader("Current"));
     headerRow.append(createHeader("GAK"));
     headerRow.append(createHeader("Qty"));
@@ -39,21 +39,17 @@ export const favoredStocks = {
           // bought price (native)
           row.append(
             createCell(
-              formatCurrencyFn(h.boughtPriceNative, h.nativeCurrency)
+              formatCurrencyFn(h.lastBoughtPricePerShare, h.nativeCurrency)
             )
           );
 
           // current price (native)
           row.append(
-            createCell(
-              formatCurrencyFn(h.currentPriceNative, h.nativeCurrency)
-            )
+            createCell(formatCurrencyFn(h.currentPriceNative, h.nativeCurrency))
           );
 
           // GAK (native)
-          row.append(
-            createCell(formatCurrencyFn(h.gak, h.nativeCurrency))
-          );
+          row.append(createCell(formatCurrencyFn(h.gak, h.nativeCurrency)));
 
           // quantity
           row.append(createCell(h.quantity));
@@ -67,9 +63,9 @@ export const favoredStocks = {
 
           // change % = (currPrice - boughtPrice) / boughtPrice
           const changePct =
-            h.boughtPriceNative > 0
-              ? ((h.currentPriceNative - h.boughtPriceNative) /
-                  h.boughtPriceNative) *
+            h.lastBoughtPricePerShare > 0
+              ? ((h.currentPriceNative - h.lastBoughtPricePerShare) /
+                  h.lastBoughtPricePerShare) *
                 100
               : 0;
           const changeCell = createCell(`${changePct.toFixed(2)}%`);

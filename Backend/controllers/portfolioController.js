@@ -58,16 +58,18 @@ const portfolioController = {
   getSimplePortfolios: async (req, res) => {
     try {
       const accountId = req.params.accountId;
-      const portfolios = await databaseServices.getPortfoliosByAccount(accountId);
+      const portfolios = await databaseServices.getPortfoliosByAccount(
+        accountId
+      );
 
       if (!portfolios || portfolios.length === 0) {
         return res.status(404).json([]);
       }
 
       // Return just the ID and name of each portfolio
-      const simplePortfolios = portfolios.map(p => ({
+      const simplePortfolios = portfolios.map((p) => ({
         id: p.id,
-        name: p.name
+        name: p.name,
       }));
 
       res.json(simplePortfolios);
@@ -87,7 +89,9 @@ const portfolioController = {
       }
 
       // Get all transactions for this portfolio
-      const transactions = await databaseServices.getTransactionsForPortfolio(portfolioId);
+      const transactions = await databaseServices.getTransactionsForPortfolio(
+        portfolioId
+      );
 
       if (!transactions || transactions.length === 0) {
         return res.json({ quantity: 0 });
@@ -95,7 +99,7 @@ const portfolioController = {
 
       // Calculate total quantity by adding buys and subtracting sells
       let quantity = 0;
-      transactions.forEach(tx => {
+      transactions.forEach((tx) => {
         if (tx.symbol === symbol) {
           if (tx.transaction_type.toLowerCase() === "buy") {
             quantity += tx.amount;
@@ -113,7 +117,7 @@ const portfolioController = {
       console.error("Error fetching stock quantity", error);
       res.status(500).json({ error: "Failed to fetch stock quantity" });
     }
-  }
+  },
 };
 
 // HELPER FUNCTIONS FOR CALCULATIONS //
@@ -141,7 +145,9 @@ async function calculatePortfolioData(accountId) {
 
   for (const portfolio of portfolios) {
     // Get transactions and calculate holdings
-    const transactions = await databaseServices.getTransactionsForPortfolio(portfolio.id);
+    const transactions = await databaseServices.getTransactionsForPortfolio(
+      portfolio.id
+    );
     const holdings = calculateHoldings(transactions);
 
     // Process each holding to get current prices and values
@@ -175,13 +181,23 @@ async function calculatePortfolioData(accountId) {
 
       // Calculate gain/loss
       const unrealizedGain = currentValueAccount - costInAccountCurrency;
-      const unrealizedGainPercent = costInAccountCurrency > 0
-        ? (unrealizedGain / costInAccountCurrency) * 100
-        : 0;
+      const unrealizedGainPercent =
+        costInAccountCurrency > 0
+          ? (unrealizedGain / costInAccountCurrency) * 100
+          : 0;
 
       // Add to totals
       totalCostAccount += costInAccountCurrency;
       totalCurrentAccount += currentValueAccount;
+
+      // Sum up each tx.price_per_share × amount (both in the security’s own currency)
+      const nativeTotalCost = holding.transactions.reduce(
+        (sum, tx) => sum + Number(tx.price_per_share) * Number(tx.amount),
+        0
+      );
+
+      // Divide by total shares to get “average cost per share” in the security’s currency
+      const avgCostNative = nativeTotalCost / holding.quantity;
 
       // Add enhanced holding
       enhancedHoldings.push({
@@ -190,22 +206,23 @@ async function calculatePortfolioData(accountId) {
         security_name: holding.security_name,
         quantity: holding.quantity,
         totalCost: holding.totalCost,
-        gak: holding.gak,
-        boughtPriceNative: holding.lastPrice,  // This is actually the price per share from most recent buy
+        gak: avgCostNative,
+        avgCostAccount: holding.gak,       // keep your existing account-currency avg
+        avgCostNative: avgCostNative,                    // the true native-currency avg we just computed
+        lastBoughtPricePerShare: holding.lastPrice, // This is actually the price per share from most recent buy
         currentPriceNative: currentPrice,
         nativeCurrency,
         currentValueNative,
         currentValueAccount,
         unrealizedGain,
-        unrealizedGainPercent
+        unrealizedGainPercent,
       });
     }
 
     // Calculate portfolio totals
     const totalUnrealizedGain = totalCurrentAccount - totalCostAccount;
-    const totalUnrealizedGainPercent = totalCostAccount > 0
-      ? (totalUnrealizedGain / totalCostAccount) * 100
-      : 0;
+    const totalUnrealizedGainPercent =
+      totalCostAccount > 0 ? (totalUnrealizedGain / totalCostAccount) * 100 : 0;
 
     // Add processed portfolio
     processedPortfolios.push({
@@ -220,8 +237,8 @@ async function calculatePortfolioData(accountId) {
         totalCost: totalCostAccount,
         totalCurrentValue: totalCurrentAccount,
         totalUnrealizedGain,
-        totalUnrealizedGainPercent
-      }
+        totalUnrealizedGainPercent,
+      },
     });
   }
 
@@ -260,123 +277,129 @@ async function getStockInfo(symbol) {
 
 // Calculate portfolio history
 async function calculatePortfolioHistory(accountId) {
-    // 1. Get all portfolios for this account
-    const portfolios = await databaseServices.getPortfoliosByAccount(accountId);
-    if (!portfolios.length) return [];
+  // 1. Get all portfolios for this account
+  const portfolios = await databaseServices.getPortfoliosByAccount(accountId);
+  if (!portfolios.length) return [];
 
-    const accountCurrency = portfolios[0].currency;
+  const accountCurrency = portfolios[0].currency;
 
-    // 2. Get all transactions across all portfolios
-    const allTransactions = [];
-    for (const portfolio of portfolios) {
-      const txs = await databaseServices.getTransactionsForPortfolio(portfolio.id);
-      allTransactions.push(...txs);
-    }
-
-    // 3. Get exchange rates for currency conversion
-    const ratesData = await getOrSetCache(
-      `rates-${accountCurrency}`,
-      () => exchangeRateService.getCurrency(accountCurrency),
-      86400 // Cache for 1 day
+  // 2. Get all transactions across all portfolios
+  const allTransactions = [];
+  for (const portfolio of portfolios) {
+    const txs = await databaseServices.getTransactionsForPortfolio(
+      portfolio.id
     );
-    const rates = ratesData.data.conversion_rates;
-
-    // 4. Calculate what was held on each day
-    const historyByDate = calculatePortfolioHistoryByDate(allTransactions);
-
-    // 5. Get price data for all securities in the portfolio
-    const securities = new Set();
-    Object.values(historyByDate).forEach(holdings =>
-      holdings.forEach(h => securities.add(h.symbol))
-    );
-
-    const priceHistories = {};
-    for (const symbol of securities) {
-      try {
-        // Get historical prices
-        const tsData = await getOrSetCache(
-          `timeSeries-${symbol}`,
-          () => alphaVantageService.getDailyTimeSeries(symbol, "compact"),
-          3600
-        );
-
-        // Get stock info (for currency)
-        const stockInfo = await getOrSetCache(
-          `overview-${symbol}`,
-          () => alphaVantageService.getCompanyOverview(symbol),
-          86400
-        );
-
-        const currency = stockInfo.data?.Currency || accountCurrency;
-        priceHistories[symbol] = {
-          series: tsData.data["Time Series (Daily)"] || {},
-          currency
-        };
-      } catch (error) {
-        console.warn(`Failed to get price data for ${symbol}`);
-        priceHistories[symbol] = { series: {}, currency: accountCurrency };
-      }
-    }
-
-    // 6. Calculate daily portfolio values (for the last 180 days)
-    const startDate = moment().subtract(180, "days");
-    const endDate = moment();
-    const dailyValues = [];
-
-    // For each business day (Mon-Fri)
-    for (let day = startDate.clone(); day.isSameOrBefore(endDate); day.add(1, "day")) {
-      // Skip weekends
-      if (day.day() === 0 || day.day() === 6) continue;
-
-      const dateStr = day.format("YYYY-MM-DD");
-
-      // Get holdings for this date (or closest previous date)
-      let holdings = historyByDate[dateStr] || [];
-      if (holdings.length === 0) {
-        holdings = findMostRecentHoldings(historyByDate, dateStr, startDate);
-      }
-
-      // Calculate total value for this day
-      let totalValue = 0;
-
-      for (const holding of holdings) {
-        const { symbol, quantity } = holding;
-        const priceData = priceHistories[symbol];
-        if (!priceData) continue;
-
-        // Find price for this day (or closest previous day)
-        const price = findPriceForDate(priceData.series, dateStr);
-        if (price === null) continue;
-
-        // Convert to account currency if needed
-        let valueInAccountCurrency = price * quantity;
-        if (priceData.currency !== accountCurrency) {
-          const rate = rates[priceData.currency];
-          if (rate) {
-            valueInAccountCurrency = valueInAccountCurrency / rate;
-          }
-        }
-
-        totalValue += valueInAccountCurrency;
-      }
-
-      // Add to daily values if we have a value
-      if (totalValue > 0) {
-        dailyValues.push({
-          date: dateStr,
-          value: totalValue
-        });
-      }
-    }
-
-    // 7. Fill in any gaps in the data
-    const result = interpolateMissingDays(dailyValues);
-
-    // 8. Sort by date
-    result.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-    return result;
+    allTransactions.push(...txs);
   }
+
+  // 3. Get exchange rates for currency conversion
+  const ratesData = await getOrSetCache(
+    `rates-${accountCurrency}`,
+    () => exchangeRateService.getCurrency(accountCurrency),
+    86400 // Cache for 1 day
+  );
+  const rates = ratesData.data.conversion_rates;
+
+  // 4. Calculate what was held on each day
+  const historyByDate = calculatePortfolioHistoryByDate(allTransactions);
+
+  // 5. Get price data for all securities in the portfolio
+  const securities = new Set();
+  Object.values(historyByDate).forEach((holdings) =>
+    holdings.forEach((h) => securities.add(h.symbol))
+  );
+
+  const priceHistories = {};
+  for (const symbol of securities) {
+    try {
+      // Get historical prices
+      const tsData = await getOrSetCache(
+        `timeSeries-${symbol}`,
+        () => alphaVantageService.getDailyTimeSeries(symbol, "compact"),
+        3600
+      );
+
+      // Get stock info (for currency)
+      const stockInfo = await getOrSetCache(
+        `overview-${symbol}`,
+        () => alphaVantageService.getCompanyOverview(symbol),
+        86400
+      );
+
+      const currency = stockInfo.data?.Currency || accountCurrency;
+      priceHistories[symbol] = {
+        series: tsData.data["Time Series (Daily)"] || {},
+        currency,
+      };
+    } catch (error) {
+      console.warn(`Failed to get price data for ${symbol}`);
+      priceHistories[symbol] = { series: {}, currency: accountCurrency };
+    }
+  }
+
+  // 6. Calculate daily portfolio values (for the last 180 days)
+  const startDate = moment().subtract(180, "days");
+  const endDate = moment();
+  const dailyValues = [];
+
+  // For each business day (Mon-Fri)
+  for (
+    let day = startDate.clone();
+    day.isSameOrBefore(endDate);
+    day.add(1, "day")
+  ) {
+    // Skip weekends
+    if (day.day() === 0 || day.day() === 6) continue;
+
+    const dateStr = day.format("YYYY-MM-DD");
+
+    // Get holdings for this date (or closest previous date)
+    let holdings = historyByDate[dateStr] || [];
+    if (holdings.length === 0) {
+      holdings = findMostRecentHoldings(historyByDate, dateStr, startDate);
+    }
+
+    // Calculate total value for this day
+    let totalValue = 0;
+
+    for (const holding of holdings) {
+      const { symbol, quantity } = holding;
+      const priceData = priceHistories[symbol];
+      if (!priceData) continue;
+
+      // Find price for this day (or closest previous day)
+      const price = findPriceForDate(priceData.series, dateStr);
+      if (price === null) continue;
+
+      // Convert to account currency if needed
+      let valueInAccountCurrency = price * quantity;
+      if (priceData.currency !== accountCurrency) {
+        const rate = rates[priceData.currency];
+        if (rate) {
+          valueInAccountCurrency = valueInAccountCurrency / rate;
+        }
+      }
+
+      totalValue += valueInAccountCurrency;
+    }
+
+    // Add to daily values if we have a value
+    if (totalValue > 0) {
+      dailyValues.push({
+        date: dateStr,
+        value: totalValue,
+      });
+    }
+  }
+
+  // 7. Fill in any gaps in the data
+  const result = interpolateMissingDays(dailyValues);
+
+  // 8. Sort by date
+  result.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  return result;
+}
 
 // Helper function to interpolate missing days
 function interpolateMissingDays(dailyValues) {
@@ -413,7 +436,7 @@ function interpolateMissingDays(dailyValues) {
         const dateStr = moment(interpolatedDate).format("YYYY-MM-DD");
         result.push({
           date: dateStr,
-          value: interpolatedValue
+          value: interpolatedValue,
         });
       }
     }
@@ -423,94 +446,93 @@ function interpolateMissingDays(dailyValues) {
   return result;
 }
 
-
-  // Helper function to calculate portfolio state (holdings) for each day
-  function calculatePortfolioHistoryByDate(transactions) {
-    if (!Array.isArray(transactions) || transactions.length === 0) {
-      return {};
-    }
-
-    // Sort transactions by date ascending
-    transactions.sort(
-      (a, b) => new Date(a.transaction_date) - new Date(b.transaction_date)
-    );
-
-    const historyByDate = {};
-    const portfolio = {}; // Current portfolio state indexed by security_id
-
-    // Process each transaction in chronological order
-    transactions.forEach((tx) => {
-      const dateStr = moment(tx.transaction_date).format("YYYY-MM-DD");
-      const id = tx.securities_id;
-      const type = (tx.transaction_type || "").toLowerCase();
-      const qty = Number(tx.amount) || 0;
-
-      // Initialize portfolio entry if needed
-      if (!portfolio[id]) {
-        portfolio[id] = {
-          securityId: id,
-          security_name: tx.security_name,
-          symbol: tx.symbol,
-          quantity: 0,
-        };
-      }
-
-      // Update portfolio based on transaction type
-      if (type === "buy") {
-        portfolio[id].quantity += qty;
-      } else if (type === "sell") {
-        portfolio[id].quantity -= qty;
-      }
-
-      // Create a snapshot of the portfolio for this date
-      historyByDate[dateStr] = Object.values(portfolio)
-        .filter((h) => h.quantity > 0) // Only include positions with positive quantity
-        .map((h) => ({ ...h })); // Clone the holdings to avoid reference issues
-    });
-
-    return historyByDate;
+// Helper function to calculate portfolio state (holdings) for each day
+function calculatePortfolioHistoryByDate(transactions) {
+  if (!Array.isArray(transactions) || transactions.length === 0) {
+    return {};
   }
 
-  // Helper to find the most recent holdings before a date
-  function findMostRecentHoldings(historyByDate, dateStr, startDate) {
-    const date = moment(dateStr);
-    let prevDate = date.clone().subtract(1, "day");
+  // Sort transactions by date ascending
+  transactions.sort(
+    (a, b) => new Date(a.transaction_date) - new Date(b.transaction_date)
+  );
 
-    while (prevDate.isSameOrAfter(startDate)) {
-      const prevDateStr = prevDate.format("YYYY-MM-DD");
-      if (historyByDate[prevDateStr] && historyByDate[prevDateStr].length > 0) {
-        return historyByDate[prevDateStr];
-      }
-      prevDate.subtract(1, "day");
+  const historyByDate = {};
+  const portfolio = {}; // Current portfolio state indexed by security_id
+
+  // Process each transaction in chronological order
+  transactions.forEach((tx) => {
+    const dateStr = moment(tx.transaction_date).format("YYYY-MM-DD");
+    const id = tx.securities_id;
+    const type = (tx.transaction_type || "").toLowerCase();
+    const qty = Number(tx.amount) || 0;
+
+    // Initialize portfolio entry if needed
+    if (!portfolio[id]) {
+      portfolio[id] = {
+        securityId: id,
+        security_name: tx.security_name,
+        symbol: tx.symbol,
+        quantity: 0,
+      };
     }
 
-    return [];
+    // Update portfolio based on transaction type
+    if (type === "buy") {
+      portfolio[id].quantity += qty;
+    } else if (type === "sell") {
+      portfolio[id].quantity -= qty;
+    }
+
+    // Create a snapshot of the portfolio for this date
+    historyByDate[dateStr] = Object.values(portfolio)
+      .filter((h) => h.quantity > 0) // Only include positions with positive quantity
+      .map((h) => ({ ...h })); // Clone the holdings to avoid reference issues
+  });
+
+  return historyByDate;
+}
+
+// Helper to find the most recent holdings before a date
+function findMostRecentHoldings(historyByDate, dateStr, startDate) {
+  const date = moment(dateStr);
+  let prevDate = date.clone().subtract(1, "day");
+
+  while (prevDate.isSameOrAfter(startDate)) {
+    const prevDateStr = prevDate.format("YYYY-MM-DD");
+    if (historyByDate[prevDateStr] && historyByDate[prevDateStr].length > 0) {
+      return historyByDate[prevDateStr];
+    }
+    prevDate.subtract(1, "day");
   }
 
-  // Helper to find price for a specific date
-  function findPriceForDate(priceData, dateStr) {
-    // Try exact date first
-    if (priceData[dateStr]) {
-      return parseFloat(priceData[dateStr]["4. close"]);
-    }
+  return [];
+}
 
-    // If not found, look for closest previous date
-    const date = moment(dateStr);
-    const dates = Object.keys(priceData).sort().reverse(); // Newest first
-
-    for (const d of dates) {
-      if (moment(d).isBefore(date)) {
-        return parseFloat(priceData[d]["4. close"]);
-      }
-    }
-
-    return null;
+// Helper to find price for a specific date
+function findPriceForDate(priceData, dateStr) {
+  // Try exact date first
+  if (priceData[dateStr]) {
+    return parseFloat(priceData[dateStr]["4. close"]);
   }
+
+  // If not found, look for closest previous date
+  const date = moment(dateStr);
+  const dates = Object.keys(priceData).sort().reverse(); // Newest first
+
+  for (const d of dates) {
+    if (moment(d).isBefore(date)) {
+      return parseFloat(priceData[d]["4. close"]);
+    }
+  }
+
+  return null;
+}
 
 // Calculate holdings from transactions - same as original
 function calculateHoldings(transactions) {
   if (!Array.isArray(transactions) || transactions.length === 0) {
-    console.log("No transactions data")
+    console.log("No transactions data");
     return [];
   }
 
@@ -546,23 +568,21 @@ function calculateHoldings(transactions) {
     h.transactions.push(tx);
   });
 
+  return Object.values(bySecurity)
+    .filter((h) => h.quantity > 0)
+    .map((h) => {
+      const avgCost = h.totalCost / h.quantity;
+      // find the last 'buy' transaction
+      const lastBuy = h.transactions
+        .filter((tx) => tx.transaction_type.toLowerCase() === "buy")
+        .slice(-1)[0];
 
-return Object.values(bySecurity)
-  .filter(h => h.quantity > 0)
-  .map(h => {
-    const avgCost = h.totalCost / h.quantity;
-    // find the last 'buy' transaction
-    const lastBuy = h.transactions
-      .filter(tx => tx.transaction_type.toLowerCase() === 'buy')
-      .slice(-1)[0];
-
-    return {
-      ...h,
-      gak: avgCost,
-      lastPrice: lastBuy ? Number(lastBuy.price_per_share) : avgCost
-    };
-  });
-
+      return {
+        ...h,
+        gak: avgCost,
+        lastPrice: lastBuy ? Number(lastBuy.price_per_share) : avgCost,
+      };
+    });
 }
 
 module.exports = portfolioController;
