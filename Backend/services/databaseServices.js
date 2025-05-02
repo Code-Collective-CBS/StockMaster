@@ -143,8 +143,7 @@ const databaseServices = {
             const currency_id = result.recordset[0].id;
 
             // 2. Create the account
-
-            const checkUser = await pool
+            const createAcc = await pool
                 .request()
                 .input("account_name", sql.VarChar(255), account_name)
                 .input("currency_id", sql.Int, currency_id)
@@ -152,10 +151,28 @@ const databaseServices = {
                 .input("bank", sql.NVarChar(100), account_bank)
                 .query(`
                 INSERT INTO Accounts (account_name, currency_id, user_id, bank)
-                VALUES (@account_name, @currency_id, @user_id, @bank)`
+                OUTPUT inserted.id AS account_id
+                VALUES (@account_name, @currency_id, @user_id, @bank)
+                `);
+
+            const newAccountId = createAcc.recordset[0].account_id
+
+            // Insert state change into AccountHistory
+            await pool
+                .request()
+                .input("account_id", sql.Int, newAccountId)
+                .input("state_change", sql.NVarChar, 'active')
+                .query(`
+                INSERT INTO AccountHistory (account_id, state_change)
+                VALUES (@account_id, @state_change)`
                 );
 
-            return { account_name, account_currency, account_bank };
+            return {
+                account_id: newAccountId,
+                account_name,
+                account_currency,
+                account_bank
+            };
         } catch (err) {
             console.error("Error: Could not create account", err);
             throw err;
@@ -723,7 +740,7 @@ const databaseServices = {
                 .input('account_id', sql.Int, account_id)
                 .query(`
                 SELECT
-                    c.currency_name AS currency,
+                    c.currency_name AS currency
                     FROM Accounts a
                     JOIN Currency c ON a.currency_id = c.id
                 WHERE a.id = @account_id
@@ -790,7 +807,7 @@ const databaseServices = {
                     FROM AccountHistory
                     WHERE account_id = @account_id
                     ORDER BY create_date DESC
-                    `)
+                    `);
 
             const latestAccountState = result.recordset[0].state_change
 
