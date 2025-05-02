@@ -191,7 +191,7 @@ async function calculatePortfolioData(accountId) {
         quantity: holding.quantity,
         totalCost: holding.totalCost,
         gak: holding.gak,
-        boughtPriceNative: holding.lastPrice,  // This is actually the price per share
+        boughtPriceNative: holding.lastPrice,  // This is actually the price per share from most recent buy
         currentPriceNative: currentPrice,
         nativeCurrency,
         currentValueNative,
@@ -518,7 +518,7 @@ function calculateHoldings(transactions) {
 
   transactions.forEach((tx) => {
     const id = tx.securities_id;
-    const type = (tx.transaction_type || "").toLowerCase();
+    const type = (tx.transaction_type || "").toLowerCase(); // delete toLowercase maybe not necessary
     const qty = Number(tx.amount) || 0;
     const tot = Number(tx.total_price) || 0;
 
@@ -546,7 +546,7 @@ function calculateHoldings(transactions) {
     h.transactions.push(tx);
   });
 
-  
+
 return Object.values(bySecurity)
   .filter(h => h.quantity > 0)
   .map(h => {
