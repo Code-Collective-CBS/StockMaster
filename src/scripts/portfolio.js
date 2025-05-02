@@ -62,8 +62,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (portfolioData) {
       // Update UI with cached data
       updatePortfolioUI(portfolioData);
-      // Refresh in background
-      setTimeout(() => refreshDataInBackground(accountId, cacheKey), 100);
     } else {
       // Not in cache, fetch it
       portfolioData = await fetchPortfolioData(accountId, cacheKey);
@@ -141,21 +139,6 @@ async function fetchPortfolioData(accountId, cacheKey) {
     }
 
     throw error; // Re-throw if no cached data
-  }
-}
-
-// Refresh data without blocking the UI
-async function refreshDataInBackground(accountId, cacheKey) {
-  try {
-    const freshData = await fetchPortfolioData(accountId, cacheKey);
-    // Only update UI if it's meaningfully different
-    if (
-      JSON.stringify(freshData) !== JSON.stringify(cachingService.get(cacheKey))
-    ) {
-      updatePortfolioUI(freshData);
-    }
-  } catch (error) {
-    console.error("Background refresh failed:", error);
   }
 }
 
@@ -387,6 +370,12 @@ function updateHoldingsTable(portfolio) {
   );
 
   sorted.forEach((h) => {
+    console.log(`Holding ${h.symbol}:`, {
+      boughtPriceNative: h.boughtPriceNative,
+      currentPriceNative: h.currentPriceNative,
+      nativeCurrency: h.nativeCurrency,
+      gak: h.gak
+    });
     const boughtPriceNative = h.boughtPriceNative;
     const currentPriceNative = h.currentPriceNative;
     const avgCostNative = h.gak;
