@@ -190,7 +190,7 @@ function updateHoldingDisplay(portfolioId) {
   if (!holding) return;
 
   document.getElementById('amountOfSecurity').textContent = holding.quantity;
-  document.getElementById('totalValue').textContent = `${(holding.totalCost).toFixed(2)} (${securityCurrency})`;
+  document.getElementById('totalValue').textContent = `${(holding.totalCostNative).toFixed(2)} (${holding.nativeCurrency})`;
   document.getElementById('gak').textContent = `${(holding.gak).toFixed(2)} (${securityCurrency})`;
 };
 

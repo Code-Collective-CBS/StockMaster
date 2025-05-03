@@ -168,32 +168,27 @@ async function calculatePortfolioData(accountId) {
       const currentValueNative = currentPrice * holding.quantity;
       let currentValueAccount = currentValueNative;
 
-      // Convert to account currency if needed
+      // Convert cost to account currency
       if (nativeCurrency !== accountCurrency) {
         currentValueAccount = currentValueNative / rates[nativeCurrency];
       }
 
-      const costInAccountCurrency = holding.totalCost;
+      // Convert cost to account currency
+      let costInAccountCurrency = holding.totalCostNative || 0;
+      if (nativeCurrency !== accountCurrency) {
+        costInAccountCurrency = holding.totalCostNative / rates[nativeCurrency];
+      }
 
       // Calculate gain/loss
       const unrealizedGain = currentValueAccount - costInAccountCurrency;
       const unrealizedGainPercent =
-        costInAccountCurrency > 0
+        costInAccountCurrency && costInAccountCurrency > 0
           ? (unrealizedGain / costInAccountCurrency) * 100
-          : 0;
+          : null;
 
       // Add to totals
       totalCostAccount += costInAccountCurrency;
       totalCurrentAccount += currentValueAccount;
-
-      // Sum up each tx.price_per_share × amount (both in the security’s own currency)
-      const nativeTotalCost = holding.transactions.reduce(
-        (sum, tx) => sum + Number(tx.price_per_share) * Number(tx.amount),
-        0
-      );
-
-      // Divide by total shares to get “average cost per share” in the security’s currency
-      const avgCostNative = nativeTotalCost / holding.quantity;
 
       // Add enhanced holding
       enhancedHoldings.push({
@@ -201,10 +196,10 @@ async function calculatePortfolioData(accountId) {
         symbol: holding.symbol,
         security_name: holding.security_name,
         quantity: holding.quantity,
-        totalCost: holding.totalCost,
-        gak: avgCostNative,
-        avgCostAccount: holding.gak,       // keep your existing account-currency avg
-        avgCostNative: avgCostNative,                    // the true native-currency avg we just computed
+        totalCostNative: holding.totalCostNative,
+        gak: holding.gak,
+        avgCostAccount: holding.gak / rates[nativeCurrency],       // keep your existing account-currency avg
+        avgCostNative: holding.gak,                    // the true native-currency avg we just computed
         lastBoughtPricePerShare: holding.lastPrice, // This is actually the price per share from most recent buy
         currentPriceNative: currentPrice,
         nativeCurrency,
@@ -230,7 +225,7 @@ async function calculatePortfolioData(accountId) {
       currency: accountCurrency,
       metrics: {
         holdings: enhancedHoldings,
-        totalCost: totalCostAccount,
+        totalCostNative: totalCostAccount,
         totalCurrentValue: totalCurrentAccount,
         totalUnrealizedGain,
         totalUnrealizedGainPercent,
@@ -536,9 +531,9 @@ function calculateHoldings(transactions) {
 
   transactions.forEach((tx) => {
     const id = tx.securities_id;
-    const type = (tx.transaction_type || "").toLowerCase(); // delete toLowercase maybe not necessary
+    const type = (tx.transaction_type)
     const qty = Number(tx.amount) || 0;
-    const tot = Number(tx.total_price) || 0;
+    const tot = Number(tx.price_per_share) * Number(tx.amount) || 0; // Use price_per_share to always get total in native currency
 
     if (!bySecurity[id]) {
       bySecurity[id] = {
@@ -546,7 +541,9 @@ function calculateHoldings(transactions) {
         security_name: tx.security_name,
         symbol: tx.symbol,
         quantity: 0,
-        totalCost: 0,
+        totalCostNative: 0,
+        totalBuyQty: 0,
+        totalBuyValue: 0,
         transactions: [],
       };
     }
@@ -554,10 +551,11 @@ function calculateHoldings(transactions) {
 
     if (type === "buy") {
       h.quantity += qty;
-      h.totalCost += tot;
+      h.totalBuyQty += qty;
+      h.totalBuyValue += tot;
     } else if (type === "sell") {
-      const avgCost = h.quantity > 0 ? h.totalCost / h.quantity : 0;
-      h.totalCost -= avgCost * qty; // remove cost basis of sold shares
+      const avgCost = h.totalBuyValue / h.totalBuyQty; // Use the original GAK (from buy only)
+      h.totalCostNative -= avgCost * qty; // remove cost basis of sold shares
       h.quantity -= qty;
     }
 
@@ -567,15 +565,16 @@ function calculateHoldings(transactions) {
   return Object.values(bySecurity)
     .filter((h) => h.quantity > 0)
     .map((h) => {
-      const avgCost = h.totalCost / h.quantity;
-      // find the last 'buy' transaction
+      const avgCost = h.totalBuyQty > 0 ? h.totalBuyValue / h.totalBuyQty : 0;
       const lastBuy = h.transactions
         .filter((tx) => tx.transaction_type.toLowerCase() === "buy")
         .slice(-1)[0];
+        const totalCostNative = avgCost * h.quantity;
 
       return {
         ...h,
-        gak: avgCost,
+        totalCostNative,
+        gak: isNaN(avgCost) ? 0 : avgCost,
         lastPrice: lastBuy ? Number(lastBuy.price_per_share) : avgCost,
       };
     });

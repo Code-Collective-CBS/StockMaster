@@ -1,9 +1,7 @@
-const { Transaction } = require('mssql');
 const databaseServices = require('../services/databaseServices');
 // CACHE
 const cache = require("../utilityFunctions/cache");
 const { getOrSetCache } = require('../utilityFunctions/cacheHelper');
-const { ReturnStatusToken } = require('tedious/lib/token/token');
 
 const databaseController = {
     createUser: async (req, res) => {
