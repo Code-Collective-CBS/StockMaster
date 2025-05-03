@@ -11,7 +11,9 @@ export const profitLoss = {
         const selectedAccount = window.cachedAccounts
             .find(acc => acc.account_id == selectedAccountId);
         const accountCurrency = selectedAccount.currency;
+        console.log(accountCurrency)
         const currencyRates = await stockAPI.getCurrency(accountCurrency);
+        console.log(currencyRates)
 
         const loadedTransactions = await loadTransactions();
         const transactions = loadedTransactions.data;
@@ -21,7 +23,7 @@ export const profitLoss = {
         transactions.forEach(trans => {
             const type = trans.transaction_type.toLowerCase(); // 'buy' or 'sell'
             const symbol = trans.symbol;
-            const qty = trans.quantity;
+            const qty = trans.amount;
             const priceRaw = trans.total_price;          // local currency amount
             const curr = trans.account_currency;
 
@@ -64,12 +66,9 @@ export const profitLoss = {
             }
         });
 
-        // Return realized sum if non-zero
-        if (totalRealizedPL !== 0) {
-            return {
-                realizedSum: totalRealizedPL.toFixed(2),
-                currency: accountCurrency
-            };
+        return {
+            realizedSum: totalRealizedPL.toFixed(2),
+            currency: accountCurrency
         }
     }
 };
