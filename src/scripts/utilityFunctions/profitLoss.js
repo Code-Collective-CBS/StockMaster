@@ -18,6 +18,7 @@ export const profitLoss = {
         const loadedTransactions = await loadTransactions();
         const transactions = loadedTransactions.data;
 
+
         // Aggregate buy/sell quantities and values per symbol
         const symbolMap = {};
         transactions.forEach(trans => {

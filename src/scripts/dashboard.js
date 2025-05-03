@@ -87,7 +87,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     totalRealizedEl.textContent = '-';
   }
 
-
   const newsContainerAuthor = document.getElementById("news-author");
   const newsContainerDescription = document.getElementById("news-description");
 
