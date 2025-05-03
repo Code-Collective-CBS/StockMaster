@@ -150,6 +150,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 1) Fetch portfolio summary
     const portfolios = await stockAPI.getPortfolioSummary(accountId);
+    console.log(portfolios);
 
     // 2) Draw pie chart of all portfolios
     const canvas = document.getElementById("portfolioChart");
@@ -206,13 +207,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       `).join("");
     }
 
-    // 8 Render Top All native values
-    const AllValue = document.querySelector(".overview-unrealized-value");
-    if (topAllValue < null) {
-      AllValue.textContent = topAllValue.map(h =>
-        formatCurrency(h.currentValueNative, h.nativeCurrency))
-    } else {
-      AllValue.textContent = '-';
+    // All unrealized value
+    const unrealizedEl = document.querySelector(".overview-unrealized-value");
+    const totalUnrealized = portfolios.reduce(
+      (sum, p) => sum + (p.metrics.totalUnrealizedGain || 0), 0
+    );
+    if (unrealizedEl) {
+      unrealizedEl.textContent = formatCurrency(totalUnrealized, portfolios[0]?.currency || "");
     }
 
     // 9) Render Top 5 unrealized gain %
