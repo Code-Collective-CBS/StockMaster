@@ -155,6 +155,9 @@ const databaseServices = {
                 VALUES (@account_name, @currency_id, @user_id, @bank)
                 `);
 
+            if (createAcc.recordset.length === 0) {
+                throw new Error(`Failed to create account in database`);
+            }
             const newAccountId = createAcc.recordset[0].account_id
 
             // Insert state change into AccountHistory
