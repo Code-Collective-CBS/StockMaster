@@ -5,71 +5,79 @@ import { currencyHandler } from "./currencyConverter.js";
 
 export const profitLoss = {
     realizedPL: async () => {
-        // Fetch accounts and transactions
         await loadAccounts();
+
         const selectedAccountId = sessionStorage.getItem("selectedAccountId");
-        const selectedAccount = window.cachedAccounts
-            .find(acc => acc.account_id == selectedAccountId);
+        const selectedAccount = window.cachedAccounts.find(
+            (acc) => acc.account_id == selectedAccountId
+        );
+
+        if (!selectedAccount) {
+            console.warn("No account selected");
+            return { realizedSum: 0, currency: "" };
+        }
+
         const accountCurrency = selectedAccount.currency;
-        console.log(accountCurrency)
         const currencyRates = await stockAPI.getCurrency(accountCurrency);
-        console.log(currencyRates)
 
         const loadedTransactions = await loadTransactions();
-        const transactions = loadedTransactions.data;
+        const transactions = loadedTransactions.data
+            .filter((tx) => tx.account_id == selectedAccountId)
+            .reverse(); // SQL gives descending; we need ascending
 
+        const symbolMap = {}; // Track average cost and quantity
+        let totalRealizedPL = 0;
 
-        // Aggregate buy/sell quantities and values per symbol
-        const symbolMap = {};
-        transactions.forEach(trans => {
-            const type = trans.transaction_type.toLowerCase(); // 'buy' or 'sell'
-            const symbol = trans.symbol;
-            const qty = trans.amount;
-            const priceRaw = trans.total_price;          // local currency amount
-            const curr = trans.account_currency;
-
-            // Convert transaction amount to account currency
-            const amount = currencyHandler.convertCurrency(
-                priceRaw, curr, accountCurrency, currencyRates
+        for (const tx of transactions) {
+            const symbol = tx.symbol;
+            const type = tx.transaction_type;
+            const qty = Number(tx.amount);
+            const totalAccountValue = currencyHandler.convertCurrency(
+                Number(tx.total_price),
+                tx.account_currency,
+                accountCurrency,
+                currencyRates
             );
 
-            // Initialize map entry for symbol if missing
+            console.log('txx.total_price', tx.total_price);
+
             if (!symbolMap[symbol]) {
                 symbolMap[symbol] = {
-                    buyQty: 0,
-                    buyValue: 0,
-                    sellQty: 0,
-                    sellValue: 0
+                    totalQty: 0,
+                    totalCost: 0,
                 };
             }
+
             const entry = symbolMap[symbol];
 
-            if (type === 'buy') {
-                // Accumulate buy quantity and value
-                entry.buyQty += qty;
-                entry.buyValue += amount;
-            } else if (type === 'sell') {
-                // Accumulate sell quantity and value
-                entry.sellQty += qty;
-                entry.sellValue += amount;
-            }
-        });
+            if (type === "buy") {
+                entry.totalQty += qty;
+                entry.totalCost += totalAccountValue;
+            } else if (type === "sell") {
+                if (entry.totalQty === 0) {
+                    console.warn(`Skipping sell of ${symbol} — no holdings`);
+                    continue;
+                }
 
-        // Calculate realized P/L using average entry/exit prices per symbol
-        let totalRealizedPL = 0;
-        Object.values(symbolMap).forEach(({ buyQty, buyValue, sellQty, sellValue }) => {
-            // Only compute if there were buys and sells
-            if (buyQty > 0 && sellQty > 0) {
-                const avgEntryPrice = buyValue / buyQty;
-                const avgExitPrice = sellValue / sellQty;
-                // Realized P/L = (avg exit price − avg entry price) × quantity sold
-                totalRealizedPL += (avgExitPrice - avgEntryPrice) * sellQty;
+                const avgCost = entry.totalCost / entry.totalQty;
+                const sellProceeds = totalAccountValue;
+                const costBasis = avgCost * qty;
+                const realizedGain = sellProceeds - costBasis;
+
+                totalRealizedPL += realizedGain;
+
+                // Update holding state
+                entry.totalQty -= qty;
+                entry.totalCost -= costBasis;
+
+                // Debug log
+                console.log(`[REALIZED] ${symbol}: Sold ${qty} at ${sellProceeds.toFixed(2)}, GAK ${avgCost.toFixed(2)} → Gain ${realizedGain.toFixed(2)}`);
             }
-        });
+        }
 
         return {
             realizedSum: totalRealizedPL.toFixed(2),
-            currency: accountCurrency
-        }
-    }
+            currency: accountCurrency,
+        };
+    },
 };
