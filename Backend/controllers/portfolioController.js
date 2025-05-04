@@ -251,7 +251,6 @@ async function calculatePortfolioData(accountId) {
     });
   }
 
-  console.log("Log from calculatePortfolioData: ",processedPortfolios);
   return processedPortfolios;
 }
 
@@ -600,14 +599,6 @@ function calculateHoldings(transactions) {
         .filter((tx) => tx.transaction_type.toLowerCase() === "buy")
         .slice(-1)[0];
         const totalCostNative = avgCost * h.quantity;
-
-      console.log("Log from the calculateHoldings",
-{        ...h,
-        totalCostNative,
-        gak: isNaN(avgCost) ? 0 : avgCost,
-        lastPrice: lastBuy ? Number(lastBuy.price_per_share) : avgCost,
-        realizedGain: h.realizedGain,}
-      )
 
       return {
         ...h,

@@ -353,6 +353,16 @@ header{
     border-color: var(--highlight);
 }
 
+.portfolio-selector {
+    background-color: var(--secondary-color);
+    color: var(--primary-text);
+    border: 1px solid var(--grey);
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: var(--text-size);
+    margin-left: 10px;
+}
+
 /* Responsive adjustments */
 @media (max-width: 1200px) {
     .dashboard-top {
