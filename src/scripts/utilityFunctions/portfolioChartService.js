@@ -14,7 +14,7 @@ export const portfolioChartService = {
       // Extract portfolio names and values
       const portfolioValues = portfolios.map((portfolio) => ({
         name: portfolio.name,
-        value: portfolio.metrics.totalCost || 0,
+        value: portfolio.metrics.totalCostNative || 0,
       }));
 
       // Skip if no values
