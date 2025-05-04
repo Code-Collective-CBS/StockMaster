@@ -19,14 +19,20 @@ export const favoredStocks = {
     listElement.appendChild(headerRow);
 
     portfolios.forEach((portfolio) => {
-      // ... your existing code ...
-
       if (portfolio.metrics && portfolio.metrics.holdings) {
         // Add a portfolio header/title first
         const portfolioHeader = document.createElement("div");
         portfolioHeader.className = "portfolio-header";
-        portfolioHeader.textContent = `${portfolio.name} (${portfolio.currency})`;
+        portfolioHeader.textContent = portfolio.name;
         listElement.appendChild(portfolioHeader);
+
+        // Add portfolio unrealized value
+        const portfolioUnrealized = document.createElement('p');
+        portfolioUnrealized.textContent = `Unrealized: ${portfolio.metrics.totalUnrealizedGain.toFixed(2)} (${portfolio.currency})`
+        portfolioUnrealized.classList.add(
+          portfolio.metrics.totalUnrealizedGain >= 0 ? "positive-change" : "negative-change"
+        );
+        listElement.appendChild(portfolioUnrealized)
 
         portfolio.metrics.holdings.forEach((h) => {
           const row = document.createElement("div");

@@ -11,8 +11,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     const accountId = sessionStorage.getItem("selectedAccountId");
 
-    const selectedAccount = await accountDetails();
-    console.log(selectedAccount);
+    const selectedAccount = await accountDetails(); // NEVER USED
 
     // POP UP
     popUps.setupDepositPopup();
@@ -304,7 +303,6 @@ function updateHoldingsTable(portfolio) {
   );
 
   sorted.forEach((h) => {
-    console.log("Holding payload", h);
     const lastBoughtPricePerShare = h.lastBoughtPricePerShare;
     const currentPriceNative = h.currentPriceNative;
     const avgCostNative = h.avgCostNative;

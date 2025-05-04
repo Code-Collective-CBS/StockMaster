@@ -188,7 +188,7 @@ header{
     font-size: 18px;
     font-weight: 600;
     margin: 15px 0 10px 0;
-    color: var(--highlight);
+    color: var(--primary-text);
   }
 
   .stock-header-row, .stock-row {
