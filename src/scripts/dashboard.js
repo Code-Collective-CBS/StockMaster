@@ -155,23 +155,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     const balanceEl = document.querySelector(".overview-value");
     if (balanceEl) balanceEl.textContent = formatCurrency(totalBalance, portfolios[0]?.currency || "");
 
-    // 5) Flatten all holdings across all portfolios, pulling both native & account values
-    const allHoldings = portfolios.flatMap(p =>
-      p.metrics.holdings.map(h => ({
-        symbol: h.symbol,
-        currentValueNative: h.currentValueNative,
-        nativeCurrency: h.nativeCurrency,
-        unrealizedGainPercent: h.unrealizedGainPercent
-      }))
-    );
+    const allHoldings = [];
+
+    portfolios.forEach((p) => {
+      p.metrics.holdings.forEach((h) => {
+        allHoldings.push({
+          ...h,
+          portfolioName: p.name,
+        });
+      });
+    });
 
     // 6) Compute Top 5 by native value
     const topByValue = allHoldings
       .sort((a, b) => b.currentValueNative - a.currentValueNative)
       .slice(0, 5);
-
-    const topAllValue = allHoldings
-      .sort((a, b) => b.currentValueNative - a.currentValueNative);
 
     // 7) Compute Top 5 by unrealized gain %
     const topByGain = allHoldings
@@ -232,7 +230,7 @@ async function getAccountId() {
 
   while (tries < 10) {
     const id = sessionStorage.getItem("selectedAccountId");
-    if(id) return id;
+    if (id) return id;
     await new Promise(resolve => setTimeout(resolve, 100)); // Wait 100ms before continuing (resolve ends the delay)
     tries++;
   }

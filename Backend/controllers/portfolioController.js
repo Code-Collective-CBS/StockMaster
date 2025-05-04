@@ -170,8 +170,6 @@ async function calculatePortfolioData(accountId) {
 
       // Skip if no quantity left (fully sold) - in const of we jump to the next iteration
       if(holding.quantity === 0) continue;
-      // const stockInfo = await getStockInfo(holding.symbol);
-      // const nativeCurrency = stockInfo.Currency;
 
       // Get current price data
       const priceData = await getStockPriceData(holding.symbol);
@@ -271,17 +269,6 @@ async function getStockPriceData(symbol) {
   }
 
   return { lastClose };
-}
-
-// Get stock info with caching
-async function getStockInfo(symbol) {
-  const stockData = await getOrSetCache(
-    `overview-${symbol}`,
-    () => alphaVantageService.getCompanyOverview(symbol),
-    3600
-  );
-
-  return stockData.data;
 }
 
 // Calculate portfolio history
@@ -402,56 +389,11 @@ async function calculatePortfolioHistory(accountId) {
   }
 
   // 7. Fill in any gaps in the data
-  const result = interpolateMissingDays(dailyValues);
+  const result = dailyValues;
 
   // 8. Sort by date
   result.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  return result;
-}
-
-// Helper function to interpolate missing days
-function interpolateMissingDays(dailyValues) {
-  if (dailyValues.length < 2) return dailyValues;
-
-  const result = [...dailyValues];
-  result.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-  // Iterate through adjacent days to find gaps
-  for (let i = 0; i < result.length - 1; i++) {
-    const currDate = new Date(result[i].date);
-    const nextDate = new Date(result[i + 1].date);
-
-    // Check if there's a gap (more than 1 day difference)
-    const daysDiff = Math.floor((nextDate - currDate) / (1000 * 60 * 60 * 24));
-    if (daysDiff > 1) {
-      // We have missing days, interpolate values
-      const startValue = result[i].value;
-      const endValue = result[i + 1].value;
-
-      for (let d = 1; d < daysDiff; d++) {
-        const interpolatedDate = new Date(currDate);
-        interpolatedDate.setDate(currDate.getDate() + d);
-
-        // Skip weekends during interpolation too
-        const dayOfWeek = interpolatedDate.getDay();
-        if (dayOfWeek === 0 || dayOfWeek === 6) continue;
-
-        // Linear interpolation formula: start + (d/total) * (end - start)
-        const ratio = d / daysDiff;
-        const interpolatedValue = startValue + ratio * (endValue - startValue);
-
-        // Insert the interpolated day
-        const dateStr = moment(interpolatedDate).format("YYYY-MM-DD");
-        result.push({
-          date: dateStr,
-          value: interpolatedValue,
-        });
-      }
-    }
-  }
-  // Re-sort after adding interpolated values
-  result.sort((a, b) => new Date(a.date) - new Date(b.date));
   return result;
 }
 
@@ -538,80 +480,85 @@ function findPriceForDate(priceData, dateStr) {
   return null;
 }
 
-// Calculate holdings from transactions - same as original
+// This function takes all transactions and groups them by each stock (securities_id)
+// Then it calculates the holding for each stock using calculateSingleHolding
 function calculateHoldings(transactions) {
+    // If there are no transactions, return an empty list
   if (!Array.isArray(transactions) || transactions.length === 0) {
-    console.log("No transactions data");
     return [];
   }
 
-  const bySecurity = {};
-
-  transactions
-  .reverse()
-  .forEach((tx) => {
+  const transactionsBySecurity = {};
+  transactions.forEach((tx) => {
     const id = tx.securities_id;
-    const type = (tx.transaction_type)
-    const qty = Number(tx.amount) || 0;
-    const tot = Number(tx.price_per_share) * Number(tx.amount) || 0; // Use price_per_share to always get total in native currency
-
-    if (!bySecurity[id]) {
-      bySecurity[id] = {
-        securityId: id,
-        security_name: tx.security_name,
-        symbol: tx.symbol,
-        nativeCurrency: tx.nativeCurrency,
-        quantity: 0,
-        totalCostNative: 0,
-        totalBuyQty: 0,
-        totalBuyValue: 0,
-        realizedGain: 0,
-        transactions: [],
-      };
+    if (!transactionsBySecurity[id]) {
+      transactionsBySecurity[id] = [];
     }
-    const h = bySecurity[id];
-
-    if (type === "buy") {
-      h.quantity += qty;
-      h.totalBuyQty += qty;
-      h.totalBuyValue += tot;
-    } else if (type === "sell") {
-      const avgCost = h.totalBuyValue / h.totalBuyQty; // Use the original (GAK = avgCost) (from buy only)
-      const costBasis = avgCost * qty; 
-      const saleValue = Number(tx.price_per_share) * qty
-      const realized = saleValue - costBasis; // (Market Value of sell - Cost of acquisition) = gains/loss
-
-      h.totalCostNative -= avgCost * qty; // remove cost basis of sold shares
-      h.quantity -= qty;
-      h.realizedGain += realized; // Track realized
-
-      // Reset the average cost calculation if fully sold out
-      if(h.quantity === 0) {
-        h.totalBuyQty = 0;
-        h.totalBuyValue = 0;
-      }
-    }
-
-    h.transactions.push(tx);
+    transactionsBySecurity[id].push(tx);
   });
 
-  return Object.values(bySecurity)
-    // .filter((h) => h.quantity > 0) // If there is a quantity
-    .map((h) => {
-      const avgCost = h.totalBuyQty > 0 ? h.totalBuyValue / h.totalBuyQty : 0;
-      const lastBuy = h.transactions
-        .filter((tx) => tx.transaction_type.toLowerCase() === "buy")
-        .slice(-1)[0];
-        const totalCostNative = avgCost * h.quantity;
+  console.log('After transactionsBySecurity', transactionsBySecurity);
+  // Calculate holding details for each stock
+  return Object.values(transactionsBySecurity).map(calculateSingleHolding);
+}
 
-      return {
-        ...h,
-        totalCostNative,
-        gak: isNaN(avgCost) ? 0 : avgCost,
-        lastPrice: lastBuy ? Number(lastBuy.price_per_share) : avgCost,
-        realizedGain: h.realizedGain,
-      };
-    });
+// This function calculates the result for one specific stock
+// It returns quantity, cost, average price, gain etc.
+function calculateSingleHolding(transactions) {
+  let quantity = 0; // How many shares we currently have
+  let totalBuyQty = 0; // Total shares bought
+  let totalBuyValue = 0; // Total amount spent on buys
+  let realizedGain = 0; // Total gain/loss from sold shares
+  let lastBuyPrice = 0; // Price of the last time we bought this stock
+
+  // Get shared info from the first transaction (symbol, currency, etc.)
+  const txObject = transactions[0]; 
+  const { securities_id, symbol, security_name, nativeCurrency } = txObject;
+
+  // Loop through all transactions, starting with the most recent - result from database is DESC
+  transactions.reverse().forEach((tx) => {
+    const qty = Number(tx.amount) || 0;
+    const price = Number(tx.price_per_share) || 0;
+    const total = qty * price;
+
+    if (tx.transaction_type === "buy") {
+      // For buys, add to our holding
+      quantity += qty;
+      totalBuyQty += qty;
+      totalBuyValue += total;
+      lastBuyPrice = price; // Remember the last buy price
+    } else if (tx.transaction_type === "sell") {
+      // For sells, calculate how much we gained/lost
+      const avgCost = totalBuyQty > 0 ? totalBuyValue / totalBuyQty : 0;
+      const costBasis = avgCost * qty;
+      const saleValue = price * qty;
+      realizedGain += saleValue - costBasis;
+      quantity -= qty;
+
+      // If we sold everything, reset the cost tracking for GAK
+      if (quantity === 0) {
+        totalBuyQty = 0;
+        totalBuyValue = 0;
+      }
+    }
+  });
+
+  // After all transactions, calculate average cost and total cost
+  const avgCost = totalBuyQty > 0 ? totalBuyValue / totalBuyQty : 0;
+  const totalCostNative = avgCost * quantity;
+
+  // Return an object with all holding info for this stock
+  return {
+    securityId: securities_id,
+    symbol,
+    security_name,
+    nativeCurrency,
+    quantity,
+    totalCostNative,
+    gak: isNaN(avgCost) ? 0 : avgCost, // GAK = average purchase price
+    lastPrice: lastBuyPrice,
+    realizedGain,
+  };
 }
 
 module.exports = portfolioController;
