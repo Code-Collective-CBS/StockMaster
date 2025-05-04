@@ -91,8 +91,6 @@ document.addEventListener("DOMContentLoaded", () => {
         // Store the new currency in sessionStorage
         sessionStorage.setItem(`accountCurrency-${account_id}`, currency);
 
-        // Clear the portfolio cache for this account
-        clearPortfolioCache(account_id);
         alert("Account changes saved");
         console.log(result);
         window.location.href = "../pages/dashboard.html"; // Redirects user to login-page
@@ -161,27 +159,3 @@ const displayAccounts = async () => {
   account_currency.value = selectedAccount.currency;
   account_state.value = selectedAccount.state;
 };
-
-// Helper function to clear portfolio cache
-function clearPortfolioCache(accountId) {
-  try {
-    // Method 1: Clear from localStorage if using native localStorage
-    localStorage.removeItem(`portfolioData-${accountId}`);
-
-    // Method 2: Clear via cachingService if it's available
-    if (typeof cachingService !== "undefined") {
-      cachingService.clear(`portfolioData-${accountId}`);
-    } else {
-      // Use direct localStorage to clear the cache
-      const cacheKey = `portfolioData-${accountId}`;
-      const cacheItems = Object.keys(localStorage).filter(
-        (key) => key === cacheKey || key.startsWith(`${cacheKey}-`)
-      );
-      cacheItems.forEach((key) => localStorage.removeItem(key));
-    }
-
-    console.log(`Cleared portfolio cache for account ${accountId}`);
-  } catch (e) {
-    console.error("Error clearing portfolio cache:", e);
-  }
-}
