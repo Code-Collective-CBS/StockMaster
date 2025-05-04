@@ -233,7 +233,7 @@ async function getAccountId() {
   while (tries < 10) {
     const id = sessionStorage.getItem("selectedAccountId");
     if(id) return id;
-    await new Promise(resolve => setTimeout(resolve, 100)); // Wait 100ms to check for it
+    await new Promise(resolve => setTimeout(resolve, 100)); // Wait 100ms before continuing (resolve ends the delay)
     tries++;
   }
 }
