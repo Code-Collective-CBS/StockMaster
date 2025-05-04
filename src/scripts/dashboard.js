@@ -2,9 +2,6 @@ import { stockAPI } from "./stockScripts/api.js";
 import { popUps } from "./utilityFunctions/popup.js";
 import { portfolioChartService } from "./utilityFunctions/portfolioChartService.js";
 import { profitLoss } from "./utilityFunctions/profitLoss.js";
-// import { loadTransactions } from "./utilityFunctions/loadTransactions.js";
-// import { loadAccounts } from "./utilityFunctions/loadAccounts.js";
-// import { currencyHandler } from "./utilityFunctions/currencyConverter.js";
 
 // ─── Utility: format a number as "1.234,56 DKK" ───
 function formatCurrency(amount, currencyCode = "") {
