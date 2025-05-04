@@ -88,13 +88,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const result = await response.json();
       if (response.status === 201) {
-        // Store the new currency in sessionStorage
-        sessionStorage.setItem(`accountCurrency-${account_id}`, currency);
 
         // Clear the portfolio cache for this account
         clearPortfolioCache(account_id);
         alert("Account changes saved");
-        console.log(result);
         window.location.href = "../pages/dashboard.html"; // Redirects user to login-page
       } else {
         alert("Fail: " + result.message);

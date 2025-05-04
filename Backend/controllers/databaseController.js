@@ -461,8 +461,6 @@ const databaseController = {
             const cacheKeyPortfolios = `portfolio-${account_id}-${account_currency}`;
             cache.del(cacheKeyPortfolios);
 
-
-
             res.status(201).json({
                 message: "Account changed",
                 account_name: changeAcc.account_name,
