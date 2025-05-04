@@ -222,11 +222,12 @@ const loadAccountDropdown = async (dropdown) => {
     });
 
     const storedIdNum = Number(storedId);
-    const onSettingsPage = window.location.pathname.endsWith('account-settings.html');
+    const onAccSettingsPage = window.location.pathname.endsWith('account-settings.html');
+    const onProfileSettingsPage = window.location.pathname.endsWith('profile-settings.html');
     const onCreateAccPage = window.location.pathname.endsWith('create-account.html');
 
     // If we're already on the settings page, don't execute the for-loop
-    if (!onSettingsPage && !onCreateAccPage) {
+    if (!onAccSettingsPage && !onCreateAccPage && !onProfileSettingsPage) {
       // Running through all of the users account to find the chosen account
       for (const account of accounts) {
         if (account.account_id === storedIdNum && account.state === 'inactive') {
