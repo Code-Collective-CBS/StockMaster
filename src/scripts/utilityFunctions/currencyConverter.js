@@ -6,7 +6,6 @@ export const currencyHandler = {
     }
 
     const conversionRates = rates.conversion_rates;
-
     // Direct conversion using cross-rate
     return (
       amount * (conversionRates[toCurrency] / conversionRates[fromCurrency])

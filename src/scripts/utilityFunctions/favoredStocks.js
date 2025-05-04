@@ -74,6 +74,19 @@ export const favoredStocks = {
           );
           row.append(changeCell);
 
+          // 2) the URL for this stock
+          const targetUrl =
+            "http://localhost:3000/src/pages/security.html?symbol=" +
+            encodeURIComponent(h.symbol);
+
+          // 3) Make the whole row a click target
+          row.addEventListener("click", () => {
+            window.location.href = targetUrl;
+          });
+
+          // 4) Change cursor on hover
+          row.style.cursor = "pointer";
+
           listElement.appendChild(row);
         });
       }
