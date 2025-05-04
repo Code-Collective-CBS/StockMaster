@@ -583,9 +583,13 @@ function calculateHoldings(transactions) {
 
       h.totalCostNative -= avgCost * qty; // remove cost basis of sold shares
       h.quantity -= qty;
+      h.realizedGain += realized; // Track realized
 
-      // Track realized
-      h.realizedGain += realized;
+      // Reset the average cost calculation if fully sold out
+      if(h.quantity === 0) {
+        h.totalBuyQty = 0;
+        h.totalBuyValue = 0;
+      }
     }
 
     h.transactions.push(tx);

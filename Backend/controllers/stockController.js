@@ -5,7 +5,6 @@ const alphaVantageService = require("../services/alphaVantageService");
 const polygonService = require("../services/polygonService");
 
 // CACHE
-const cache = require("../utilityFunctions/cache");
 const { getOrSetCache } = require("../utilityFunctions/cacheHelper");
 
 const stockController = {
