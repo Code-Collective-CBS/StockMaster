@@ -182,6 +182,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       ulValue.innerHTML = topByValue.map(h => `
         <li>
           <span class="symbol">${h.symbol}</span>
+          <span class="portfolioName">${h.portfolioName}</span>
           <span class="val">${formatCurrency(h.currentValueNative, h.nativeCurrency)}</span>
         </li>
       `).join("");
@@ -208,17 +209,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 9) Render Top 5 unrealized gain %
     const ulGain = document.getElementById("top-gain-list");
     if (ulGain) {
-      ulGain.innerHTML = topByGain.map(h => {
-        const sign = h.unrealizedGainPercent >= 0 ? "+" : "-";
-        const pct = Math.abs(h.unrealizedGainPercent).toFixed(2) + "%";
-        const cls = h.unrealizedGainPercent >= 0 ? "positive-change" : "negative-change";
-        return `
-          <li>
-            <span class="symbol">${h.symbol}</span>
-            <span class="val ${cls}">${sign}${pct}</span>
-          </li>
-        `;
-      }).join("");
+      const ulGain = document.getElementById("top-gain-list");
+      if (ulGain) {
+        ulGain.innerHTML = topByGain.map(h => {
+          const sign = h.unrealizedGainPercent >= 0 ? "+" : "-";
+          const pct = Math.abs(h.unrealizedGainPercent).toFixed(2) + "%";
+          const cls = h.unrealizedGainPercent >= 0 ? "positive-change" : "negative-change";
+          return `
+            <li>
+              <span class="symbol">${h.symbol}</span>
+              <span class="portfolioName">${h.portfolioName}</span>
+              <span class="val ${cls}">${sign}${pct}</span>
+            </li>
+          `;
+        }).join("");
+      }      
     }
   } catch (err) {
     console.error("Dashboard setup failed:", err);

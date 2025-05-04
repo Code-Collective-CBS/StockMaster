@@ -497,7 +497,6 @@ function calculateHoldings(transactions) {
     transactionsBySecurity[id].push(tx);
   });
 
-  console.log('After transactionsBySecurity', transactionsBySecurity);
   // Calculate holding details for each stock
   return Object.values(transactionsBySecurity).map(calculateSingleHolding);
 }

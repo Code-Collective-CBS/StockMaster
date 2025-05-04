@@ -199,7 +199,7 @@ a.portfolio {
   padding: 0;
 }
 
-.top-list li {
+#top-value-list li, #top-gain-list li {
   display: flex;
   justify-content: space-between;
   padding: 8px 0;
@@ -212,6 +212,10 @@ a.portfolio {
 
 .top-list .symbol {
   font-weight: bold;
+}
+
+.top-list .portfolioName {
+  font-size: 14px;
 }
 
 .top-list .val {
