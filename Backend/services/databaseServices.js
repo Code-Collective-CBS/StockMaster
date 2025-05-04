@@ -330,9 +330,14 @@ const databaseServices = {
             const result = await pool
                 .request()
                 .input("portfolioId", sql.Int, portfolioId).query(`
-                    SELECT t.*, s.symbol, s.name as security_name, s.type as security_type
+                    SELECT t.*,
+                    s.symbol,
+                    s.name as security_name,
+                    s.type as security_type,
+                    c.currency_name AS nativeCurrency
                     FROM Transactions t
                     JOIN Securities s ON t.securities_id = s.id
+                    JOIN Currency c ON t.currency_id = c.id
                     WHERE t.portfolio_id = @portfolioId
                     ORDER BY t.transaction_date DESC
                 `);

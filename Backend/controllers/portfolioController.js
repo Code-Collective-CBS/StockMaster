@@ -155,14 +155,29 @@ async function calculatePortfolioData(accountId) {
     let totalCostAccount = 0;
     let totalCurrentAccount = 0;
 
+    let totalRealizedGainAccount = 0;
+
     for (const holding of holdings) {
+      const nativeCurrency = holding.nativeCurrency;
+
+      // Always accumulate realized gain
+      let realizedAccount = holding.realizedGain || 0;
+
+      if (holding.nativeCurrency !== accountCurrency) {
+        realizedAccount = realizedAccount / rates[holding.nativeCurrency];
+      }
+      totalRealizedGainAccount += realizedAccount;
+
+      // Skip if no quantity left (fully sold) - in const of we jump to the next iteration
+      if(holding.quantity === 0) continue;
+      // const stockInfo = await getStockInfo(holding.symbol);
+      // const nativeCurrency = stockInfo.Currency;
+
       // Get current price data
       const priceData = await getStockPriceData(holding.symbol);
-      const stockInfo = await getStockInfo(holding.symbol);
 
       // Get stock details
       const currentPrice = priceData.lastClose;
-      const nativeCurrency = stockInfo.Currency;
 
       // Calculate values
       const currentValueNative = currentPrice * holding.quantity;
@@ -179,7 +194,7 @@ async function calculatePortfolioData(accountId) {
         costInAccountCurrency = holding.totalCostNative / rates[nativeCurrency];
       }
 
-      // Calculate gain/loss
+      // Calculate unrealized gain/loss
       const unrealizedGain = currentValueAccount - costInAccountCurrency;
       const unrealizedGainPercent =
         costInAccountCurrency && costInAccountCurrency > 0
@@ -207,6 +222,8 @@ async function calculatePortfolioData(accountId) {
         currentValueAccount,
         unrealizedGain,
         unrealizedGainPercent,
+        realizedGain: holding.realizedGain,
+        realizedGainAccount: realizedAccount,
       });
     }
 
@@ -229,10 +246,12 @@ async function calculatePortfolioData(accountId) {
         totalCurrentValue: totalCurrentAccount,
         totalUnrealizedGain,
         totalUnrealizedGainPercent,
+        totalRealizedGain: totalRealizedGainAccount,
       },
     });
   }
 
+  console.log("Log from calculatePortfolioData: ",processedPortfolios);
   return processedPortfolios;
 }
 
@@ -529,7 +548,9 @@ function calculateHoldings(transactions) {
 
   const bySecurity = {};
 
-  transactions.forEach((tx) => {
+  transactions
+  .reverse()
+  .forEach((tx) => {
     const id = tx.securities_id;
     const type = (tx.transaction_type)
     const qty = Number(tx.amount) || 0;
@@ -540,10 +561,12 @@ function calculateHoldings(transactions) {
         securityId: id,
         security_name: tx.security_name,
         symbol: tx.symbol,
+        nativeCurrency: tx.nativeCurrency,
         quantity: 0,
         totalCostNative: 0,
         totalBuyQty: 0,
         totalBuyValue: 0,
+        realizedGain: 0,
         transactions: [],
       };
     }
@@ -554,16 +577,23 @@ function calculateHoldings(transactions) {
       h.totalBuyQty += qty;
       h.totalBuyValue += tot;
     } else if (type === "sell") {
-      const avgCost = h.totalBuyValue / h.totalBuyQty; // Use the original GAK (from buy only)
+      const avgCost = h.totalBuyValue / h.totalBuyQty; // Use the original (GAK = avgCost) (from buy only)
+      const costBasis = avgCost * qty; 
+      const saleValue = Number(tx.price_per_share) * qty
+      const realized = saleValue - costBasis; // (Market Value of sell - Cost of acquisition) = gains/loss
+
       h.totalCostNative -= avgCost * qty; // remove cost basis of sold shares
       h.quantity -= qty;
+
+      // Track realized
+      h.realizedGain += realized;
     }
 
     h.transactions.push(tx);
   });
 
   return Object.values(bySecurity)
-    .filter((h) => h.quantity > 0)
+    // .filter((h) => h.quantity > 0) // If there is a quantity
     .map((h) => {
       const avgCost = h.totalBuyQty > 0 ? h.totalBuyValue / h.totalBuyQty : 0;
       const lastBuy = h.transactions
@@ -571,11 +601,20 @@ function calculateHoldings(transactions) {
         .slice(-1)[0];
         const totalCostNative = avgCost * h.quantity;
 
+      console.log("Log from the calculateHoldings",
+{        ...h,
+        totalCostNative,
+        gak: isNaN(avgCost) ? 0 : avgCost,
+        lastPrice: lastBuy ? Number(lastBuy.price_per_share) : avgCost,
+        realizedGain: h.realizedGain,}
+      )
+
       return {
         ...h,
         totalCostNative,
         gak: isNaN(avgCost) ? 0 : avgCost,
         lastPrice: lastBuy ? Number(lastBuy.price_per_share) : avgCost,
+        realizedGain: h.realizedGain,
       };
     });
 }

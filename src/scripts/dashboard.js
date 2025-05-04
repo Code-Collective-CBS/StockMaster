@@ -1,10 +1,6 @@
 import { stockAPI } from "./stockScripts/api.js";
 import { popUps } from "./utilityFunctions/popup.js";
 import { portfolioChartService } from "./utilityFunctions/portfolioChartService.js";
-import { profitLoss } from "./utilityFunctions/profitLoss.js";
-// import { loadTransactions } from "./utilityFunctions/loadTransactions.js";
-// import { loadAccounts } from "./utilityFunctions/loadAccounts.js";
-// import { currencyHandler } from "./utilityFunctions/currencyConverter.js";
 
 // ─── Utility: format a number as "1.234,56 DKK" ───
 function formatCurrency(amount, currencyCode = "") {
@@ -75,18 +71,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   popUps.setupDepositPopup()
   popUps.createPortfolio();
 
-  const realizedPLData = await profitLoss.realizedPL();
-  const totalRealizedEl = document.querySelector('.overview-realized-value');
-
-  if (realizedPLData) {
-    totalRealizedEl.textContent = formatCurrency(
-      Number(realizedPLData.realizedSum),
-      realizedPLData.currency
-    );
-  } else {
-    totalRealizedEl.textContent = '-';
-  }
-
   const newsContainerAuthor = document.getElementById("news-author");
   const newsContainerDescription = document.getElementById("news-description");
 
@@ -150,7 +134,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 1) Fetch portfolio summary
     const portfolios = await stockAPI.getPortfolioSummary(accountId);
-    console.log(portfolios);
 
     // 2) Draw pie chart of all portfolios
     const canvas = document.getElementById("portfolioChart");
@@ -169,9 +152,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 4) Update Balance card
     const totalBalance = portfolios
       .reduce((sum, p) => sum + p.metrics.totalCurrentValue, 0);
-    const currency = portfolios[0]?.currency || "";
     const balanceEl = document.querySelector(".overview-value");
-    if (balanceEl) balanceEl.textContent = formatCurrency(totalBalance, currency);
+    if (balanceEl) balanceEl.textContent = formatCurrency(totalBalance, portfolios[0]?.currency || "");
 
     // 5) Flatten all holdings across all portfolios, pulling both native & account values
     const allHoldings = portfolios.flatMap(p =>
@@ -214,6 +196,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
     if (unrealizedEl) {
       unrealizedEl.textContent = formatCurrency(totalUnrealized, portfolios[0]?.currency || "");
+    }
+
+    // Realized value
+    const realizedEl = document.querySelector(".overview-realized-value");
+    const totalrealized = portfolios.reduce(
+      (sum, p) => sum + (p.metrics.totalRealizedGain || 0), 0
+    );
+    if(realizedEl) {
+      realizedEl.textContent = formatCurrency(totalrealized, portfolios[0]?.currency || "");
     }
 
     // 9) Render Top 5 unrealized gain %
