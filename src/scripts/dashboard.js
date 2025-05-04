@@ -129,7 +129,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // PORTFOLIO DISPLAY //
   try {
-    const accountId = sessionStorage.getItem("selectedAccountId");
+    let accountId = await getAccountId();
     if (!accountId) throw new Error("No account selected");
 
     // 1) Fetch portfolio summary
@@ -203,7 +203,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const totalrealized = portfolios.reduce(
       (sum, p) => sum + (p.metrics.totalRealizedGain || 0), 0
     );
-    if(realizedEl) {
+    if (realizedEl) {
       realizedEl.textContent = formatCurrency(totalrealized, portfolios[0]?.currency || "");
     }
 
@@ -226,3 +226,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Dashboard setup failed:", err);
   }
 });
+
+async function getAccountId() {
+  let tries = 0;
+
+  while (tries < 10) {
+    const id = sessionStorage.getItem("selectedAccountId");
+    if(id) return id;
+    await new Promise(resolve => setTimeout(resolve, 100)); // Wait 100ms to check for it
+    tries++;
+  }
+}
