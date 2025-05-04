@@ -471,25 +471,5 @@ const databaseController = {
             res.status(500).json({ message: 'Server fail' });
         }
     },
-    /*
-        deleteAccount: async (req, res) => {
-            // Saves the user- and account id from the session in variables
-            const user_id = req.session.user_id
-            const account_id = parseInt(req.params.account_id);
-
-            try {
-                const deletedAccount = await databaseServices.deleteAccount(user_id, account_id)
-                if (!deletedAccount) return res.status(404).json({ message: 'Account not found' });
-
-                // Clear cache
-                const cacheKey = `accounts-user_id-${user_id}`;
-                cache.del(cacheKey);
-
-                return res.status(200).json({ message: "Account deleted" });
-            } catch (err) {
-                return res.status(500).json({ message: 'Server fail' });
-            }
-        }
-        */
 };
 module.exports = databaseController;

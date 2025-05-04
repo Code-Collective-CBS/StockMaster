@@ -224,6 +224,7 @@
         <!-- Pie chart card -->
         <div class="card pie-chart-card">
           <div class="chart-container">
+            <h2 class="card-title">Portfolio Distribution</h2>
             <canvas id="portfolioDistributionChart"></canvas>
           </div>
         </div>
@@ -234,6 +235,9 @@
         <div class="card full-width">
           <div class="card-header">
             <h2 class="card-title">Portfolio Performance Over Time</h2>
+            <div id="portfolio-selector-container" class="portfolio-selector-wrapper">
+              <!-- Our JavaScript will insert the selector here -->
+            </div>
           </div>
           <div class="chart-container">
             <canvas id="portfolioHistoryChart"></canvas>
@@ -246,12 +250,6 @@
         <div class="card full-width">
           <div class="card-header">
             <h2 class="card-title">Holdings Distribution By Portfolio</h2>
-            <div
-              id="portfolio-selector-container"
-              class="portfolio-selector-wrapper"
-            >
-              <!-- Our JavaScript will insert the selector here -->
-            </div>
           </div>
           <div class="holdings-grid">
             <!-- Left column for chart -->

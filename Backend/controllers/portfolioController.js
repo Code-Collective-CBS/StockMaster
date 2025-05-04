@@ -118,6 +118,42 @@ const portfolioController = {
       res.status(500).json({ error: "Failed to fetch stock quantity" });
     }
   },
+  getPortfolioHistoryForPortfolio: async (req, res) => {
+    const portfolioId = parseInt(req.params.portfolioId);
+    const userId = req.session.user_id;
+  
+    if (!userId || !portfolioId) {
+      return res.status(400).json({ message: 'Missing user or portfolio ID' });
+    }
+  
+    try {
+      const transactions = await databaseServices.getTransactionsForPortfolio(portfolioId);
+  
+      // Aggregate value over time
+      const historyMap = new Map();
+  
+      let cumulativeValue = 0;
+      for (const tx of transactions.reverse()) { // Go oldest → newest
+        const dateKey = tx.transaction_date.toISOString().split('T')[0]; // "YYYY-MM-DD"
+  
+        const value = tx.amount * tx.price_per_share * (tx.transaction_type.toLowerCase() === 'buy' ? 1 : -1);
+        cumulativeValue += value;
+  
+        historyMap.set(dateKey, cumulativeValue);
+      }
+  
+      // Convert Map to array
+      const historyArray = Array.from(historyMap.entries()).map(([date, value]) => ({
+        date,
+        value
+      }));
+  
+      res.status(200).json(historyArray);
+    } catch (err) {
+      console.error('Failed to calculate portfolio history from transactions', err);
+      res.status(500).json({ message: 'Server error while calculating portfolio history' });
+    }
+  },  
 };
 
 // HELPER FUNCTIONS FOR CALCULATIONS //
@@ -169,7 +205,7 @@ async function calculatePortfolioData(accountId) {
       totalRealizedGainAccount += realizedAccount;
 
       // Skip if no quantity left (fully sold) - in const of we jump to the next iteration
-      if(holding.quantity === 0) continue;
+      if (holding.quantity === 0) continue;
 
       // Get current price data
       const priceData = await getStockPriceData(holding.symbol);
@@ -483,7 +519,7 @@ function findPriceForDate(priceData, dateStr) {
 // This function takes all transactions and groups them by each stock (securities_id)
 // Then it calculates the holding for each stock using calculateSingleHolding
 function calculateHoldings(transactions) {
-    // If there are no transactions, return an empty list
+  // If there are no transactions, return an empty list
   if (!Array.isArray(transactions) || transactions.length === 0) {
     return [];
   }
@@ -511,7 +547,7 @@ function calculateSingleHolding(transactions) {
   let lastBuyPrice = 0; // Price of the last time we bought this stock
 
   // Get shared info from the first transaction (symbol, currency, etc.)
-  const txObject = transactions[0]; 
+  const txObject = transactions[0];
   const { securities_id, symbol, security_name, nativeCurrency } = txObject;
 
   // Loop through all transactions, starting with the most recent - result from database is DESC

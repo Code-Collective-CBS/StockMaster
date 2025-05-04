@@ -904,25 +904,6 @@ const databaseServices = {
             throw error;
         }
     },
-    /*
-    deleteAccount: async (user_id, account_id) => {
-        try {
-            const pool = await poolPromise;
-            const result = await pool.request()
-                .input('user_id', sql.Int, user_id)
-                .input('id', sql.Int, account_id)
-                .query(
-                    `DELETE FROM Accounts
-                WHERE id = @id
-                AND user_id = @user_id`
-                )
-            return result.rowsAffected[0]
-        } catch (err) {
-            console.error('Failed to delete account', err)
-            throw err
-        }
-    }
-    */
 };
 
 module.exports = databaseServices;

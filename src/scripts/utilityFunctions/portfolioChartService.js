@@ -39,7 +39,7 @@ export const portfolioChartService = {
 
       // Ensure proper size before rendering
       canvas.style.width = '100%';
-      canvas.style.height = '100%';
+      canvas.style.height = '300px';     
 
       // Create chart with maintainAspectRatio: false for better sizing
       const chartInstance = new Chart(canvas, {
@@ -142,7 +142,7 @@ export const portfolioChartService = {
 
       // Ensure proper size before rendering
       canvas.style.width = '100%';
-      canvas.style.height = '100%';
+      canvas.style.height = '300px';     
 
       // Create chart with maintainAspectRatio: false for better sizing
       canvas.chart = new Chart(canvas, {
@@ -245,8 +245,8 @@ export const portfolioChartService = {
     }
 
     // Ensure proper canvas size
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
+    canvas.style.height = '300px';           
+    canvas.style.width = '100%';             
 
     // Create the chart with improved styling
     canvas.chart = new Chart(canvas, {

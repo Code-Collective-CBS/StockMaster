@@ -38,7 +38,11 @@ router.get('/simple-portfolios/:accountId', portfolioController.getSimplePortfol
 // Get quantity in portfolio
 router.get('/portfolio/:portfolioId/stock/:symbol', portfolioController.getStockQuantityInPortfolio);
 
+// MAYBE DELETE LATER?
 router.get('/portfolio/account/:accountId/history', portfolioController.getPortfolioHistory);
+
+// For specific portfolio
+router.get('/portfolio/:portfolioId/history', portfolioController.getPortfolioHistoryForPortfolio);
 
 // Create portfolio
 router.post('/createPortfolio/:accountId', databaseController.createPortfolio);
@@ -61,7 +65,5 @@ router.get('/transactions/account/:account_id', databaseController.getTransactio
 // Change account settings (name, currency and status)
 router.put('/update-account-settings/:account_id', databaseController.updateAccountSettings)
 
-// Delete account
-// router.delete('/delete-account/:account_id', databaseController.deleteAccount)
 
 module.exports = router;

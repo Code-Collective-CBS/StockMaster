@@ -11,8 +11,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     const accountId = sessionStorage.getItem("selectedAccountId");
 
-    const selectedAccount = await accountDetails(); // NEVER USED
-
     // POP UP
     popUps.setupDepositPopup();
     popUps.createPortfolio();
@@ -28,7 +26,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const portfolioData = await stockAPI.getPortfolioSummary(accountId);
     updatePortfolioUI(portfolioData);
 
-    renderHistoryChart(accountId, portfolioData[0]?.currency);
+    // renderHistoryChart(accountId, portfolioData[0]?.currency);
   } catch (error) {
     console.error("Error loading portfolio data:", error);
     showErrorMessage("Failed to load portfolio data. Please try again later.");
@@ -202,26 +200,9 @@ async function updatePortfolioUI(portfolios) {
   }
 }
 
-async function renderHistoryChart(accountId, currencyCode) {
-  try {
-    // 1) Fetch history from the server
-    const historyData = await stockAPI.getPortfolioHistory(accountId);
-    // eturning JSON array [{date, value}, ...]
-
-    // 2) Get the canvas and draw
-    const historyCanvas = document.getElementById("portfolioHistoryChart");
-    portfolioChartService.createPortfolioHistoryChart(
-      historyCanvas,
-      historyData,
-      currencyCode
-    );
-  } catch (err) {
-    console.error("Failed to load history chart:", err);
-  }
-}
-
 // Function to create portfolio selector and holdings distribution chart
 function createPortfolioSelector(portfolios, chartCanvas) {
+
   if (!portfolios || portfolios.length === 0 || !chartCanvas) {
     console.warn("Missing portfolios data or chart canvas");
     return;
@@ -265,6 +246,8 @@ function createPortfolioSelector(portfolios, chartCanvas) {
     select.appendChild(option);
   });
 
+  renderHistoryChart(portfolios[0].id, portfolios[0].currency); // Show first portfolio in history chart
+
   selectorContainer.appendChild(select);
 
   // Event listener for select change
@@ -278,6 +261,8 @@ function createPortfolioSelector(portfolios, chartCanvas) {
       selectedPortfolio
     );
 
+    renderHistoryChart(selectedPortfolio.id, selectedPortfolio.currency);
+
     // Update holdings table
     updateHoldingsTable(selectedPortfolio);
   });
@@ -289,6 +274,24 @@ function createPortfolioSelector(portfolios, chartCanvas) {
       portfolios[0]
     );
     updateHoldingsTable(portfolios[0]);
+  }
+}
+
+async function renderHistoryChart(portfolioId, currencyCode) {
+  try {
+    // 1) Fetch history from the server
+    const res = await fetch(`/api/database/portfolio/${portfolioId}/history`);
+    const data = await res.json();
+
+    // 2) Get the canvas and draw
+    const historyCanvas = document.getElementById("portfolioHistoryChart");
+    portfolioChartService.createPortfolioHistoryChart(
+      historyCanvas,
+      data,
+      currencyCode
+    );
+  } catch (err) {
+    console.error("Failed to load history chart:", err);
   }
 }
 
@@ -351,29 +354,6 @@ function updatePerformanceDisplay(element, percentChange) {
   element.classList.add(
     percentChange >= 0 ? "positive-change" : "negative-change"
   );
-}
-
-// Other display functions
-function showNoPortfoliosMessage() {
-  const mainContent = document.querySelector(".main-content");
-  if (mainContent) {
-    mainContent.innerHTML = `
-            <div class="no-data-message">
-                <h2>No portfolios found</h2>
-                <p>Create a new portfolio to get started.</p>
-                <button class="btn btn-primary" id="createFirstPortfolioButton">Create Portfolio</button>
-            </div>
-        `;
-
-    // Add event listener for the button
-    document
-      .getElementById("createFirstPortfolioButton")
-      .addEventListener("click", () => {
-        // Show the create portfolio modal
-        const modal = document.getElementById("addPortfolioModal");
-        if (modal) modal.style.display = "flex";
-      });
-  }
 }
 
 function showErrorMessage(message) {
