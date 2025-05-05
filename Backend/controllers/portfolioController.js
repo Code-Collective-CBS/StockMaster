@@ -1,6 +1,7 @@
 const databaseServices = require("../services/databaseServices");
 const exchangeRateService = require("../services/exchangeRateService");
 const alphaVantageService = require("../services/alphaVantageService");
+const currencyUtil = require("../utilityFunctions/currencyUtils");
 const { getOrSetCache } = require("../utilityFunctions/cacheHelper");
 const moment = require("moment");
 
@@ -83,7 +84,7 @@ const portfolioController = {
   getStockQuantityInPortfolio: async (req, res) => {
     try {
       const { portfolioId, symbol } = req.params;
-
+      
       if (!portfolioId || !symbol) {
         return res.status(400).json({ error: "Missing portfolioId or symbol" });
       }
@@ -121,11 +122,20 @@ const portfolioController = {
   getPortfolioHistoryForPortfolio: async (req, res) => {
     const portfolioId = parseInt(req.params.portfolioId);
     const userId = req.session.user_id;
-  
+    const accountCurrency = req.query.accountCurrency;
+    
     if (!userId || !portfolioId) {
       return res.status(400).json({ message: 'Missing user or portfolio ID' });
     }
-  
+
+    const ratesData = await getOrSetCache(
+      `rates-${accountCurrency}`,
+      () => exchangeRateService.getCurrency(accountCurrency),
+      86400 // 1 day
+    );
+
+    const conversionRates = ratesData.data.conversion_rates;
+
     try {
       const transactions = await databaseServices.getTransactionsForPortfolio(portfolioId); // All transactions for specific portfolio
   
@@ -134,12 +144,20 @@ const portfolioController = {
       
       // for each transaction we figure out if it's a buy or sell
       let cumulativeValue = 0;
-      for (const tx of transactions.reverse()) { // Go oldest to newest because of DESC from DB
-        const dateKey = moment(tx.transaction_date).format("YYYY-MM-DD"); // "YYYY-MM-DD"
-  
-        const value = tx.amount * tx.price_per_share * (tx.transaction_type.toLowerCase() === 'buy' ? 1 : -1); // if it's a buy we add the value to the portfolio (sell = -1 and buy = +1)
-        cumulativeValue += value;
-  
+      for (const tx of transactions.reverse()) {
+        const dateKey = moment(tx.transaction_date).format("YYYY-MM-DD");
+      
+        const rawValue = tx.amount * tx.price_per_share * (tx.transaction_type.toLowerCase() === 'buy' ? 1 : -1);
+      
+        // Security prices are always in USD so convert from USD to account currency
+        const convertedValue = currencyUtil.convertCurrency(
+          rawValue,
+          'USD', // Hard coded because all securities are in USD
+          accountCurrency,
+          conversionRates
+        );
+      
+        cumulativeValue += convertedValue;
         historyMap.set(dateKey, cumulativeValue);
       }
   

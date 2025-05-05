@@ -280,7 +280,7 @@ function createPortfolioSelector(portfolios, chartCanvas) {
 async function renderHistoryChart(portfolioId, currencyCode) {
   try {
     // 1) Fetch history from the server
-    const res = await fetch(`/api/database/portfolio/${portfolioId}/history`);
+    const res = await fetch(`/api/database/portfolio/${portfolioId}/history?accountCurrency=${currencyCode}`);
     const data = await res.json();
 
     // 2) Get the canvas and draw
