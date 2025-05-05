@@ -255,7 +255,7 @@ export const popUps = {
                     <p class="modal-instruction">Enter amount to buy</p>
                     <select id="popup-portfolios-select"></select>
                     <div class="input-group">
-                        <input id="buy-amount" type="number" placeholder="Amount" />
+                        <input id="buy-amount" type="number" step="1" min="1" pattern="\d*" placeholder="Amount" />
                     </div>
                     <p class="stock-price-info">Price per share: <span id="stock-price"></span></p>
                     <p class="total-price-info">Total price: <span id="total-price">0</span></p>
@@ -275,6 +275,8 @@ export const popUps = {
       const accountBalanceSpan = tradeModal.querySelector("#account-balance");
 
       amountInput.addEventListener("input", async () => {
+        amountInput.value = amountInput.value.replace(/\D/g, "");
+
         const amount = parseFloat(amountInput.value);
         let total = amount * window.latestStockPrice;
 
@@ -406,7 +408,7 @@ export const popUps = {
                     <p class="modal-instruction">Enter amount to sell</p>
                     <select id="popup-portfolios-select"></select>
                     <div class="input-group">
-                        <input id="sell-amount" type="number" placeholder="Amount" />
+                        <input id="sell-amount" type="number" step="1" min="1" pattern="\d*" placeholder="Amount" />
                     </div>
                     <p class="stock-price-info">Price per share: <span id="stock-price"></span></p>
                     <p class="total-price-info">Total price: <span id="total-price">0</span></p>
@@ -463,6 +465,8 @@ export const popUps = {
 
       // Calculate total on input
       amountInput.addEventListener("input", async () => {
+        amountInput.value = amountInput.value.replace(/\D/g, "");
+
         const amount = parseFloat(amountInput.value);
         let total = amount * window.latestStockPrice;
 

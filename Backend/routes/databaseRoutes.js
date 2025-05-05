@@ -38,10 +38,10 @@ router.get('/simple-portfolios/:accountId', portfolioController.getSimplePortfol
 // Get quantity in portfolio
 router.get('/portfolio/:portfolioId/stock/:symbol', portfolioController.getStockQuantityInPortfolio);
 
-// MAYBE DELETE LATER?
+// Get all portfolios on account
 router.get('/portfolio/account/:accountId/history', portfolioController.getPortfolioHistory);
 
-// For specific portfolio
+// Get specific portfolio
 router.get('/portfolio/:portfolioId/history', portfolioController.getPortfolioHistoryForPortfolio);
 
 // Create portfolio
