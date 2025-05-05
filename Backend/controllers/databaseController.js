@@ -185,8 +185,32 @@ const databaseController = {
         }
     },
 
+    getAllAccountsForUser: async (req, res) => {
+        try {
+            const userId = req.session.user_id
 
-   
+            if (!userId) {
+                return res.status(400).json({ error: "User ID is required" });
+            }
+
+            const cacheKey = `accounts-user_id-${userId}`;
+            const { data, source } = await getOrSetCache(
+                cacheKey,
+                () => databaseServices.getAccountInfo(userId),
+                600
+            );
+
+            if (!data || data.length === 0) {
+                return res.status(404).json({ error: "No accounts found for this user" });
+            }
+
+            res.json({ data, source });
+        } catch (err) {
+            console.error("Error fetching user accounts:", err);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    },
+
 
     searchCurrencies: async (req, res) => {
         try {
