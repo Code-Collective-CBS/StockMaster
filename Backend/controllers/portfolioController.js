@@ -127,16 +127,17 @@ const portfolioController = {
     }
   
     try {
-      const transactions = await databaseServices.getTransactionsForPortfolio(portfolioId);
+      const transactions = await databaseServices.getTransactionsForPortfolio(portfolioId); // All transactions for specific portfolio
   
       // Aggregate value over time
       const historyMap = new Map();
-  
+      
+      // for each transaction we figure out if it's a buy or sell
       let cumulativeValue = 0;
-      for (const tx of transactions.reverse()) { // Go oldest → newest
-        const dateKey = tx.transaction_date.toISOString().split('T')[0]; // "YYYY-MM-DD"
+      for (const tx of transactions.reverse()) { // Go oldest to newest because of DESC from DB
+        const dateKey = moment(tx.transaction_date).format("YYYY-MM-DD"); // "YYYY-MM-DD"
   
-        const value = tx.amount * tx.price_per_share * (tx.transaction_type.toLowerCase() === 'buy' ? 1 : -1);
+        const value = tx.amount * tx.price_per_share * (tx.transaction_type.toLowerCase() === 'buy' ? 1 : -1); // if it's a buy we add the value to the portfolio (sell = -1 and buy = +1)
         cumulativeValue += value;
   
         historyMap.set(dateKey, cumulativeValue);
