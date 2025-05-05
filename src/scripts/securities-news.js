@@ -119,9 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Defensive rendering to avoid crashes if fields are missing
       newsContainerAuthor.innerHTML = article.author ?? "Unknown author";
       newsContainerDescription.innerHTML = `
-        ${article.description ?? "No description available"}<br><br>
-        <a href="${article.article_url}" target="_blank">Read more here</a>
-      `;
+        ${article.description ?? "No description available"}`;
     } catch (error) {
       console.error("Error fetching news:", error.message);
     }
