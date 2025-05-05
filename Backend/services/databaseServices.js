@@ -350,37 +350,6 @@ const databaseServices = {
             throw err;
         }
     },
-
-    // // Add this function to databaseServices.js
-    // getTransactionsForMultiplePortfolios: async (portfolioIds) => {
-    //     try {
-    //         if (!portfolioIds || portfolioIds.length === 0) {
-    //             return [];
-    //         }
-
-    //         const pool = await poolPromise;
-
-    //         // SQL Server doesn't directly support array parameters
-    //         // We'll use a comma-separated string and STRING_SPLIT
-    //         const portfolioIdsString = portfolioIds.join(',');
-
-    //         const result = await pool.request()
-    //             .input('portfolioIds', sql.NVarChar, portfolioIdsString)
-    //             .query(`
-    //       SELECT t.*, s.symbol, s.name as security_name, s.type as security_type
-    //       FROM Transactions t
-    //       JOIN Securities s ON t.securities_id = s.id
-    //       WHERE t.portfolio_id IN (SELECT value FROM STRING_SPLIT(@portfolioIds, ','))
-    //       ORDER BY t.transaction_date DESC
-    //     `);
-
-    //         return result.recordset;
-    //     } catch (err) {
-    //         console.error('Error getting transactions for multiple portfolios:', err);
-    //         throw err;
-    //     }
-    // },
-
     getPortfoliosByAccount: async (accountId) => {
         try {
             const pool = await poolPromise;
