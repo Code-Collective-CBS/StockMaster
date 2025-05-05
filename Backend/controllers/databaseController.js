@@ -39,7 +39,6 @@ const databaseController = {
     },
 
     login: async (req, res) => {
-        const { email, password } = req.body;
         const body = req.body;
 
         try {
