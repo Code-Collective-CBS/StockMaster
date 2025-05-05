@@ -210,7 +210,6 @@ const databaseController = {
         }
     },
 
-
     searchCurrencies: async (req, res) => {
         try {
             const { query } = req.query; // Extract the query parameter from the requesr
