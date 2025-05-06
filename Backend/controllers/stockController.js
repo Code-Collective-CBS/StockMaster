@@ -1,7 +1,6 @@
 // This file handles stock-related HTTP request and uses the Alpha Vantage service file
 // Import alphaVantageService module
 const alphaVantageService = require("../services/alphaVantageService");
-// const alphaVantageService = require("../services/mockAlphaVantageService"); // MOCK DATA
 const polygonService = require("../services/polygonService");
 
 // CACHE

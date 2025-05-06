@@ -1,5 +1,3 @@
-import { mockPortfolioData } from "./mockPortfolioData.js";
-
 // api.js (Frontend API Calls)
 const API_BASE_URL = "http://localhost:3000/api/stocks";
 const API_CURRENCY_URL = "http://localhost:3000/api/currency";
@@ -100,14 +98,6 @@ export const stockAPI = {
     try {
       if (!accountId) {
         throw new Error("Account ID is required");
-      }
-
-      const USE_MOCK_DATA = false;
-
-      if (USE_MOCK_DATA) {
-        console.log("Using mock portfolio data for account:", accountId);
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        return mockPortfolioData;
       }
 
       // Make API call
