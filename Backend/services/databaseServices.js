@@ -366,7 +366,7 @@ const databaseServices = {
                 JOIN Accounts a ON p.account_id = a.id
                 JOIN Currency c ON a.currency_id = c.id
                 WHERE p.account_id = @accountId
-      `); // Fixed: Filter by account_id
+      `); 
             return result.recordset;
         } catch (err) {
             console.error("Error getting portfolios for account:", err);
@@ -396,7 +396,7 @@ const databaseServices = {
                 .request()
                 .input("user_id", sql.Int, userId)
                 .input("account_id", sql.Int, accountId)
-                .input("amount", sql.Decimal(18, 2), amount) // Use the same type as your DB column
+                .input("amount", sql.Decimal(18, 2), amount)
                 .query(`
                 UPDATE Accounts
                 SET total_balance = total_balance + @amount
