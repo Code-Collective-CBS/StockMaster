@@ -39,9 +39,9 @@ export const portfolioChartService = {
 
       // Ensure proper size before rendering
       canvas.style.width = '100%';
-      canvas.style.height = '300px';     
+      canvas.style.height = '300px';
 
-      // Create chart with maintainAspectRatio: false for better sizing
+      // Create chart
       const chartInstance = new Chart(canvas, {
         type: "pie",
         data: {
@@ -142,9 +142,9 @@ export const portfolioChartService = {
 
       // Ensure proper size before rendering
       canvas.style.width = '100%';
-      canvas.style.height = '300px';     
+      canvas.style.height = '300px';
 
-      // Create chart with maintainAspectRatio: false for better sizing
+      // Create chart
       canvas.chart = new Chart(canvas, {
         type: "pie",
         data: {
@@ -221,7 +221,7 @@ export const portfolioChartService = {
     // Format labels and data
     const labels = cleanHistory.map(entry => {
       const date = new Date(entry.date);
-      // Format date more compactly (e.g., "Jan 2025" instead of full date)
+      // Format date more compactly
       return date.toLocaleDateString("da-DK", { month: 'short', year: 'numeric' });
     });
 
@@ -245,10 +245,10 @@ export const portfolioChartService = {
     }
 
     // Ensure proper canvas size
-    canvas.style.height = '300px';           
-    canvas.style.width = '100%';             
+    canvas.style.height = '300px';
+    canvas.style.width = '100%';
 
-    // Create the chart with improved styling
+    // Create chart
     canvas.chart = new Chart(canvas, {
       type: "line",
       data: {
@@ -257,9 +257,9 @@ export const portfolioChartService = {
           {
             label: "Portfolio Value",
             data,
-            borderColor: "#00DA91", // highlight color
+            borderColor: "#00DA91",
             backgroundColor: gradient,
-            tension: 0.4, // smoother curve
+            tension: 0.4,
             fill: true,
             pointRadius: 0, // hide points for cleaner look
             pointHoverRadius: 5, // show points on hover
@@ -284,7 +284,7 @@ export const portfolioChartService = {
         scales: {
           x: {
             grid: {
-              display: false, // cleaner look without x gridlines
+              display: false,
               drawBorder: false
             },
             ticks: {

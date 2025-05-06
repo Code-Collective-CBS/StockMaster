@@ -15,8 +15,6 @@ export const currencyHandler = {
   portfolioValue: (holdings, targetCurrency, exchangeRates) => {
     let total = 0;
 
-
-    // For now we use mock data to calculate the portfolio holding: (everyting in the holding variable)
     holdings.forEach((holding) => {
       const valueInOriginalCurrency = holding.quantity * holding.currenPrice;
       const valueInTargetCurrency = convertCurrency(

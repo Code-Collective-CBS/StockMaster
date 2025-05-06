@@ -1,8 +1,7 @@
-/*This file should:
-
-Load environment variables
-Export configuration objects
-NOT make any API calls directly
+/*
+This file:
+- Loads environment variables
+- Exports configuration objects
 */
 
 // Load environment variables form .env file

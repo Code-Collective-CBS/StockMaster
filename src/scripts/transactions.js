@@ -1,6 +1,6 @@
 import { popUps } from "./utilityFunctions/popup.js";
 import { loadTransactions } from "./utilityFunctions/loadTransactions.js";
-import {loadAccounts } from './utilityFunctions/loadAccounts.js'
+import { loadAccounts } from './utilityFunctions/loadAccounts.js'
 
 document.addEventListener("DOMContentLoaded", async () => {
     // POP UP
@@ -22,7 +22,7 @@ function displayTransactions(transactionData) {
     const table = document.getElementById('transaction-table');
     const tableBody = document.querySelector('.tbody-transactions');
 
-    // Custome order for td in table with bracket notation 
+    // Custome order for td in table with bracket notation
     const displayFields = [
         'transaction_date',
         'account_name',
@@ -63,7 +63,7 @@ function displayTransactions(transactionData) {
 };
 
 const displayAccountSummary = () => {
-    const accounts = window.cachedAccounts; // Using window from ../scripts/utilityFunctions/loadAccounts.js and are called in DOM (note before was it called inside sidebar.js but the accounts could not load)
+    const accounts = window.cachedAccounts;
 
     if (!accounts || accounts.length === 0) {
         console.warn("No cached accounts available.");

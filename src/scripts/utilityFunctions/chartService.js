@@ -271,18 +271,18 @@ export const chartService = {
     percentDifference,
     currencyCode = "USD" // Default to USD if no currency code is provided
   ) {
-    // Create the element if it doesn't exist
+    // Creates element if it doesn't exist
     const priceInfoElement = document.createElement("div");
     priceInfoElement.className = "price-info";
 
-    // Insert it before the canvas in the security-graph section
+    // Inserts it before the canvas in the security-graph section
     const securityGraph = document.querySelector(".security-graph");
     const canvas = document.getElementById("portfolioChart");
     if (securityGraph && canvas) {
       securityGraph.insertBefore(priceInfoElement, canvas);
     }
 
-    // Format values for display using decimal style
+    // Formats values for display using decimal style
     const formattedPrice =
       new Intl.NumberFormat("en-US", {
         style: "decimal",
@@ -309,10 +309,10 @@ export const chartService = {
       signDisplay: "always",
     }).format(percentDifference);
 
-    // Set color class based on whether difference is positive or negative
+    // Sets color class based on whether difference is positive or negative
     const colorClass = difference >= 0 ? "positive-change" : "negative-change";
 
-    // Update the HTML content
+    // Updates the HTML content
     priceInfoElement.innerHTML = `
         <div class="current-price">${formattedPrice}</div>
         <div class="price-change ${colorClass}">

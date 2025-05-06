@@ -1,4 +1,3 @@
-// portfolio.js - Update to fetch real data
 import { stockAPI } from "./stockScripts/api.js";
 import { favoredStocks } from "./utilityFunctions/favoredStocks.js";
 import { portfolioChartService } from "./utilityFunctions/portfolioChartService.js";

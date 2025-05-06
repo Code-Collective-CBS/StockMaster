@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const result = await response.json();
       if (response.ok) {
-        // Store user data in localStorage
+        // Set sessionstorage for user data 
         sessionStorage.setItem("userId", result.id);
 
         // store name for display

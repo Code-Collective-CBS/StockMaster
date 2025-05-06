@@ -93,8 +93,7 @@ header{
 .portfolio-list-card {
     grid-column: 2; /* Card will take the second column */
 
-    grid-row: 1 / span 2; /* It is placed in column 2, starting at row 1.
-    grid-row: 1 / span 2; → This means it spans across two rows (from row 1 through row 2).So this element will be taller than the others. */
+    grid-row: 1 / span 2; /* It is placed in column 2, starting at row 1. This means it spans across two rows (from row 1 through row 2).So this element will be taller than the others. */
 }
 
 .pie-chart-card {

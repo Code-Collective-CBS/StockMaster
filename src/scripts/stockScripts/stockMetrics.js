@@ -38,9 +38,7 @@ export const stockMetrics = {
         return (num * 100).toFixed(2) + '%';
     },
 
-    /**
-     * Update text content of an element if it exists
-     */
+    // Update text content of an element if it exists
     updateElement: function(id, value) {
         const element = document.getElementById(id);
         if (element) {
@@ -48,9 +46,7 @@ export const stockMetrics = {
         }
     },
 
-    /**
-     * Populate key statistics section
-     */
+    // Populate key statistics section
     populateKeyStatistics: function(companyData, currentPrice) {
         this.updateElement('prevClose', currentPrice?.toFixed(2)); // The "?" is the optional operater and checks if it even exists
         this.updateElement('daysRange',
@@ -69,9 +65,7 @@ export const stockMetrics = {
         this.updateElement('eps', companyData.EPS);
     },
 
-    /**
-     * Populate dividends section
-     */
+    // Populate dividends section
     populateDividends: function(companyData) {
         // Skip if no dividend data is available
         if (!companyData.DividendPerShare || companyData.DividendPerShare === '0') {
@@ -88,9 +82,7 @@ export const stockMetrics = {
         this.updateElement('exDividendDate', companyData.ExDividendDate);
     },
 
-    /**
-     * Populate company profile section
-     */
+    // Populate company profile section
     populateCompanyProfile: function(companyData) {
         this.updateElement('sector', companyData.Sector);
         this.updateElement('industry', companyData.Industry);
@@ -98,17 +90,13 @@ export const stockMetrics = {
         this.updateElement('exchange', companyData.Exchange);
     },
 
-    /**
-     * Populate technical indicators section
-     */
+    // Populate technical indicators section
     populateTechnicalIndicators: function(companyData) {
         this.updateElement('movingAvg50', companyData['50DayMovingAverage']);
         this.updateElement('movingAvg200', companyData['200DayMovingAverage']);
     },
 
-    /**
-     * Create analyst visualizations
-     */
+    // Create analyst visualizations
     createAnalystVisualizations: function(companyData, currentPrice) {
         // Skip if no analyst data is available
         if (!companyData.AnalystRatingBuy &&
@@ -129,9 +117,7 @@ export const stockMetrics = {
         this.updatePriceTargetGauge(companyData, currentPrice);
     },
 
-    /**
-     * Create analyst ratings chart
-     */
+    // Create analyst ratings chart
     createAnalystRatingsChart: function(companyData) {
         const canvas = document.getElementById('analystRatingsChart');
         if (!canvas) return;
@@ -152,7 +138,7 @@ export const stockMetrics = {
                     label: 'Analyst Ratings',
                     data: [strongBuy, buy, hold, sell, strongSell],
                     backgroundColor: [
-                        '#00DA91', // Strong Buy (your highlight color)
+                        '#00DA91', // Strong Buy
                         '#4CAF50', // Buy
                         '#FFD700', // Hold
                         '#FF9800', // Sell
@@ -181,9 +167,7 @@ export const stockMetrics = {
         });
     },
 
-    /**
-     * Update price target gauge
-     */
+    // Update price target gauge
     updatePriceTargetGauge: function(companyData, currentPrice) {
         // Get price targets
         const targetPrice = parseFloat(companyData.AnalystTargetPrice);

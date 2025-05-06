@@ -62,6 +62,3 @@ This project is developed as part of the **"Programming of Small Systems Develop
 
 ### License
 This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details.
-
-Back-end skal have hjælp til alt
-Front-end rules

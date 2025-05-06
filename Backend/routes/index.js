@@ -2,14 +2,13 @@
 
 const path = require('path');
 const express = require('express')
-const router = express.Router(); // Brug router i stedet for app
+const router = express.Router();
 const fs = require('fs');
 const cors = require('cors');
 
 
 // Import API routes modules
-// As we create new route files, we should import them here:
-const stockRoutes = require('./stockRoutes'); //
+const stockRoutes = require('./stockRoutes');
 
 // Exchange routes
 const currencyRoutes = require('./currencyRoutes');
@@ -19,7 +18,7 @@ const databaseRoutes = require('./databaseRoutes')
 
 // Main login page route
 router.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../../src/pages/login.html'));  // Changed this to login instead of dashboard
+  res.sendFile(path.join(__dirname, '../../src/pages/login.html'));
 });
 
 // Dynamic route handler for all our html pages, insted of hardcoding them all:
@@ -35,7 +34,6 @@ router.get('/pages/:page.html', (req, res) => {
 });
 
 router.use(cors());
-
 
 // Let app use our imported stocks routes
 router.use('/api/stocks', stockRoutes); // This is an bsulote path so it will always start with api/stocks...the path

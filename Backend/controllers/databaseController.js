@@ -63,7 +63,6 @@ const databaseController = {
         }
     },
 
-    // In databaseController.js - modify userInfo to include accounts
     userInfo: async (req, res) => {
         const userID = req.session.user_id;
 
@@ -212,7 +211,7 @@ const databaseController = {
 
     searchCurrencies: async (req, res) => {
         try {
-            const { query } = req.query; // Extract the query parameter from the requesr
+            const { query } = req.query; // Extract the query parameter from the request
 
             if (!query) {
                 return res.status(400).json({ error: 'Search query is required' }); // Handle missing query
@@ -245,7 +244,7 @@ const databaseController = {
         try {
             const user_id = req.session.user_id;
             const account_id = parseInt(req.params.account_id);
-            const { amount } = req.body; // { "amount": 500 }
+            const { amount } = req.body;
 
             if (!user_id || !account_id) {
                 return res.status(400).json({ error: 'User Id or Accound Id is required' });

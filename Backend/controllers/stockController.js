@@ -132,20 +132,7 @@ const stockController = {
       console.error("Error in getNews", error);
       res.status(500).json({ error: "Failed to fetch data for indicies" });
     }
-  },
-
-  // Test the connection
-  testConnection: async (req, res) => {
-    try {
-      const result = await alphaVantageService.testConnection();
-      res.json(result);
-    } catch (error) {
-      console.error("Error in testConnection controller:", error);
-      res
-        .status(500)
-        .json({ error: "Failed to test Alpha Vantage connection" });
-    }
-  },
+  }
 };
 
 module.exports = stockController;

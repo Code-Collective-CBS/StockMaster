@@ -30,6 +30,7 @@ router.get('/search-currency', databaseController.searchCurrencies);
 // Update profile route
 router.put('/updateprofileInfo', databaseController.updateUserProfile);
 
+// Get profile info
 router.get('/portfolio/account/:accountId', portfolioController.getPortfolioSummary);
 
 // Get information for popup buy/sell

@@ -2,7 +2,7 @@ import { searchFunction } from "./utilityFunctions/searchFunction.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     // For currency-search function
-    // const deleteButton = document.querySelector(".delete-search");
+    const deleteButton = document.querySelector(".delete-search");
     const searchContainer = document.querySelector(".displaySearch");
     // Account details
     const account_currency = document.getElementById('accountCurrency');
@@ -11,10 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const createAccBtn = document.getElementById('createAcc')
 
     // //// BUTTONS ////
-    // deleteButton.addEventListener('click', () => {
-    //     account_currency.value = '';
-    //     searchContainer.innerHTML = '';
-    // });
+    deleteButton.addEventListener('click', () => {
+        account_currency.value = '';
+        searchContainer.innerHTML = '';
+    });
 
     //// SEARCH CURRENCIES ////
     account_currency.addEventListener('input', async () => {
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch("http://localhost:3000/api/database/create-account", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json" // JSON data
+                    "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
                     account_name: name,
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
             if (response.status === 201) {
                 alert("Account succesfully created");
-                window.location.href = "../pages/dashboard.html" // Redirects user to login-page
+                window.location.href = "../pages/dashboard.html"
             } else {
                 alert("Fail: " + result.message)
             }

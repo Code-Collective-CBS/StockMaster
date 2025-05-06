@@ -217,7 +217,7 @@
               <span class="col value">Invested Value</span>
               <span class="col shares">Shares</span>
             </div>
-            <!-- JS will insert .portfolio-row.data rows here -->
+            <!-- .portfolio-row.data rows will come here through our script -->
           </div>
         </div>
 
@@ -236,7 +236,7 @@
           <div class="card-header">
             <h2 class="card-title">Portfolio Performance Over Time</h2>
             <div id="portfolio-selector-container" class="portfolio-selector-wrapper">
-              <!-- Our JavaScript will insert the selector here -->
+              <!-- we will insert selector here through our script -->
             </div>
           </div>
           <div class="chart-container">
@@ -269,11 +269,10 @@
                     <th>Quantity</th>
                     <th>Value (native)</th>
                     <th>Value (portfolio)</th>
-                    <!-- NEW -->
                   </tr>
                 </thead>
                 <tbody>
-                  <!-- Table rows will be filled by JavaScript -->
+                  <!-- Table rows will be filled by our script -->
                 </tbody>
               </table>
             </div>
@@ -281,25 +280,25 @@
         </div>
       </section>
     </main>
-    <!-- Add Chart.js library -->
+    <!-- Chart.js library -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
 
-    <!-- Add api files -->
+    <!-- Api files -->
     <script src="../scripts/stockScripts/api.js" type="module"></script>
 
-    <!-- Add service files -->
+    <!-- Service files -->
     <script
       src="../scripts/utilityFunctions/portfolioChartService.js"
       type="module"
     ></script>
 
-    <!-- Add portfolio.js and Sidebar.js -->
+    <!-- Portfolio.js and Sidebar.js -->
     <script type="module" src="../scripts/portfolio.js" type="module"></script>
     <script type="module" src="/src/scripts/sidebar.js"></script>
   </body>
 
-  <!-- Add favored stocks object -->
+  <!-- Favored stocks object -->
   <script
     src="../scripts/utilityFunctions/favoredStocks.js"
     type="module"

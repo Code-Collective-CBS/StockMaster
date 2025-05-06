@@ -10,9 +10,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const symbol = urlParams.get("symbol");
   window.urlParams = urlParams; // Use for buy/sell
 
-  //   const symbol = IBMStockData.companyOverview.Symbol;
-  //   console.log(`Stock symbol: ${symbol}`);
-
   // Storing time series globally so we can use it again
   let globalTimeSeriesData;
   let globalCompanyOverview;
@@ -21,8 +18,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Get company overview data
     const companyData = await stockAPI.getCompanyOverview(symbol);
     globalCompanyOverview = companyData.data; // Caching
-    // globalCompanyOverview = IBMStockData.companyOverview;
-    // globalTimeSeriesData = IBMStockData.dailyTimeSeries;
 
     displayCompanyName(globalCompanyOverview, symbol);
     displayCompanyOverview(globalCompanyOverview, symbol);
@@ -61,7 +56,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Error fetching data:", error);
   }
 
-  await checkHoldingForSecurity(symbol); // note NEED TO BE INSIDE DOM - UPDATE PAGE IF USER BUYS OR SELL (MISING)
+  await checkHoldingForSecurity(symbol);
 });
 
 function updateStockHeader(text) {
@@ -175,7 +170,7 @@ function displaySecurityHolding(matchedSecurities) {
     portfolioSelect.appendChild(option);
 
     // Save holding by portfolioId
-    holdingMapByPortfolioId[match.portfolioId] = match.holding; // 3: { quantity: 12, symbol: "IBM", ... },
+    holdingMapByPortfolioId[match.portfolioId] = match.holding;
   });
 
   // Set initial display to first match

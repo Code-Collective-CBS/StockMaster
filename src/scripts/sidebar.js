@@ -135,7 +135,6 @@ function navigateToPage(href) {
 function handleSignOut() {
   try {
     sessionStorage.clear();
-    localStorage.clear();
 
     window.location.href = "/src/pages/login.html";
   } catch (error) {

@@ -174,10 +174,6 @@ body {
           align-items: flex-start;
           gap: 20px;
         }
-
-        .profile-picture-section {
-          align-self: center;
-        }
       }
 
     .form-row {

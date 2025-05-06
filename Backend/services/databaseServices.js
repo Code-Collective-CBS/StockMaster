@@ -366,7 +366,7 @@ const databaseServices = {
                 JOIN Accounts a ON p.account_id = a.id
                 JOIN Currency c ON a.currency_id = c.id
                 WHERE p.account_id = @accountId
-      `); 
+      `);
             return result.recordset;
         } catch (err) {
             console.error("Error getting portfolios for account:", err);
@@ -403,7 +403,7 @@ const databaseServices = {
                 WHERE id = @account_id AND user_id = @user_id
 
                 SELECT * FROM Accounts WHERE id = @account_id
-            `); // USE OF SELECT FOR LATER USE TO DISPLAY NEW ACCOUNT INSTEAD OF GETTING NEW INFORMATION MAYBE NOT NEEDED
+            `); // Used for unit testing
 
             // 3. Insert into Transactions table
             await pool
@@ -547,7 +547,7 @@ const databaseServices = {
             `);
 
             if (securityQuery.recordset.length === 0) {
-                throw new Error('Security not found'); // MAYBE ADD FUNCTION TO ADD SECURITY
+                throw new Error('Security not found');
             }
 
             const securities_id = securityQuery.recordset[0].id;
@@ -572,7 +572,7 @@ const databaseServices = {
             const total_price = amount * price_per_share;
             let convertedTotalPrice = total_price;
 
-            if (accountCurrency !== security_currency) { // SET window.securityCurrency in security.js
+            if (accountCurrency !== security_currency) {
                 const rates = await exchangeRateService.getCurrency(security_currency);
                 convertedTotalPrice = currencyUtils.convertCurrency(
                     total_price,
@@ -639,7 +639,7 @@ const databaseServices = {
                 `);
             }
 
-            const transaction_id = insertQuery.recordset[0].id; // OUTPUT from "OUTPUT INSERTED.id"
+            const transaction_id = insertQuery.recordset[0].id;
 
             return { success: true, transaction_id, accountCurrency }
         } catch (error) {
@@ -838,12 +838,11 @@ const databaseServices = {
                         SUM(t.amount) AS total_buys
                     FROM Transactions t
                     JOIN Securities s ON t.securities_id = s.id
-                    WHERE LOWER(t.transaction_type) = 'buy'
+                    WHERE t.transaction_type = 'buy'
                     AND s.symbol = @symbol
                     AND t.portfolio_id = @portfolio_id
-                `); // USE OF LOWER TO TREAT LEGACCY DATA THAT USES UPPERCASE
+                `);
 
-            // NOTE: Use "AND t.account_id = @account_id" When legacy data is wiped
             const totalBuys = buysResult.recordset[0].total_buys || 0;
 
             // Second query: sum of sells
@@ -857,12 +856,11 @@ const databaseServices = {
                     SUM(t.amount) AS total_sells
                     FROM Transactions t
                     JOIN Securities s ON t.securities_id = s.id
-                    WHERE LOWER(t.transaction_type) = 'sell'
+                    WHERE t.transaction_type = 'sell'
                     AND s.symbol = @symbol
                     AND t.portfolio_id = @portfolio_id
                     `);
 
-            // NOTE: Use "AND t.account_id = @account_id" When legacy data is wiped
             const totalSells = sellsResult.recordset[0].total_sells || 0;
 
             const netQuantity = totalBuys - totalSells;

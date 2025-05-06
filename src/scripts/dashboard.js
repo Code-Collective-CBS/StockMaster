@@ -14,7 +14,7 @@ function formatCurrency(amount, currencyCode = "") {
   );
 }
 
-// New function to create portfolio selector
+// Function to create portfolio selector
 function createPortfolioSelector(portfolios) {
   const selector = document.getElementById('portfolio-selector');
   if (!selector) return;
@@ -48,7 +48,6 @@ function createPortfolioSelector(portfolios) {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-  // PRESENT IN THE SECURITIES-NEWS.JS MAYBE MOVE IT?
   const topPicksSymbols = [
     {
       symbol: "I:NDX",
@@ -98,7 +97,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   //// NEWS ////
-  // article_url not working even though following documention on Polygon.io
   const gethNews = async () => {
     try {
       const response = await stockAPI.getNews();
@@ -221,7 +219,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             </li>
           `;
         }).join("");
-      }      
+      }
     }
   } catch (err) {
     console.error("Dashboard setup failed:", err);

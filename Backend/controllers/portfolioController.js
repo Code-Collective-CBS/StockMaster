@@ -84,7 +84,7 @@ const portfolioController = {
   getStockQuantityInPortfolio: async (req, res) => {
     try {
       const { portfolioId, symbol } = req.params;
-      
+
       if (!portfolioId || !symbol) {
         return res.status(400).json({ error: "Missing portfolioId or symbol" });
       }
@@ -123,7 +123,7 @@ const portfolioController = {
     const portfolioId = parseInt(req.params.portfolioId);
     const userId = req.session.user_id;
     const accountCurrency = req.query.accountCurrency;
-    
+
     if (!userId || !portfolioId) {
       return res.status(400).json({ message: 'Missing user or portfolio ID' });
     }
@@ -138,17 +138,17 @@ const portfolioController = {
 
     try {
       const transactions = await databaseServices.getTransactionsForPortfolio(portfolioId); // All transactions for specific portfolio
-  
+
       // Aggregate value over time
       const historyMap = new Map();
-      
+
       // for each transaction we figure out if it's a buy or sell
       let cumulativeValue = 0;
       for (const tx of transactions.reverse()) {
         const dateKey = moment(tx.transaction_date).format("YYYY-MM-DD");
-      
+
         const rawValue = tx.amount * tx.price_per_share * (tx.transaction_type.toLowerCase() === 'buy' ? 1 : -1);
-      
+
         // Security prices are always in USD so convert from USD to account currency
         const convertedValue = currencyUtil.convertCurrency(
           rawValue,
@@ -156,23 +156,23 @@ const portfolioController = {
           accountCurrency,
           conversionRates
         );
-      
+
         cumulativeValue += convertedValue;
         historyMap.set(dateKey, cumulativeValue);
       }
-  
+
       // Convert Map to array
       const historyArray = Array.from(historyMap.entries()).map(([date, value]) => ({
         date,
         value
       }));
-  
+
       res.status(200).json(historyArray);
     } catch (err) {
       console.error('Failed to calculate portfolio history from transactions', err);
       res.status(500).json({ message: 'Server error while calculating portfolio history' });
     }
-  },  
+  },
 };
 
 // HELPER FUNCTIONS FOR CALCULATIONS //
@@ -266,7 +266,7 @@ async function calculatePortfolioData(accountId) {
         quantity: holding.quantity,
         totalCostNative: holding.totalCostNative,
         gak: holding.gak,
-        avgCostAccount: holding.gak / rates[nativeCurrency],       // keep your existing account-currency avg
+        avgCostAccount: holding.gak / rates[nativeCurrency], // keep your existing account-currency avg
         avgCostNative: holding.gak,                    // the true native-currency avg we just computed
         lastBoughtPricePerShare: holding.lastPrice, // This is actually the price per share from most recent buy
         currentPriceNative: currentPrice,

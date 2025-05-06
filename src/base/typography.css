@@ -1,10 +1,10 @@
 
-/* Typografi-variabler fra Figma */
+/* Typografi-variables from Figma */
 
 :root {
     --font-primary: 'Outfit', sans-serif;
 
-    /* Overskrifter */
+    /* Headlines */
     --h1-size: 52px;
     --h1-weight: 600; /* Semibold */
 

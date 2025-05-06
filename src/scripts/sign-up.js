@@ -1,5 +1,5 @@
 // Chooses avatar
-document.addEventListener('DOMContentLoaded', () =>{
+document.addEventListener('DOMContentLoaded', () => {
     const avatarOptions = document.querySelectorAll('.avatar-option');
     const avatarInput = document.getElementById('selectedAvatar');
 
@@ -30,7 +30,7 @@ document.getElementById("registerForm").addEventListener("submit", async functio
         const response = await fetch("http://localhost:3000/api/database/users", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json" // JSON data
+                "Content-Type": "application/json"
             },
             body: JSON.stringify({
                 firstname,
@@ -45,7 +45,7 @@ document.getElementById("registerForm").addEventListener("submit", async functio
         const result = await response.json();
         if (response.status === 201) {
             alert("User succesfully created");
-            window.location.href = "../pages/dashboard.html" // Redirects user to dashboard
+            window.location.href = "../pages/dashboard.html"
         } else {
             alert("Fail: " + result.message)
         }

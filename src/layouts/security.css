@@ -216,7 +216,7 @@ section {
 .info-label {
   color: var(--secondary-text);
   font-size: 14px;
-  
+
 }
 .info-value {
   color: var(--primary-text);
@@ -267,7 +267,6 @@ section {
 /* Analyst Section Styling */
 .analyst-section {
   grid-column: span 2;
-  /* Make this section span both columns */
 }
 
 .analyst-container {

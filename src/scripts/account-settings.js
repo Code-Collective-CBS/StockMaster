@@ -10,7 +10,6 @@ const account_currency = document.getElementById("account_currency");
 const account_state = document.getElementById("account_state");
 const account_name = document.getElementById("account_name");
 const saveAcc = document.getElementById("changeAcc");
-// const deleteAcc = document.getElementById("deleteAcc");
 
 // Gets the accountID from sidebar.js. Covnerts to number because session-/localStorage always return number.
 const account_id = Number(sessionStorage.getItem("selectedAccountId"));
@@ -76,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
         {
           method: "PUT",
           headers: {
-            "Content-Type": "application/json", // JSON data
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             account_name: name,
@@ -90,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (response.status === 201) {
 
         alert("Account changes saved");
-        window.location.href = "../pages/dashboard.html"; // Redirects user to login-page
+        window.location.href = "../pages/dashboard.html";
       } else {
         alert("Fail: " + result.message);
       }
@@ -99,39 +98,6 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("Failed to change account settings");
     }
   });
-  /// DELETE ACCOUNT
-  /*
-  deleteAcc.addEventListener("click", async () => {
-    const deleteConfirmed = window.confirm(
-      "Are you sure you want to delelte this account? This action can not be undone."
-    );
-
-    if (deleteConfirmed) {
-      try {
-        const response = await fetch(
-          `http://localhost:3000/api/database/delete-account/${account_id}`,
-          {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json", // JSON data
-            },
-          }
-        );
-
-        const result = await response.json();
-        if (response.status === 200) {
-          alert("Account deleted");
-          window.location.href = "../pages/dashboard.html"; // Redirects user to login-page
-        } else {
-          alert("Fail: " + result.message);
-        }
-      } catch (error) {
-        console.error("Failed to delete account: " + error);
-        alert("Failed to delete account");
-      }
-    }
-  });
-  */
 });
 
 // Function to display account-info in account-settings.

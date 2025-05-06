@@ -2,11 +2,11 @@ export const favoredStocks = {
   populateStocksList: (listElement, portfolios, formatCurrencyFn) => {
     listElement.innerHTML = "";
 
-    // Add column headers first
+    // Creates column headers
     const headerRow = document.createElement("div");
     headerRow.className = "stock-header-row";
 
-    // Create headers matching the cell structure below
+    // Creates headers matching the cell structure below
     headerRow.append(createHeader("Symbol"));
     headerRow.append(createHeader("Name"));
     headerRow.append(createHeader("Last Bought"));
@@ -20,7 +20,7 @@ export const favoredStocks = {
 
     portfolios.forEach((portfolio) => {
       if (portfolio.metrics && portfolio.metrics.holdings) {
-        // Add a portfolio header/title first
+        // Creates portfolio title
         const portfolioHeader = document.createElement("div");
         portfolioHeader.className = "portfolio-header";
         portfolioHeader.textContent = portfolio.name;
@@ -80,17 +80,17 @@ export const favoredStocks = {
           );
           row.append(changeCell);
 
-          // 2) the URL for this stock
+          // The URL for the stock
           const targetUrl =
             "http://localhost:3000/src/pages/security.html?symbol=" +
             encodeURIComponent(h.symbol);
 
-          // 3) Make the whole row a click target
+          // Make the whole row a click target
           row.addEventListener("click", () => {
             window.location.href = targetUrl;
           });
 
-          // 4) Change cursor on hover
+          // Change cursor on hover
           row.style.cursor = "pointer";
 
           listElement.appendChild(row);

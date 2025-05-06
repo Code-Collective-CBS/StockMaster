@@ -4,7 +4,6 @@ import { popUps } from "./utilityFunctions/popup.js";
 
 
 document.addEventListener("DOMContentLoaded", () => {
-  // PRESENT IN THE DASHBOARD.JS MAYBE MOVE IT?
   const topPicksSymbols = [
     {
       symbol: "I:NDX",
@@ -23,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
       htmlElement: document.getElementById("I:CX20GI"),
     },
   ];
-  
+
   const stockInput = document.getElementById("stockInput");
   const deleteButton = document.querySelector(".delete-search");
   const searchContainer = document.querySelector(".displaySearch");

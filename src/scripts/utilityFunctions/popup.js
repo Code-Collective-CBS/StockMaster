@@ -132,7 +132,7 @@ export const popUps = {
 
         let updatedBalance = selectedAccount.total_balance;
 
-        if(isDeposit) {
+        if (isDeposit) {
           updatedBalance = selectedAccount.total_balance + amount;
         } else {
           updatedBalance = selectedAccount.total_balance - amount;
@@ -163,7 +163,7 @@ export const popUps = {
         });
       });
 
-      // Confirm logic (you can expand this)
+      // Confirm logic
       modal.querySelector("#confirmAction").addEventListener("click", () => {
         const activeType =
           modal.querySelector(".toggle-btn.active").dataset.type;
@@ -178,7 +178,7 @@ export const popUps = {
         }
 
         console.log(`User wants to ${activeType} ${amount.value}`);
-        modal.remove(); // Optional: auto-close after action
+        modal.remove(); // Auto-close after action
       });
     });
 
@@ -290,9 +290,8 @@ export const popUps = {
         }
 
         if (!isNaN(total)) {
-          totalPriceSpan.textContent = `${total.toFixed(2)} ${
-            selectedAccount.currency
-          }`;
+          totalPriceSpan.textContent = `${total.toFixed(2)} ${selectedAccount.currency
+            }`;
         } else {
           totalPriceSpan.textContent = `0 ${selectedAccount.currency}`;
         }
@@ -303,7 +302,7 @@ export const popUps = {
 
       const allPortfolioDetails = await popUps.simplePortfolioList(selectedAccount.account_id);
 
-      if(!allPortfolioDetails || allPortfolioDetails.length === 0) {
+      if (!allPortfolioDetails || allPortfolioDetails.length === 0) {
         alert("You must create a portfolio before you can buy securities.");
         tradeModal.remove();
         return;
@@ -373,7 +372,7 @@ export const popUps = {
 
               const refreshedAccount = await popUps.accountDetails();
               accountBalanceSpan.textContent = `${refreshedAccount.total_balance} ${refreshedAccount.currency}`;
-              window.location.reload(); // MAYBE SMOTHER UX LATER - BUT NEED FOR UPDATING HOLDINGS OF SECURITY
+              window.location.reload();
             } else {
               alert("Transaction failed: ", result.message);
             }
@@ -431,7 +430,7 @@ export const popUps = {
       const selectedAccount = await popUps.accountDetails();
       const allPortfolioDetails = await popUps.simplePortfolioList(selectedAccount.account_id);
 
-      if(!allPortfolioDetails || allPortfolioDetails.length === 0) {
+      if (!allPortfolioDetails || allPortfolioDetails.length === 0) {
         alert("You must create a portfolio before you can buy securities.");
         tradeModal.remove();
         return;
@@ -480,9 +479,8 @@ export const popUps = {
         }
 
         if (!isNaN(total)) {
-          totalPriceSpan.textContent = `${total.toFixed(2)} ${
-            selectedAccount.currency
-          }`;
+          totalPriceSpan.textContent = `${total.toFixed(2)} ${selectedAccount.currency
+            }`;
         } else {
           totalPriceSpan.textContent = `0 ${selectedAccount.currency}`;
         }
