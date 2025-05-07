@@ -1,6 +1,6 @@
 import { stockAPI } from "./stockScripts/api.js";
 import { stockMetrics } from "./stockScripts/stockMetrics.js";
-import { chartService } from "../scripts/utilityFunctions/chartService.js"
+import { chartService } from "./utilityFunctions/chartService.js";
 import { popUps } from "./utilityFunctions/popup.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -10,14 +10,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const symbol = urlParams.get("symbol");
   window.urlParams = urlParams; // Use for buy/sell
 
-  // Storing time series globally so we can use it again
-  let globalTimeSeriesData;
-  let globalCompanyOverview;
-
   try {
     // Get company overview data
     const companyData = await stockAPI.getCompanyOverview(symbol);
-    globalCompanyOverview = companyData.data; // Caching
+    const globalCompanyOverview = companyData.data; // Caching
 
     displayCompanyName(globalCompanyOverview, symbol);
     displayCompanyOverview(globalCompanyOverview, symbol);
@@ -27,7 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // price history data for stock graph (chart.js)
     const timeSeriesResponse = await stockAPI.getDailyTimeSeries(symbol);
     const fullTimeSeriesData = timeSeriesResponse.data; // unwrap it first
-    globalTimeSeriesData = fullTimeSeriesData?.["Time Series (Daily)"];
+    const globalTimeSeriesData = fullTimeSeriesData?.["Time Series (Daily)"];
     chartService.createPriceChart(globalTimeSeriesData, globalCompanyOverview);
 
     // Set closePrice for use in buy/sell feature
