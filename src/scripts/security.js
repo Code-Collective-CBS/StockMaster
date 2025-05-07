@@ -1,6 +1,6 @@
 import { stockAPI } from "./stockScripts/api.js";
 import { stockMetrics } from "./stockScripts/stockMetrics.js";
-import { chartService } from "./utilityFunctions/chartService.js";
+import { chartService } from "../scripts/utilityFunctions/chartService.js"
 import { popUps } from "./utilityFunctions/popup.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     popUps.sellSecurity();
 
     // Displaying all stock metrics from the stockMetrics module
-    stockMetrics.displayStockData(globalCompanyOverview, 251.25);
+    stockMetrics.displayStockData(globalCompanyOverview, latestPrice);
 
     // Setting up the event listener for change in time interval
     const intervalSelect = document.getElementById("portfolio-graph-interval");

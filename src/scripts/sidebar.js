@@ -46,6 +46,7 @@ function initializeSidebar() {
     handleNavigation();
     setActiveSidebarItem();
     setupSignOut();
+    initializeThemeToggle();
   } catch (error) {
     console.error("Error initializing sidebar:", error);
   }
@@ -188,6 +189,32 @@ const getUserInfo = async () => {
     document.getElementById('profile-name').textContent = 'User not found';
   }
 };
+
+function initializeThemeToggle() {
+  const themeToggle = document.getElementById('theme-toggle');
+
+  if (themeToggle) {
+    //
+    const savedTheme = sessionStorage.getItem('theme');
+
+    // use savedTheme
+    if (savedTheme === 'light') {
+      document.body.classList.add('light-theme');
+      themeToggle.classList.add('active');
+    }
+    themeToggle.addEventListener('click', () => {
+
+      themeToggle.classList.toggle('active');
+
+
+      document.body.classList.toggle('light-theme');
+
+      // save in sessionStorage
+      const isLightTheme = document.body.classList.contains('light-theme');
+      sessionStorage.setItem('theme', isLightTheme ? 'light' : 'dark');
+    });
+  }
+}
 
 
 const loadAccountDropdown = async (dropdown) => {
