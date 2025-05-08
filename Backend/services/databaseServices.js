@@ -90,6 +90,15 @@ const databaseServices = {
 
         try {
             const pool = await poolPromise;
+
+            const userExists = await pool.request()
+            .input("email", sql.NVarChar(100), email)
+            .query("SELECT COUNT(*) AS count FROM Users WHERE email = @email");
+
+            if (userExists.recordset[0].count > 0) {
+                return { status: 400, message: "E-mail already exists" };
+            }
+
             const updateUser = await pool
                 .request()
                 .input("id", sql.Int, user_id)
