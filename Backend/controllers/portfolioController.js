@@ -260,23 +260,23 @@ async function calculatePortfolioData(accountId) {
 
       // Add enhanced holding
       enhancedHoldings.push({
-        securityId: holding.securityId,
-        symbol: holding.symbol,
-        security_name: holding.security_name,
-        quantity: holding.quantity,
-        totalCostNative: holding.totalCostNative,
-        gak: holding.gak,
-        avgCostAccount: holding.gak / rates[nativeCurrency], // keep your existing account-currency avg
-        avgCostNative: holding.gak,                    // the true native-currency avg we just computed
-        lastBoughtPricePerShare: holding.lastPrice, // This is actually the price per share from most recent buy
-        currentPriceNative: currentPrice,
-        nativeCurrency,
-        currentValueNative,
-        currentValueAccount,
-        unrealizedGain,
-        unrealizedGainPercent,
-        realizedGain: holding.realizedGain,
-        realizedGainAccount: realizedAccount,
+        securityId: holding.securityId, // unique security_id i.e 14 for apple
+        symbol: holding.symbol, // security symbol i.e "AAPL" for apple
+        security_name: holding.security_name, // The full name i.e "Apple Inc"
+        quantity: holding.quantity, // qunatity of holdings i.e 10
+        totalCostNative: holding.totalCostNative, // total cost price in native currency i.e 10 * 197$ = 1970$
+        gak: holding.gak, // average purchase price, if we bought 10 apple shares at different cost prices
+        avgCostAccount: holding.gak / rates[nativeCurrency], // gak in account currency
+        avgCostNative: holding.gak,                    // the native-currency gak
+        lastBoughtPricePerShare: holding.lastPrice, // most recent bought price
+        currentPriceNative: currentPrice, // current price i.e apple: 197$
+        nativeCurrency, // $
+        currentValueNative, // actually same as currentpirce
+        currentValueAccount, // current price in account currency i.e apple: 1306DKK
+        unrealizedGain, // unrealized gain/loss in account currency
+        unrealizedGainPercent, // unrealized gain/loss in pct
+        realizedGain: holding.realizedGain, // already realized gain/pct
+        realizedGainAccount: realizedAccount, // realized gain/pct in account currency
       });
     }
 
