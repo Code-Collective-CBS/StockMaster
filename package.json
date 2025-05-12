@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "prestart": "npm install",
     "start": "node backend/server.js"
   },
   "repository": {
