@@ -1,4 +1,13 @@
-const timeSeriesDaily = {
+const getDailyTimeSeries = {
+  "data": {
+    "Meta Data": {
+      "1. Information": "Daily Prices (open, high, low, close) and Volumes",
+      "2. Symbol": "AAPL",
+      "3. Last Refreshed": "2025-05-30",
+      "4. Output Size": "Full size",
+      "5. Time Zone": "US/Eastern"
+    },
+    "Time Series (Daily)": {
       "2025-05-30": {
         "1. open": "199.3700",
         "2. high": "201.9600",
@@ -33,16 +42,21 @@ const timeSeriesDaily = {
         "3. low": "193.4600",
         "4. close": "195.2700",
         "5. volume": "78432918"
-      },
-      "2025-05-22": {
-        "1. open": "200.7100",
-        "2. high": "202.7500",
-        "3. low": "199.7000",
-        "4. close": "201.3600",
-        "5. volume": "46742407"
       }
     }
+  }
+};
 
-const newArr = Object.entries(timeSeriesDaily);
+const timeSeriesData = getDailyTimeSeries.data["Time Series (Daily)"];
 
-console.log(newArr.slice(-3));
+// opret dato arrayet
+  const rawDates = Object.entries(timeSeriesData)
+  .map(([date, data]) => date)
+  .sort((dateA, dateB) => new Date(dateA) - new Date(dateB));
+
+  const prices = Object.entries(timeSeriesData)
+  .sort(([dateA], [dateB]) => new Date(dateA) - new Date(dateB))
+  .map(([date, data]) => data["4. close"]);
+
+  console.log(rawDates)
+  console.log(prices);

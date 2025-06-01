@@ -183,9 +183,9 @@ Math.min(20, 50) = 20 // Kan kun vise 20 (alt der er)
                     " " +
                     currencyCode;
                 }
-                return label; ("Stock Price (USD): 201.58 USD")
+                return label; // ("Stock Price (USD): 201.58 USD")
               },
-              title: function (tooltipItems) { // outomatisk oprettet objekt, der har alle tooltips items, som vi lige har oprettet
+              title: function (tooltipItems) { // aoutomatisk oprettet objekt, der har alle tooltips items, som vi lige har oprettet
                 const idx = tooltipItems[0].dataIndex;  // alle toolTips for hvert punkt
                 return rawDates[idx]; // rawDates arryet med index for det givne tooltip
               },
