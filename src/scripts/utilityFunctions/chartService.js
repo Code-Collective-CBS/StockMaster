@@ -2,7 +2,7 @@ export const chartService = {
   createPriceChart: function (
     timeSeriesData,
     companyCurrency,
-    interval = -365
+    interval = -365 // Tager 
   ) {
     if (!timeSeriesData) {
       console.error("Invalid time series data format");
