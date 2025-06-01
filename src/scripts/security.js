@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // price history data for stock graph (chart.js)
     const timeSeriesResponse = await stockAPI.getDailyTimeSeries(symbol);
     const fullTimeSeriesData = timeSeriesResponse.data; // unwrap it first
-    const globalTimeSeriesData = fullTimeSeriesData?.["Time Series (Daily)"];
+    const globalTimeSeriesData = fullTimeSeriesData?.["Time Series (Daily)"]; // "?" betyder vi stadig kan bruge vores kode hvis undefined
     chartService.createPriceChart(globalTimeSeriesData, globalCompanyOverview);
 
     // Set closePrice for use in buy/sell feature
@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const intervalSelect = document.getElementById("portfolio-graph-interval");
     if (intervalSelect) {
       intervalSelect.addEventListener("change", function () {
-        const days = parseInt(this.value); // from security.html value, and then parse it to a number
+        const days = parseInt(this.value); // from security.html value, and then parse to Integer
         chartService.createPriceChart(globalTimeSeriesData, globalCompanyOverview, -days);
       });
     }

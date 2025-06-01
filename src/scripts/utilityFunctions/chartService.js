@@ -2,7 +2,7 @@ export const chartService = {
   createPriceChart: function (
     timeSeriesData,
     companyCurrency,
-    interval = -365 // Tager 
+    interval = -365 // Tager
   ) {
     if (!timeSeriesData) {
       console.error("Invalid time series data format");
@@ -27,33 +27,48 @@ export const chartService = {
 
     // Clear existing chart
     if (window.priceChart) {
-      window.priceChart.destroy();
+      window.priceChart.destroy(); // kan også bruge canvas.clearRect()
     }
 
     // Also remove any existing price info displays to prevent duplication
-    const existingPriceInfo = document.querySelector(".price-info");
+    const existingPriceInfo = document.querySelector(".price-info"); // Dette er et element, med className der bliver oprettet dynamisk
     if (existingPriceInfo) {
-      existingPriceInfo.remove();
+      // Fra tidligere
+      existingPriceInfo.remove(); // Fjern elementet, så du kan oprette den igen senere
     }
 
     // Use the provided time series data
     const timeSeries = timeSeriesData;
 
     // converting the object to array of key value pairs for easier use with Object.entries
-    // En JS-metode der konverterer et objekt til et array af [key, value] par. 
+    // En JS-metode der konverterer et objekt til et array af [key, value] par.
     const dataPoints = Object.entries(timeSeries);
+    // URL'en for at vise: "http://localhost:3000/api/stocks/daily/AAPL?outputsize=365"
 
     // Sorting from oldest to newest
-    dataPoints.sort((a, b) => new Date(a[0]) - new Date(b[0]));
+    dataPoints.sort((a, b) => new Date(a[0]) - new Date(b[0])); // Sortere det nye Array i stigende rækkefølge (ASC) vha nye instancser (new Date)
+    // regnestykke: a - b (Hvis a er større end b kommer b før a, vice versa)
 
     // Log the total number of data points
     console.log(`Total data points: ${dataPoints.length}`);
 
     // Calculate the actual number of points to display based on the interval
     const pointsToShow = Math.min(
+      // .Min() bruges til at sikre den laveste værdi, så vi kun viser de antal datapoints vi har
       dataPoints.length,
-      interval < 0 ? Math.abs(interval) : dataPoints.length
+      interval < 0 ? Math.abs(interval) : dataPoints.length // .abs() = absolutte værdi
     );
+    /*
+Hvis dataPoints.length = 100 og interval = -30:
+Math.abs(-30) = 30
+Math.min(100, 30) = 30 - Vis kun 30 punkter
+
+// Hvis dataPoints.length = 100 og interval = 0:
+Math.min(100, 100) = 100 - Vis alle punkter
+
+// Hvis dataPoints.length = 20 og interval = -50:
+Math.min(20, 50) = 20 // Kan kun vise 20 (alt der er)
+*/
 
     console.log(`Showing the last ${pointsToShow} data points`);
 
@@ -70,6 +85,15 @@ export const chartService = {
     const prices = [];
 
     recentData.forEach(([date, values]) => {
+      /*         '2025-05-22', (date)
+    { (values)
+      '1. open': '200.7100',
+      '2. high': '202.7500',
+      '3. low': '199.7000',
+      '4. close': '201.3600',
+      '5. volume': '46742407'
+    }
+    */
       // Adding the date to our dates array
       rawDates.push(date);
 
@@ -79,14 +103,15 @@ export const chartService = {
       } else {
         console.warn(`Missing close price for date ${date}`);
         // Add the previous price or 0 if it's the first one
-        prices.push(prices.length > 0 ? prices[prices.length - 1] : 0);
+        prices.push(prices.length > 0 ? prices[prices.length - 1] : 0); // Hvis den ike eksistere,
+        // pusher vi den samme som sidst for at undgå dårlig chart, men laver en horizonstal price chart
       }
     });
 
     // Log the date range we're displaying
     if (rawDates.length > 0) {
       console.log(
-        `Date range: ${rawDates[0]} to ${rawDates[rawDates.length - 1]}`
+        `Date range: ${rawDates[0]} to ${rawDates[rawDates.length - 1]}` // logger ældste dato til nyeste i consollen, for bedre overblik
       );
     }
 
@@ -108,45 +133,46 @@ export const chartService = {
     // Change the graph color based on the difference (red if negative)
     const chartColor = priceDifference >= 0 ? "#00DA91" : "#EB5050"; // Green or red
 
-    const chartBackgroundColor = priceDifference >= 0
-    ? "rgba(0, 218, 145, 0.1)"  // Light green
-    : "rgba(253, 55, 58, 0.1)"; // Light red
+    const chartBackgroundColor =
+      priceDifference >= 0
+        ? "rgba(0, 218, 145, 0.1)" // Light green
+        : "rgba(253, 55, 58, 0.1)"; // Light red
 
     // Create the chart
     window.priceChart = new Chart(canvas, {
-      type: "line",
-      data: {
-        labels: formattedDates,
-        datasets: [
+      type: "line", // line chart
+      data: { // dataen til chartet
+        labels: formattedDates, // X-aksens labels (datoer)
+        datasets: [ // Y-aksen data (priser)
           {
             label: ` Stock Price (${currencyCode})`,
-            data: prices,
-            borderColor: chartColor,
-            backgroundColor: chartBackgroundColor,
-            borderWidth: 2,
-            tension: 0.1,
-            fill: true,
+            data: prices, // prices arrayet der indeholder "fourthClose" afhængigt af interval
+            borderColor: chartColor, // rød / grøn afhængig af positiv/negativ
+            backgroundColor: chartBackgroundColor, // transparency på 10%
+            borderWidth: 2, // linje-grafen har en tykkelse på 2px
+            tension: 0.1, // intensitet/aggresivitet mellem data-punkter
+            fill: true, // fylder baggrunden på charten
           },
         ],
       },
       options: {
-        responsive: true,
+        responsive: true, // hvis du ændre skærmstørrlse
         interaction: {
-          intersect: false,
-          mode: "index",
+          intersect: false, // du behøver ikke præcist at ramme data-punktet
+          mode: "index", // laver punkter om til indexes, så på en uge har du 7 indexes
         },
         plugins: {
-          tooltip: {
-            enabled: true,
-            mode: "index",
+          tooltip: { // dette er informationsblokken der kommer når du hover over data-punkt
+            enabled: true, // dette betyder vi har enabled den
+            mode: "index", // deler punkter op i index
             intersect: false,
-            callbacks: {
-              label: function (context) {
+            callbacks: { // kalder sig selv så vi kan skrive vores egen kode til hvordan tooltip skal se ud
+              label: function (context) { // context er en automatisk oprettet objekt af chart.js der indeholder alt information (en function med en indlejret funktion)
                 let label = context.dataset.label || "";
                 if (label) {
                   label += ": ";
                 }
-                if (context.parsed.y !== null) {
+                if (context.parsed.y !== null) { // hvis priserne på y-aksen er bearbejdet (hvis værdierne findes), som er inde i prices array
                   // Use decimal style and append currency code
                   label +=
                     new Intl.NumberFormat("en-US", {
@@ -157,11 +183,11 @@ export const chartService = {
                     " " +
                     currencyCode;
                 }
-                return label;
+                return label; ("Stock Price (USD): 201.58 USD")
               },
-              title: function (tooltipItems) {
-                const idx = tooltipItems[0].dataIndex;
-                return rawDates[idx];
+              title: function (tooltipItems) { // outomatisk oprettet objekt, der har alle tooltips items, som vi lige har oprettet
+                const idx = tooltipItems[0].dataIndex;  // alle toolTips for hvert punkt
+                return rawDates[idx]; // rawDates arryet med index for det givne tooltip
               },
             },
           },
@@ -176,10 +202,10 @@ export const chartService = {
             },
             ticks: {
               autoSkip: true,
-              maxTicksLimit: interval === -7 ? 7 : 12,
-              maxRotation: interval === -7 ? 30 : 0,
+              maxTicksLimit: interval === -7 ? 7 : 12, // hvis interval er -7 hvis maks 7 labels, ellers vis max 12 labels
+              maxRotation: interval === -7 ? 30 : 0, // hvis intervallet er 7 så roter 30 grader
               callback: function (val, index) {
-                return formattedDates[index] || "";
+                return formattedDates[index] || ""; // selve datoen ("May 21")
               },
             },
           },
@@ -280,10 +306,11 @@ export const chartService = {
     const securityGraph = document.querySelector(".security-graph");
     const canvas = document.getElementById("portfolioChart");
     if (securityGraph && canvas) {
-      securityGraph.insertBefore(priceInfoElement, canvas);
+      securityGraph.insertBefore(priceInfoElement, canvas); // hvad vil jeg gerne indsætte, reference til placeringen det skal være før
     }
 
     // Formats values for display using decimal style
+    // indbygget js funktion til at fromttere tal efter lokal standard
     const formattedPrice =
       new Intl.NumberFormat("en-US", {
         style: "decimal",
