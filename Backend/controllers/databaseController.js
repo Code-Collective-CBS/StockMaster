@@ -79,13 +79,13 @@ const databaseController = {
 
             // Get accounts with portfolios
             const accounts = await databaseServices.getAccountInfo(userID);
-            const accountsWithPortfolios = await Promise.all(
-                accounts.map(async account => ({
-                    ...account,
-                    portfolios: await databaseServices.getPortfoliosByAccount(account.id)
+            const accountsWithPortfolios = await Promise.all( // Afventer at alle promises fra getPortfoliosByAccount 
+                accounts.map(async account => ({  // Returnere et nyt array
+                    ...account, // Kopierer alle accounts for userID givet i accounts
+                    portfolios: await databaseServices.getPortfoliosByAccount(account.id) // Tilføjer alle porteføljer for den specifikke account (Hvilket kan indholde flere promises)
                 }))
             );
-
+            console.log(accountsWithPortfolios);
             res.status(200).json({
                 user: {
                     firstname: user.firstname,
@@ -93,7 +93,7 @@ const databaseController = {
                     email: user.email,
                     avatar: user.avatar
                 },
-                accounts: accountsWithPortfolios
+                accounts: accountsWithPortfolios // Returneres som et array med objekter, der indeholder accountinfo og portfolios (det er et array, da det kommer fra SQL recordset), i JSON format
             });
         } catch (err) {
             console.error('Error getting user info:', err);
@@ -354,7 +354,7 @@ const databaseController = {
             cache.del(cacheKeyTransactions);
             // Portfolio cache
             const cacheKeyPortfolios = `portfolio-${account_id}-${accountCurrency}`;
-            cache.del(cacheKeyPortfolios);
+            cache.del(cacheKeyPortfolios);validateSecurityAmount
 
             res.status(201).json({
                 message: "Security bought",

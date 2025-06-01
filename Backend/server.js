@@ -22,10 +22,13 @@ app.use(session({
 // Use port from config
 const PORT = config.server.port;
 
-// Use absolute paths for static files
+// Use absolute paths for static files (Middlewares)
 app.use('/src', express.static(path.join(__dirname, '../src')));
-app.use(express.json());
-app.use(cors());
+app.use(express.json());  
+app.use(cors()); /*
+ Croos Origin Ressource Sharing. Er en sikkerheds funktion der bruges i webbrowsere
+ der tillader web applikationer at få adgang til ressourcer fra domæner,
+ der adskilelr sig fra den som applikationen selv bliver serveret fra*/
 app.use(routes);
 
 // Start the server

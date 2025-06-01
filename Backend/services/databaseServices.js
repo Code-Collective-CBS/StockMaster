@@ -5,11 +5,11 @@ const currencyUtils = require("../utilityFunctions/currencyUtils");
 
 // Creates connection to our MSSQL database through our login in config.database
 // Creates a pool of connections. More reusable and effective
-const poolPromise = new sql.ConnectionPool(config.database)
-    .connect()
-    .then((pool) => {
+const poolPromise = new sql.ConnectionPool(config.database) // Opretter en connection pool vha. databse oplysninger i config filen
+    .connect() // Returnere også et pool objekt
+    .then((pool) => { // Eksikverers når promised er blevet resolved (løst). Kunne også bruge await istedet
         console.log("Connected to Azure SQL");
-        return pool;
+        return pool; // Returnere den etablerede pool som et objekt
     })
     .catch((err) => {
         console.log("Database connection failed:", err);
@@ -25,7 +25,7 @@ const databaseServices = {
             .input("email", sql.NVarChar(100), email)
             .query("SELECT COUNT(*) AS count FROM Users WHERE email = @email");
 
-        if (userExists.recordset[0].count > 0) {
+        if (userExists.recordset[0].count > 0) { // Recordset returneres som et array
             return { status: 400, message: "E-mail already exists" };
         }
 
@@ -242,7 +242,9 @@ const databaseServices = {
                 throw new Error(`Account with id: ${account_id} not found`);
             }
 
-            return result.recordset[0]; // { total_balance, currency }
+            return result.recordset[0]; // { total_balance, currency } 
+            // Bruges i BuyAndSellSecurity
+
         } catch (error) {
             console.error("Error getting account balance and currency", error);
             throw error;
@@ -399,6 +401,7 @@ const databaseServices = {
 
             const currency_id = accountQuery.recordset[0]?.currency_id; // "?.currency_id" safety to acces currency from recordset[0] only if it exist, otherwise asign undefined to variable
             if (!currency_id) throw new Error('Account currency not found');
+            // ? sikrer at der ikke kastes en fejl, men derimod fortsætter som "Undefined". Derfor kan vi selv kaste vores "egen" fejl efterfølgende
 
             // 2. Update balance
             const result = await pool
@@ -454,6 +457,8 @@ const databaseServices = {
 
             const currency_id = accountQuery.recordset[0]?.currency_id;
             if (!currency_id) throw new Error('Account currency not found');
+            // ? sikrer at der ikke kastes en fejl, men derimod fortsætter som "Undefined". Derfor kan vi selv kaste vores "egen" fejl efterfølgende
+            // Kaldes "optional chaining" - Beskytter mod fejl
 
             // 2. Update balance
             const result = await pool
@@ -470,6 +475,7 @@ const databaseServices = {
             `);
 
             if (result.rowsAffected[0] === 0) throw new Error("Insufficient funds"); // Extra check if total_balance >= @amount in SQL fails
+            // Kaster en "egen" fejl, hvis der ikke er nogle rækker som er påvirket i SQL.
 
             // 3. Insert into Transactions table
             await pool
@@ -581,7 +587,7 @@ const databaseServices = {
             const total_price = amount * price_per_share;
             let convertedTotalPrice = total_price;
 
-            if (accountCurrency !== security_currency) {
+            if (accountCurrency !== security_currency) { // Hvis currency ikke er ens, så skal den konverteres!
                 const rates = await exchangeRateService.getCurrency(security_currency);
                 convertedTotalPrice = currencyUtils.convertCurrency(
                     total_price,
@@ -591,7 +597,7 @@ const databaseServices = {
                 );
             }
 
-            if (transaction_type === 'buy' && convertedTotalPrice > parseFloat(total_balance)) {
+            if (transaction_type === 'buy' && convertedTotalPrice > parseFloat(total_balance)) { // ParseFloat konvterer string til decimaltal (floating point number)
                 throw new Error(`Insufficient balance. Need ${convertedTotalPrice.toFixed(2)} ${accountCurrency}, but have ${parseFloat(total_balance).toFixed(2)}`);
             }
 

@@ -40,6 +40,7 @@ export const chartService = {
     const timeSeries = timeSeriesData;
 
     // converting the object to array of key value pairs for easier use with Object.entries
+    // En JS-metode der konverterer et objekt til et array af [key, value] par. 
     const dataPoints = Object.entries(timeSeries);
 
     // Sorting from oldest to newest
