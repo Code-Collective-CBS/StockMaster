@@ -262,26 +262,26 @@ Math.min(20, 50) = 20 // Kan kun vise 20 (alt der er)
 
       try {
         const date = new Date(dateStr);
-
+        // console.log('formatDatesByInterval', date); VILLE VISE Mon Jan 06 2025 01:00:00 GMT+0100 (Centraleuropæisk normaltid)
         // Only show label for dates that fall on our skip factor
-        if (index % skipFactor === 0 || index === rawDates.length - 1) {
+        if (index % skipFactor === 0 || index === rawDates.length - 1) { // Hvis label er deleligt med skipfaktor (fx. hvert 5. punkt) eller viser altid sidste dato ved (length-1)
           if (interval === 0 || interval <= -1095) {
             // For long intervals, just show year
-            formattedDates.push(date.getFullYear().toString());
+            formattedDates.push(date.getFullYear().toString()); // Viser kun år ved lange intervaler +=3 år 
           } else if (interval <= -365) {
             // For 1+ year, show month + year
             formattedDates.push(
-              `${months[date.getMonth()]} ${date.getFullYear()}`
+              `${months[date.getMonth()]} ${date.getFullYear()}` // Viser måned og årstal ved +=1 år
             );
           } else if (interval <= -31) {
             // For 1+ month, show month + day
-            formattedDates.push(`${months[date.getMonth()]} ${date.getDate()}`);
+            formattedDates.push(`${months[date.getMonth()]} ${date.getDate()}`); // Viser måned og dato ved +=1 måned
           } else {
             // For weeks, show month + day
-            formattedDates.push(`${months[date.getMonth()]} ${date.getDate()}`);
+            formattedDates.push(`${months[date.getMonth()]} ${date.getDate()}`); // Viser måned og dato ved alt mindre end 1 måned
           }
         } else {
-          formattedDates.push("");
+          formattedDates.push(""); // Hvis index ikke er deleligt med skipfaktor eller sidste tal i rawDates. (Sikre samme antal labels som datapunkter)
         }
       } catch (e) {
         console.error(`Error formatting date ${dateStr}:`, e);
