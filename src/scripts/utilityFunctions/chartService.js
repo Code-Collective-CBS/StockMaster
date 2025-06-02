@@ -46,7 +46,7 @@ export const chartService = {
     // URL'en for at vise: "http://localhost:3000/api/stocks/daily/AAPL?outputsize=365"
 
     // Sorting from oldest to newest
-    dataPoints.sort((a, b) => new Date(a[0]) - new Date(b[0])); // Sortere det nye Array i stigende rækkefølge (ASC) vha nye instancser (new Date)
+    dataPoints.sort((a, b) => new Date(a[0]) - new Date(b[0])); // Sortere det nye Array (direkte manipulation) i stigende rækkefølge (ASC) vha nye instancser (new Date)
     // regnestykke: a - b (Hvis a er større end b kommer b før a, vice versa)
 
     // Log the total number of data points
@@ -216,9 +216,9 @@ Math.min(20, 50) = 20 // Kan kun vise 20 (alt der er)
 
   formatDatesByInterval: function (rawDates, interval) {
     const months = [
-      "Jan",
-      "Feb",
-      "Mar",
+      "Jan", // 0
+      "Feb", // 1
+      "Mar", // 2
       "Apr",
       "May",
       "Jun",

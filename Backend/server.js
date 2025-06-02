@@ -24,7 +24,7 @@ const PORT = config.server.port;
 
 // Use absolute paths for static files (Middlewares)
 app.use('/src', express.static(path.join(__dirname, '../src')));
-app.use(express.json());  
+app.use(express.json());
 app.use(cors()); /*
  Croos Origin Ressource Sharing. Er en sikkerheds funktion der bruges i webbrowsere
  der tillader web applikationer at få adgang til ressourcer fra domæner,

@@ -868,7 +868,7 @@ const databaseServices = {
                 .input('account_id', sql.Int, account_id)
                 .query(`
                     SELECT
-                    SUM(t.amount) AS total_sells
+                        SUM(t.amount) AS total_sells
                     FROM Transactions t
                     JOIN Securities s ON t.securities_id = s.id
                     WHERE t.transaction_type = 'sell'
